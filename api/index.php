@@ -6,7 +6,8 @@
 	if(!preg_match($router_pattern, $request, $matches)) die($request);
 	unset($_GET['request']);
 	
-	$class = ucfirst($matches[1]);
+	$class_name = str_replace(array('News'),array('NewsBriefs'),ucfirst($matches[1]));
+	$class = $class_name;
 	$Collection = new $class();
 	
 	if(!$matches[2] && $_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -22,7 +23,7 @@
 		if(!empty($_POST['notice'])) $_POST['notice'] = nl2br($_POST['notice']);
 		
 		try{
-			$Response->data = $Collection->create($_POST)->save()->toArray();
+			$Response->data = $Collection->create($_POST)->save()->fetch()->toArray();
 			echo_response($Response);
 		} catch(Exception $e) {
 			$Response->meta->error_type = $e->getMessage();

@@ -45,7 +45,8 @@
 		
 		public function create($data){
 			try {
-				$new_model = new $this->ModelClass($data);
+				$new_model = new $this->ModelClass();
+				$new_model->set($new_model->parse($data));
 			} catch(ErrorException $e) {
 				if($e->getMessage() == 'WrongModelID') return NULL;
 			}
