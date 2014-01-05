@@ -1,7 +1,7 @@
 <?php
 	class Article extends Model {
-		protected $_table = "`bp_sov-art`.`articles`";
-		protected $_table_links = "`bp_sov-art`.`article_links`";
+		protected $_table = "`dbname`.`articles`";
+		protected $_table_links = "`dbname`.`article_links`";
 		
 		function __construct($data) {
 			parent::__construct($data);
@@ -34,7 +34,7 @@
 		}
 	}
 	
-	class Articles extends Collection {
+	class Blog extends Collection {
 		public $ModelClass = Article;
 		
 		function __construct() {

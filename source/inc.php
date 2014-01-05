@@ -7,7 +7,7 @@ require_once 'v2/lib/Table.php';
 require_once 'v2/lib/Model.php';
 require_once 'v2/lib/Collection.php';
 	
-	$GLOBALS['DB'] = DB::connect('bp_sov-art');
+	$GLOBALS['DB'] = DB::connect('dbname');
 	
 	function __autoload($classname) {
 		if(is_file(str_replace('.:','',get_include_path())."/v2/classes/". $classname .".php")) {

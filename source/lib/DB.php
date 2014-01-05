@@ -1,13 +1,8 @@
 <?php
 	class DB {
-		const HOST = "bp.mysql";
-		const USER = "bp_mysql";
-		const PWD = "dgy9dzuj";
-		/*
 		const HOST = "localhost";
 		const USER = "root";
 		const PWD = "";
-		*/
 		protected static $instance;
 		protected static $dbh;
 		protected static $name;
