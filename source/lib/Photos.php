@@ -8,7 +8,6 @@
 		
 		function __construct($data) {
 			parent::__construct($data);
-			
 			// 
 			if($this->isNew() && !$this->isEmpty('filepath')) {
 				// фотография инициализирована абсолютным путем к файлу
@@ -17,13 +16,13 @@
 					throw new Exception('File not found');
 					return NULL;
 				}
-				$this->set($this->_parseFileInfo($_fileinfo));
+				$this->set($this->parse($_fileinfo));
 				$_fileroot = str_replace(array('/'.$this->get('folder').'/',$this->get('file')), '', $this->get('filepath'));
 				if($_fileroot !== self::$root && !$this->isEmpty('file')) {
 					$temp_filepath = self::$root."/temp/".$this->get('file');
 					if(copy($this->get('filepath'), $temp_filepath)) {
 						$_fileinfo = File::info($temp_filepath);
-						$this->set($this->_parseFileInfo($_fileinfo));
+						$this->set($this->parse($_fileinfo));
 					} else return NULL;
 				}
 			}
@@ -61,6 +60,7 @@
 		}
 		
 		public function moveTo($new_folder) {
+			print $new_folder;
 			if(in_array($new_folder, $this->_folders)) {
 				$new_filepath = self::$root.'/'.$new_folder.'/'.$this->get('file');
 				if(copy($this->get('filepath'), $new_filepath)) {
@@ -117,7 +117,7 @@
 		
 		public function rename($str){
 			$new_filename = $this->Table->uniqTranslit('filename', $str);
-			$new_filepath = $this->get('path').'/'.$new_filename.'.'.$this->get('extension');
+			print $new_filepath = $this->get('path').'/'.$new_filename.'.'.$this->get('extension');
 			if(rename($this->get('filepath'),$new_filepath)) {
 				$this->set('filepath', $new_filepath)
 						->set('filename', $new_filename)
@@ -161,7 +161,9 @@
 			return $this;
 		}
 		
-		protected function _parseFileInfo($data){
+		public function parse($data){
+			$data = parent::parse($data);
+			
 			$data['file'] = $data['basename'];
 			$data['path'] = $data['dirname'];
 			$data['folder'] = basename($data['dirname']);

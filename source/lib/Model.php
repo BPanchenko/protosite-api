@@ -19,7 +19,11 @@
 			if(!empty($this->_table_links)) {
 				$this->TableLinks = new Table($this->_table_links);
 			}
-			$this->set($data);
+			if(ctype_digit($data)) {
+				$this->set(array('id'=>$data));
+			} else {
+				$this->set($data);
+			}
 		}
 		
 		public function addTo($Collection) {

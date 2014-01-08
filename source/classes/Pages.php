@@ -1,7 +1,7 @@
 <?php
 	class Page extends Model {
-		protected $_table = "`bp_sov-art`.`pages`";
-		protected $_table_content = "`bp_sov-art`.`page_content`";
+		protected $_table = "`dbname`.`pages`";
+		protected $_table_content = "`dbname`.`page_content`";
 		
 		function __construct($data) {
 			parent::__construct($data);

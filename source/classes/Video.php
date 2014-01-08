@@ -1,6 +1,6 @@
 <?php
 	class Vid extends Model {
-		protected $_table = "`bp_sov-art`.`video`";
+		protected $_table = "`dbname`.`video`";
 		
 		function __construct($data) {
 			parent::__construct($data);

@@ -1,6 +1,6 @@
 <?php
 	class Category extends Model {
-		protected $_table = "`bp_sov-art`.`product_categories`";
+		protected $_table = "`dbname`.`product_categories`";
 		
 		function __construct($data) {
 			parent::__construct($data);

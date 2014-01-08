@@ -1,7 +1,7 @@
 <?php
 	class User extends Model {
-		protected $_table = "`bp_sov-art`.`users`";
-		protected $_table_tokens = "`bp_sov-art`.`user_tokens`";
+		protected $_table = "`dbname`.`users`";
+		protected $_table_tokens = "`dbname`.`user_tokens`";
 		public $TableTokens;
 		
 		function __construct($data) {

@@ -26,12 +26,6 @@
 			$this->set('photos',$Photos);
 			return $this;
 		}
-		
-		public function _parse($data){
-			$data = parent::_parse($data);
-			if(!empty($data['date']) && is_numeric($data['date'])) $data['date'] = date("Y-m-d", $data['date']);
-			return $data;
-		}
 	}
 	
 	class Blog extends Collection {
