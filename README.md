@@ -1,6 +1,6 @@
 <h1>API</h1>
 <p>
-	ѕредоставл€ет доступ к данным через HTTP-запросы вида: <code>/api/{collection_name}[/{id}[/{model_method}]|{collection_method}]<code>.
+	ѕредоставл€ет доступ к данным через HTTP-запросы вида: <code>/api/{collection_name}[/{id}[/{model_method}]|{collection_method}]</code>.
 	<br><br>
 	<h4>ќбщие GET-параметры дл€ всех запросов (необ€зательные):</h4>
 	<dl>
