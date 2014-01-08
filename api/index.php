@@ -1,4 +1,13 @@
 <?php
+require_once 'source/functions.php';
+require_once 'source/lib/Data.php';
+require_once 'source/lib/DB.php';
+require_once 'source/lib/File.php';
+require_once 'source/lib/Table.php';
+require_once 'source/lib/Model.php';
+require_once 'source/lib/Collection.php';
+
+	$GLOBALS['DB'] = DB::connect('dbname');
 	
 	// build params
 	$request = trim($_GET['request'],'/');
