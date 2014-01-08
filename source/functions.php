@@ -19,9 +19,6 @@ function is_valid_callback($subject) {
 }
 
 function echo_response($Response){
-	$redirect_uri = $_GET['redirect_uri'] ? $_GET['redirect_uri'] : $_POST['redirect_uri'] ? $_POST['redirect_uri'] : NULL;
-	if($redirect_uri) header('Location: '.$redirect_uri);
-	
 	$callback = $_GET["callback"];
 	
 	if($Response->data!==NULL) {
