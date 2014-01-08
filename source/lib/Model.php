@@ -1,11 +1,13 @@
 <?php
 	abstract class Model {
         protected $_attributes = array();	// Массив данных модели
-		protected $_dbh;
 		protected $_changed = array();	// Хеш измененных атрибутов модели
+		protected $_dbh;
+		protected $_folder = "temp";
         protected $_table = "";			// Основная таблица данных модели
 		public $idAttribute;
-		public $collection = NULL;
+		public $Collection = NULL;
+		public $Owner = NULL; // Модель, к которой установленно отношение текущей модели с помощью методов attached и linkTo
 		public $Table;	// Объект таблицы базы данных
 		public $TableLinks;	// Объект таблицы связей сущности
 		public $id;
@@ -29,8 +31,14 @@
 		public function addTo($Collection) {
 			if(!($Collection instanceof Collection)) throw new ErrorException("IncorrectCollection");
 			$Collection->add($this);
-			$this->collection = $Collection;
+			$this->Collection = $Collection;
 			return $Collection;
+		}
+		
+		public function attached($Model){
+			$Model->linkTo($this);
+			$this->Owner = $Model;
+			return $Model;
 		}
 		
 		public function delete() {
@@ -60,16 +68,25 @@
 			return $this;
 		}
 		
+		public function folder($_folder=''){
+			if(!empty($_folder) && is_string($_folder)) {
+				$this->set('folder',$_folder)->_folder = $_folder;
+			}
+			return $this->_folder;
+		}
+		
 		public function linkTo($obj) {
 			if(!empty($this->TableLinks)) {
 				if($obj instanceof Model && !$obj->isNew()) {
 					$data[0][$this->idAttribute] = $this->id;
 					$data[0][$obj->idAttribute] = $obj->id;
+					$obj->Owner = $this;
 				}
 				if($obj instanceof Collection && $obj->length) {
 					foreach($obj->models as $key => $model) {
 						$data[$key][$this->idAttribute] = $this->id;
 						$data[$key][$model->idAttribute] = $model->id;
+						$model->Owner = $this;
 					}
 				}
 				if(count($data)) foreach($data as $link) {
@@ -107,12 +124,13 @@
 		}
 		
 		public function parse($data) {
-			if($this->Table->hasField('name_translit') && empty($data['name_translit'])) {
+			if($this->Table->hasField('name_translit') && empty($data['name_translit']) && !empty($data['name'])) {
 				$data['name_translit'] = $this->Table->uniqTranslit('name_translit', $data['name']);
 			}
 			if($this->Table->hasField('sort') && empty($data['sort'])) {
 				$data['sort'] = $this->Table->nextSort();
 			}
+
 			return $data;
 		}
 		
