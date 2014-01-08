@@ -1,14 +1,14 @@
-<h1>API</h1>
+<h1>REST API</h1>
 <p>
-	ѕредоставл€ет доступ к данным через HTTP-запросы вида: <code>/api/{collection_name}[/{id}[/{model_method}]|{collection_method}]</code>.
+	ѕредоставл€ет доступ к данным бл€годар€ HTTP-запросам вида: <code>/api/{collection_name}[/{id}[/{model_method}]|{collection_method}]</code>.
 	<br><br>
 	<h4>ќбщие GET-параметры дл€ всех запросов (необ€зательные):</h4>
 	<dl>
-		<dt><code>fields</code></dt>
+		<dt><q>fields</q></dt>
 			<dd>ѕеречень запрашиваемых атрибутов модели, переданных через зап€тую. ѕо умолчанию отдаетс€ весь набор данных.</dd>
-		<dt><code>count</code></dt>
+		<dt><q>count</q></dt>
 			<dd>количество сущностей в ответе</dd>
-		<dt><code>offset</code></dt>
+		<dt><q>offset</q></dt>
 			<dd>смещение результатов выборки</dd>
 	</dl>
 </p>
