@@ -13,23 +13,31 @@
 		<dt><q>sort</q></dt>
 			<dd>Сортировка результатов запроса. В параметре передается название столбца, по которому выполняется сортировка, ее порядок определяется знаком '-' в случае сортировки по убыванию (DESC) и отсутствием знака '-' для сортировки по убыванию (ASC).</dd>
 	</dl>
-	<h2>Целевые запросы(Конечные точки) API<h2>
+	<h2>Целевые запросы(конечные точки) API<h2>
 	<p>
 		<h4><code>GET: /blog/</code></h4>
-		<p></p>
-		<h4>POST: /blog/</h4>
-		<h4>GET: /blog/{article_id}</h4>
-		<h4>PUT: /blog/{article_id}</h4>
-		
-		<h4>GET: /users/</h4>
-		<h4>POST: /users/</h4>
-		<h4>GET: /users/{user_id}</h4>
-		<h4>PUT: /users/{user_id}</h4>
-		<h4>POST: /users/auth</h4>
-		<h4>POST: /users/forgot</h4>
-		<h4>POST: /users/registration</h4>
-		
-		<h4>POST: /upload/</h4>
+		<p>Массив статей.</p>
+		<h4><code>POST: /blog/</code></h4>
+		<p>Создание новой статьи.</p>
+		<h4><code>GET: /blog/{article_id}</code></h4>
+		<p>Подробные данные.</p>
+		<h4><code>PUT: /blog/{article_id}</code></h4>
+		<p>Редактирование.</p>
+	</p>
+	<h2>Ветка доступа к данным зарегистрированных пользователей сайта<h2>
+	<p>
+		<h4><code>GET: /users/</code></h4>
+		<h4><code>POST: /users/</code></h4>
+		<h4><code>GET: /users/{user_id}</code></h4>
+		<h4><code>PUT: /users/{user_id}</code></h4>
+		<h4><code>POST: /users/auth</code></h4>
+		<h4><code>POST: /users/forgot</code></h4>
+		<h4><code>POST: /users/registration</code></h4>
+	</p>
+	<h2>Служебная ветка запросов.<h2>
+	<p>
+		<h4><code>POST: /upload/</code></h4>
+		<p>Загрузка файлов на сервер.</p>
 	</p>
 	<br><br>
 	<h2>Backbone.php</h2>
@@ -78,7 +86,7 @@
 	</p>
 	<h3>Model</h3>
 	<p>
-		Экземпляр класса <q>Item</q> имеет следующие методы и свойства:
+		Экземпляр класса <q>Model</q> имеет следующие методы и свойства:
 		
 	</p>
 	<h3>Collection</h3>
