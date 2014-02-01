@@ -24,7 +24,7 @@
 			}
 			
 			if(is_array($data)) {
-				$this->set($data);
+				$this->set($this->parse($data));
 			} elseif(is_numeric($data)) {
 				$this->set(array('id'=>$data));
 			}
@@ -43,7 +43,7 @@
 		
 		public function attached($Model, $info=array(), $debug=false){
 			if($debug) {
-				print "test";
+				print "attached";
 				pa($info);
 			}
 			$this->Owner = $Model;
@@ -61,15 +61,21 @@
 		public function fetch($fields=NULL){
 			if($this->isNew()) return $this;
 			
+			$columns = "*";
 			if(!empty($fields)) {
-				$fields = Data::str2array($fields);
-				if(!in_array($this->idAttribute,$fields)) {
-					array_unshift($fields, $this->idAttribute);
+				$_fields = Data::str2array($fields);
+				if(count($_fields)) {
+					$fields = array();
+					foreach($_fields as $field)
+						if($this->Table->hasField($field)) array_push($fields, $field);
+					if(count($fields)) {
+						if(!in_array($this->idAttribute,$fields)) array_unshift($fields, $this->idAttribute);
+						$columns = "`".implode("`,`",$fields)."`";
+					}
 				}
-				$columns = "`".implode("`,`",$fields)."`";
-			} else $columns = "*";
+			}
 			
-			$query = "select *".
+			$query = "select ".$columns.
 								" from ".$this->_table.
 								" where `".$this->idAttribute."`=".$this->id." limit 1;";
 			$sth = $this->_dbh->query($query);
@@ -79,8 +85,7 @@
 				print $query;
 				throw new ErrorException("WrongModelID");
 			}
-			$sth->setFetchMode(PDO::FETCH_ASSOC);
-			$this->set($this->parse($sth->fetch()));
+			$this->set($this->parse($sth->fetch(PDO::FETCH_ASSOC)));
 			
 			return $this;
 		}
@@ -92,30 +97,90 @@
 			return $this->_folder;
 		}
 		
+		/**
+		 * Устанавливает или обновляет связь между сущностями,
+		 * записывая идентификаторы связанных сущностей в $this->TableLinks.
+		 * $obj - объект, который связывается с текущим.
+		 *        Может быть как моделью, так и коллекцией.
+		 *        Если передана коллекция, то каждая модель коллекции связывается с текущим объектом.
+		 *        Свойство $obj->Owner устанавливается как ссылка на текущую модель.
+		 * $info - дополнительные данные, записываемые в $this->TableLinks вместе с идентификаторами.
+		 * 		   Если в $obj передана модель, то $info есть ассоциативный массив,
+		 *         названия ключей которого совпадают с названиями столбцов данных в таблице $this->TableLinks.
+		 * TODO:   Если была передана коллекция, то $info может быть простым массивом, 
+		 *         каждым элементом которого будет являтся ассоциативный массив, 
+		 *         хранящий данные для ссылки на соответствующую модель из коллекции.
+		 *         Порядок следования моделей и данных должен совпадать.
+		 */
 		public function linkTo($obj, $info=array(), $debug=false) {
-			if(!empty($this->TableLinks)) {
-				if($obj instanceof Model && !$obj->isNew()) {
-					$data[0][$this->idAttribute] = $this->id;
-					$data[0][$obj->idAttribute] = $obj->id;
-					$obj->Owner = $this;
+			if(empty($this->TableLinks)) return $this;
+			
+			if($obj instanceof Model && !$obj->isNew()) {
+				$data[0][$this->idAttribute] = $this->id;
+				$data[0][$obj->idAttribute] = $obj->id;
+				$obj->Owner = $this;
+			}
+			if($obj instanceof Collection && $obj->length) {
+				foreach($obj->models as $key => $model) {
+					$data[$key][$this->idAttribute] = $this->id;
+					$data[$key][$model->idAttribute] = $model->id;
+					$model->Owner = $this;
 				}
-				if($obj instanceof Collection && $obj->length) {
-					foreach($obj->models as $key => $model) {
-						$data[$key][$this->idAttribute] = $this->id;
-						$data[$key][$model->idAttribute] = $model->id;
-						$model->Owner = $this;
-					}
-				}
-				if(count($data)) foreach($data as $link) {
-					if(is_array($info)) $link = array_merge($link, $info);
-					if($debug) pa($link);
-					$this->TableLinks->save($link);
-				}
+			}
+			if(count($data)) foreach($data as $link) {
+				if(is_array($info)) $link = array_merge($link, $info);
+				if($debug) pa($link);
+				$this->TableLinks->save($link);
 			}
 			return $this;
 		}
 		
-		// remove заменяет clear, поэтому пока предполагается использование clear в коде, метод простреливает remove
+		public function hasLink($model) {
+			if(!($model instanceof Model)) return false;
+			$query = "select `".$this->idAttribute."`".
+								" from ".$this->TableLinks->name().
+								" where `".$this->idAttribute."`=".$this->id." and ".$model->idAttribute."`=".$model->id." limit 1;";
+			$sth = $this->_dbh->query($query);
+			return (bool)$sth->rowCount();
+		}
+		
+		public function getIdLinks($col){
+			$_res = array();
+			if($this->TableLinks->hasField($col)) {
+				$sth = $this->_dbh->query("select `".$col."` from ".$this->TableLinks->name()." 
+									where ".$this->idAttribute."=".$this->id);
+				if($sth->rowCount()) {
+					while($id = $sth->fetchColumn()) array_push($_res, $id);
+				}
+			}
+			return $_res;
+		}
+		
+		public function removeLink($col, $id) {
+			if($col instanceof Model) {
+				$obj = $col;
+				if($this->TableLinks->hasField($obj->idAttribute)) {
+					$this->_dbh->exec("delete from ".$this->TableLinks->name()." 
+										where ".$obj->idAttribute."=".$obj->id." 
+												and ".$this->idAttribute."=".$this->id);
+					$obj->Owner = NULL;
+				}
+			} elseif(is_string($col) && is_numeric($id) && $id) {
+				if($this->TableLinks->hasField($col)) {
+					$this->_dbh->exec("delete from ".$this->TableLinks->name()." 
+										where `".$col."`=".$id." and `".$this->idAttribute."`=".$this->id);
+				}
+			}
+			return $this;
+		}
+		public function removeLinks($col){
+			if($this->TableLinks->hasField($col)) {
+				$this->_dbh->exec("delete from ".$this->TableLinks->name()." 
+									where ".$col.">0 and ".$this->idAttribute."=".$this->id);
+			}
+			return $this;
+		}
+		
 		public function clear($attr) {
 			return $this->remove($attr);
 		}
@@ -135,7 +200,7 @@
 		}
 		
 		public function isEmpty($attr){
-			return !$this->has($attr) || !(boolean)trim($this->get($attr));
+			return !$this->has($attr) || !(boolean)trim($this->get($attr)) || !(boolean)count($this->get($attr));
 		}
 		
 		public function isNew(){
@@ -147,14 +212,41 @@
 		}
 		
 		public function parse($data) {
-			if(empty($data['name_translit']) && $this->Table->hasField('name_translit')) {
-				$data['name_translit'] = $this->Table->uniqTranslit('name_translit', $data['name']);
-			}
-			if(empty($data['sort']) && $this->Table->hasField('sort')) {
-				$data['sort'] = $this->Table->nextSort();
-			}
+//			if(empty($data['name_translit']) && $this->isNew() && 
+//			$this->Table->hasField('name_translit') && !empty($data['name'])) {
+//				$data['name_translit'] = $this->Table->uniqTranslit('name_translit', $data['name']);
+//			}
 			
 			return $data;
+		}
+		
+		public function save($data=array(), $debug=false) {
+			if($data === true) {
+				$data = array();
+				$debug = true;
+			}
+			if(count($data)) $this->set($this->parse($data));
+			
+			if($this->Table->hasField('sort') && $this->isEmpty('sort')) {
+				$this->set('sort', $this->Table->nextSort());
+			}
+			if($this->Table->hasField('sort') && $this->isEmpty('sort')) {
+				$this->set('sort', $this->Table->nextSort());
+			}
+			if($this->Table->hasField('name_translit') && $this->isEmpty('name_translit') 
+					&& $this->isNew() && !$this->isEmpty('name')) {
+				$this->set('name_translit',  $this->Table->uniqTranslit('name_translit', $this->get('name')));
+			}
+			
+			if($debug && $this instanceof Photo) {
+				print "SAVE Model ".get_class($this);
+				pa($this->toArray());
+			}
+			$id = $this->Table->save($this->toArray(), $debug);
+			if($this->isNew() && !empty($id)) {
+				$this->set($this->idAttribute,$id);
+			}
+			return $this;
 		}
 		
 		public function set($attr, $value=NULL) {
@@ -165,7 +257,6 @@
 				$value = call_user_func(array($value,"toArray"));
 			}
 			is_array($attr) ? $attributes = $attr : $attributes[$attr] = $value;
-			$attributes = $this->parse($attributes);
 			
 			foreach($attributes as $key => $val) {
 				if(is_numeric($val) && $val < PHP_INT_MAX) {
@@ -191,22 +282,9 @@
 			return $this;
 		}
 		
-		public function save($data=array(), $debug=false) {
-			if(count($data)) $this->set($this->parse($data));
-			
-			if($this->Table->hasField('sort') && empty($data['sort'])) {
-				$data['sort'] = $this->Table->nextSort();
-			}
-			
-			if($debug && $this instanceof Photo) {
-				print "SAVE Model ".get_class($this);
-				pa($this->toArray());
-			}
-			$id = $this->Table->save($this->toArray(), $debug);
-			if($this->isNew() && !empty($id)) {
-				$this->set($this->idAttribute,$id);
-			}
-			return $this;
+		public function toAPI($fields=array()) {
+			$array = $this->toArray($fields);
+			return $array;
 		}
 		
 		public function toArray($fields=NULL) {

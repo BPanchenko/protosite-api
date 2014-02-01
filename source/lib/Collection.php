@@ -6,11 +6,12 @@
 		protected $_columns = array();
         protected $_defaults = array(
 			"fetch" => array(
-				"search_fields" => array('name'),
-				"order_key" => "id",
-				"order_by" => "desc",
-				"offset" => 0,
-				"count" => 20
+				'compact' => false,
+				'search_fields' => array('name'),
+				'order_key' => "id",
+				'order_by' => "desc",
+				'offset' => 0,
+				'count' => 20
 			)
 		);
 		protected $_folder = "temp";
@@ -38,7 +39,6 @@
 				$model = new $this->ModelClass($data);
 			}
 			if(isset($model)) {
-//				if($model->isNew()) $model->fetch();
 				array_push($this->models, $model);
 				$this->length++;
 			}
@@ -57,6 +57,7 @@
 		public function fetch($options) {
 			$options = $this->_prepareFetchOptions($options);
 			
+			$rows = array();
 			$ids = array();
 			if(count($options['ids'])) $ids = $options['ids'];
 			else {
@@ -97,10 +98,17 @@
 				if(count($exprs)) $where = "WHERE ".implode(" and ", $exprs);
 				
 				// QUERY
-				$query = "select `".$this->idAttribute."` from ".$this->Table->name()." ".$where.$order.$limit.$offset;
-				$sth = $this->_dbh->query($query);
-				
-				if($sth->rowCount()) while($id = $sth->fetchColumn()) array_push($ids, $id);
+				if((boolean)$options['compact']) {
+					$query = "select * from ".$this->Table->name()." ".$where.$order.$limit.$offset;
+					$sth = $this->_dbh->query($query);
+					if($sth->rowCount()) while($row = $sth->fetch()) {
+						$this->add($row);
+					}
+				} else {
+					$query = "select `".$this->idAttribute."` from ".$this->Table->name()." ".$where.$order.$limit.$offset;
+					$sth = $this->_dbh->query($query);
+					if($sth->rowCount()) while($id = $sth->fetchColumn()) array_push($ids, $id);
+				}
 			}
 			
 			if(count($ids)) foreach($ids as $id) {
@@ -120,12 +128,19 @@
 			return $this->_folder;
 		}
 		
+		public function get($id) {
+			if($id && is_numeric($id)) 
+				foreach($this->models as $model) 
+					if($model->id == $id) return $model;
+			return NULL;
+		}
+		
 		public function toAPI($fields=array()) {
 			$array = $this->toArray($fields);
 			return $array;
 		}
 		
-		public function toArray($fields=array()) {
+		public function toArray($fields=NULL) {
 			$array = array();
 			if(count($this->models)) foreach($this->models as $model) {
 				array_push($array,$model->toArray($fields));
@@ -143,7 +158,7 @@
 				}
 			}
 			
-			$system_params = array('ids','fields','q','max_id','min_id','count','offset');
+			$system_params = array('ids','fields','compact','q','max_id','min_id','count','offset');
 			if(count($options)) foreach($options as $key => $value){
 				// передается массив идентификаторов или перечень полей выборки
 				if($key == 'ids' && !is_array($value)) {
@@ -169,19 +184,19 @@
 			return $opt;
 		}
 		
-		public function where($attributes){
-			$_models = $this->models;
-			if(!is_array() || empty($attributes)) return $_models;
+		public function where($attributes, $fields=NULL){
+			if(!is_array($attributes) || empty($attributes)) return $this->toArray();
 			
-			foreach($this->attributes as $attr=>$value) {
+			$_result = array();
+			foreach($attributes as $attr=>$value) {
 				foreach($this->models as $model) {
-					if($model->get($attr) == $value) {
-						array_push($_models, $model);
+					if($model->get($attr) === $value) {
+						array_push($_result, $model->toArray($fields));
 						continue 2;
 					}
 				}
 			}
-			return $_models;
+			return $_result;
 		}
 	}
 ?>
