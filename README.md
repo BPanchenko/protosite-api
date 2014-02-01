@@ -1,6 +1,6 @@
 ﻿<h1>REST API</h1>
 <p>
-	Шаблон строки запроса к API: <code>/api/{collection_name}/[{item_id|collection_method}/[{item_method|collection_method_parametr}/][{item_method_parametr}/]]</code>.<br>
+	Шаблон строки запроса к API: <code>/api/{collection_name}/[{item_id|collection_method}/[{item_method|method_parametr}/][{method_parametr}/]]</code>.<br>
 	<br><br>
 	<h5>Общие GET-параметры для всех запросов (необязательные):</h5>
 	<dl>
