@@ -88,20 +88,29 @@
 					...
 					return $result;
 				}
+				public function delete_method($method_parametr, $options=array()) {
+					...
+					return $result;
+				}
 			}
 			
 			class Items extends Collection {
 				public $ModelClass = Item;
 				
 				/** Gun API Methods
-				 * param $options - хеш параметров из программной среды
+				 * param $options - хеш параметров из программной среды,
+				 *                  обычно это массив $_GET, $_POST или $_PUT
 				 *  _______________   __________________
 				 *  request_method | | collection_method
-				public function  get_method($options=array()) {
+				public function  get_method($method_parametr, $options=array()) {
 					...
 					return $result;
 				}
-				public function post_method($options=array()) {
+				public function post_method($method_parametr, $options=array()) {
+					...
+					return $result;
+				}
+				public function put_method($method_parametr, $options=array()) {
 					...
 					return $result;
 				}
