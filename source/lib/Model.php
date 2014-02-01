@@ -1,10 +1,10 @@
 <?php
 	abstract class Model {
         protected $_attributes = array();	// Массив данных модели
-		protected $_changed = array();	// Хеш измененных атрибутов модели
 		protected $_dbh;
 		protected $_folder = "temp";
         protected $_table = "";			// Основная таблица данных модели
+		public $changed = array();	// Хеш измененных атрибутов модели
 		public $idAttribute;
 		public $Collection = NULL;
 		public $Owner = NULL; // Модель, к которой установленно отношение текущей модели с помощью методов attached и linkTo
@@ -252,6 +252,7 @@
 		public function set($attr, $value=NULL) {
 			if(!$attr || empty($attr)) return $this;
 			
+			$this->changed[$key] = array(); // очистка хеша измененных атрибутов
 			$attributes = array();
 			if($value instanceof Model || $value instanceof Collection) {
 				$value = call_user_func(array($value,"toArray"));
@@ -269,7 +270,7 @@
 				}
 				
 				// если атрибут был задан ранее и не равен новому значению, то он сохраняется в хеше измененных атрибутов
-				if(isset($this->_attributes[$key]) && $this->_attributes[$key] !== $val) $this->_changed[$key] = $val;
+				if(isset($this->_attributes[$key]) && $this->_attributes[$key] !== $val) $this->changed[$key] = $val;
 				
 				if(is_array($this->_attributes[$key]) && is_array($val)) {
 					// для сохранения массива данных используется слияние старых и новых данных 

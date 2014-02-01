@@ -126,6 +126,7 @@
 	
 	if($_SERVER['REQUEST_METHOD'] == 'PUT') {
 		$Item->save($_PUT);
+		pa($Item->changed);
 		
 		if(empty($_PUT['photo_ids'])) {
 			$Item->removeLinks('photo_id')->remove('photos,marks');
