@@ -131,7 +131,6 @@
 			$Item->removeLinks('photo_id')->remove('photos,marks');
 			
 		} else {
-			// TODO: не работает удаление ссылки, которая не была передана в параметрах(удалена в клиенте)
 			if(!is_array($_PUT['photo_ids'])) throw new Exception("Wrong type _PUT['photo_ids']");
 			
 			// удаление ссылок, которые не были переданы

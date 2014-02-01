@@ -57,8 +57,14 @@
 			Ссылка для активации пароля имеет следующий вид: http://sitename/api/users/{user_id}/activate-new-password/XXXX/.
 		</p>
 	</p>
-	<h3>Служебная ветка запросов.</h3>
+	<h3>Служебная ветка запросов.*</h3>
 	<p>
+		<h4><code>GET: /connector/fb.php</code></h4>
+		<p>Авторизация пользователя с помощью социальной сети Facebook.com.</p>
+		<h4><code>GET: /connector/tw.php</code></h4>
+		<p>Авторизация пользователя с помощью социальной сети Twitter.com.</p>
+		<h4><code>GET: /connector/vk.php</code></h4>
+		<p>Авторизация пользователя с помощью социальной сети VK.com.</p>
 		<h4><code>POST: /upload/</code></h4>
 		<p>Загрузка файлов на сервер.</p>
 	</p>
