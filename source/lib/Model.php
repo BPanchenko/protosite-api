@@ -11,9 +11,10 @@
 		public $Table;	// Объект таблицы базы данных
 		public $TableLinks;	// Объект таблицы связей сущности
 		public $id;
+		public $parent = NULL;
 		
 		function __construct($data) {
-			$this->_dbh = DB::dbh();
+			$this->_dbh = DB_MySql::dbh();
 			if(!empty($this->_table)) {
 				$this->Table = new Table($this->_table);
 				$this->idAttribute = $this->Table->primaryKey();
@@ -39,6 +40,11 @@
 			$Collection->add($this);
 			$this->Collection = $Collection;
 			return $Collection;
+		}
+		
+		public function append($obj) {
+			$obj->parent = $this;
+			return $this;
 		}
 		
 		public function attached($Model, $info=array(), $debug=false){
@@ -289,10 +295,10 @@
 		}
 		
 		public function toArray($fields=NULL) {
-			$result = array();
-			
+			if(!count($this->_attributes)) return NULL;
 			if(!empty($fields) && is_string($fields)) $fields = Data::str2array($fields);
 			
+			$result = array();
 			if(count($fields)) {
 				if(!in_array($this->idAttribute, $fields)) {
 					array_unshift($fields, $this->idAttribute);
@@ -306,14 +312,7 @@
 							$result[$attr[0]] = $this->_attributes[$attr[0]];
 					}
 				}
-//			} else $result = $this->_attributes;
-			} else {
-				foreach($this->_attributes as $attr=>$value) {
-					if(!in_array($attr, array('id'))) {
-						$result[$attr] = $value;
-					}
-				}
-			}
+			} else $result = $this->_attributes;
 			return $result;
         }
 		

@@ -6,7 +6,7 @@
 		protected $_columns = array();
         protected $_defaults = array(
 			"fetch" => array(
-				'compact' => false,
+				'quantity' => 'little',
 				'search_fields' => array('name'),
 				'order_key' => "id",
 				'order_by' => "desc",
@@ -19,8 +19,12 @@
 		public $Table;	// Объект таблицы базы данных
 		public $TableLinks;	// Объект таблицы связей сущности
 		
+		public $parent = NULL;
+		public $child = NULL; // last the appended object
+		public $children = array(); // array the appended objects
+		
 		function __construct() {
-			$this->_dbh = DB::dbh();
+			$this->_dbh = DB_MySql::dbh();
 			// определение характеристик таблицы данных из Модели
 			$Model = new $this->ModelClass();
 			if(!empty($Model->Table)) {
@@ -42,6 +46,11 @@
 				array_push($this->models, $model);
 				$this->length++;
 			}
+			return $this;
+		}
+		
+		public function append($obj) {
+			$obj->parent = $this;
 			return $this;
 		}
 		
@@ -98,7 +107,7 @@
 				if(count($exprs)) $where = "WHERE ".implode(" and ", $exprs);
 				
 				// QUERY
-				if((boolean)$options['compact']) {
+				if($options['quantity']=='small') {
 					$query = "select * from ".$this->Table->name()." ".$where.$order.$limit.$offset;
 					$sth = $this->_dbh->query($query);
 					if($sth->rowCount()) while($row = $sth->fetch()) {

@@ -6,10 +6,10 @@
 		private $_primaryKey;
 		
 		function __construct($table_name) {
-			$this->_dbh = DB::dbh();
-			$_name = str_replace(array(DB::name(),'`','.'),'',$table_name);
+			$this->_dbh = DB_MySql::dbh();
+			$_name = str_replace(array(DB_MySql::name(),'`','.'),'',$table_name);
 			if(!$this->_dbh->query("show tables like '".$_name."'")->rowCount()) throw new ErrorException("WrongTableName");
-			$this->_name = "`".DB::name()."`.`".$_name."`";
+			$this->_name = "`".DB_MySql::name()."`.`".$_name."`";
 			$this->_fields = $this->_fields();
 			$this->_primaryKey = $this->_primaryKey();
 		}
@@ -22,20 +22,40 @@
 			return array_key_exists($field, $this->_fields);
 		}
 		
-		public function save($data) {
+		public function save($data, $debug) {
 			$prepare_data = array();
 			if(!empty($data) && is_array($data)) {
 				foreach($data as $key=>$value) {
-					if($this->hasField($key)) $prepare_data[$key] = stripslashes($value);
+					if($this->hasField($key) && !in_array($key, array('date_update'))) {
+						if($this->_fields[$key]=='number') $prepare_data[$key] = (int)$value;
+						elseif($this->_fields[$key]=='double') $prepare_data[$key] = (float)$value;
+						else $prepare_data[$key] = stripslashes($value);
+					}
 				}
 			}
 			if(count($prepare_data)) {
 				$keys = array_keys($prepare_data);
 				$update_parts = array();
-				foreach($keys as $key) array_push($update_parts, $key."=:".$key);
-				$this->_dbh->prepare("insert ".$this->_name." (`".implode("`, `",$keys)."`, `date_create`)
-										values (:".implode(", :",$keys).", now())
-										on duplicate key update ".implode(", ",$update_parts).";")->execute($prepare_data);
+				foreach($keys as $key) array_push($update_parts, "`".$key."`=:".$key);
+				
+				if(!in_array('date_create',$keys) && $this->hasField('date_create')) {
+					$query = "insert ".$this->_name." (`".implode("`, `",$keys)."`, `date_create`)
+								values (:".implode(", :",$keys).", now())";
+				} else {
+					$query = "insert ".$this->_name." (`".implode("`, `",$keys)."`)
+								values (:".implode(", :",$keys).")";
+				}
+				$query .= "on duplicate key update ".implode(", ",$update_parts).";";
+				
+				if($debug) {
+					print $query;
+					print "<br>\n";
+					var_dump($prepare_data);
+				}
+				
+				$this->_dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+				$sth = $this->_dbh->prepare($query);
+				$sth->execute($prepare_data);
 				return $this->_dbh->lastInsertId();
 			}
 			return false;
@@ -77,7 +97,8 @@
 				$sth->setFetchMode(PDO::FETCH_ASSOC);
 				while($row = $sth->fetch()) {
 					$field = $row['Field'];
-					if(preg_match("/(int)/",$row['Type'])) $type = "number";
+					if(preg_match("/(double)/",$row['Type'])) $type = "double";
+					elseif(preg_match("/(int)/",$row['Type'])) $type = "number";
 					elseif(preg_match("/(date|timestamp)/",$row['Type'])) $type = "date";
 					else $type = "string";
 					$fields[$field] = $type;

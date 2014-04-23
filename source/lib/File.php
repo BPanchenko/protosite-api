@@ -7,29 +7,50 @@
 		public static function info($filepath) {
 			$_info = array();
 			if(strpos('.',$path) !== false && !is_file($filepath)) return NULL;
+			
 			if(is_file($filepath)) $_info = pathinfo($filepath);
+			
+			// images
 			foreach (self::$img_exts as $value) {
-				if (strpos('.',$path) === false && is_file($filepath.".".$value)) {
+				if (empty($_info['extension']) && is_file($filepath.".".$value)) {
 					$filepath .= ".".$value;
 					$_info = array_merge($_info, pathinfo($filepath));
 				}
-				if($value == $_info['extension']) $_info['type'] = 'img';
+				if($value == $_info['extension']) {
+					$_info['type'] = 'img';
+					$_info['filepath'] = $filepath;
+					list($_info['width'], $_info['height']) = getimagesize($filepath);
+				}
 			}
+			
+			// video
 			foreach (self::$vid_exts as $value) {
-				if (strpos('.',$path) === false && is_file($filepath.".".$value)) {
+				if (empty($_info['extension']) && is_file($filepath.".".$value)) {
 					$filepath .= ".".$value;
 					$_info = array_merge($_info, pathinfo($filepath));
 				}
-				if($value == $_info['extension']) $_info['type'] = 'vid';
+				if($value == $_info['extension']) {
+					$_info['type'] = 'vid';
+					$_info['filepath'] = $filepath;
+				}
 			}
+			
+			// sounds
 			foreach (self::$snd_exts as $value) {
-				if (strpos('.',$path) === false && is_file($filepath.".".$value)) {
+				if (empty($_info['extension']) && is_file($filepath.".".$value)) {
 					$filepath .= ".".$value;
 					$_info = array_merge($_info, pathinfo($filepath));
 				}
-				if($value == $_info['extension']) $_info['type'] = 'snd';
+				if($value == $_info['extension']) {
+					$_info['type'] = 'snd';
+					$_info['filepath'] = $filepath;
+				}
 			}
-			return $_info;
+			
+			if(!empty($_info['filepath'])) {
+				$_info['filesize'] = filesize($_info['filepath']);
+				return $_info;
+			} else return NULL;
 		}
 		
 		public static function filesizeDisplay($filesize){
