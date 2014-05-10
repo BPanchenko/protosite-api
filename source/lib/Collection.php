@@ -6,7 +6,7 @@
 		protected $_columns = array();
         protected $_defaults = array(
 			"fetch" => array(
-				'quantity' => 'little',
+				'bulk' => 'compact',
 				'search_fields' => array('name'),
 				'order_key' => "id",
 				'order_by' => "desc",
@@ -107,16 +107,32 @@
 				if(count($exprs)) $where = "WHERE ".implode(" and ", $exprs);
 				
 				// QUERY
-				if($options['quantity']=='small') {
-					$query = "select * from ".$this->Table->name()." ".$where.$order.$limit.$offset;
-					$sth = $this->_dbh->query($query);
-					if($sth->rowCount()) while($row = $sth->fetch()) {
-						$this->add($row);
-					}
-				} else {
-					$query = "select `".$this->idAttribute."` from ".$this->Table->name()." ".$where.$order.$limit.$offset;
-					$sth = $this->_dbh->query($query);
-					if($sth->rowCount()) while($id = $sth->fetchColumn()) array_push($ids, $id);
+				switch($options['bulk']) {
+					case 'ids':
+						$query = "select `".$this->idAttribute."` from ".$this->Table->name()." ".$where.$order.$limit.$offset;
+						$sth = $this->_dbh->query($query);
+						if($sth->rowCount()) while($id = $sth->fetchColumn()) {
+							$this->add(array(
+								$this->idAttribute => $id
+							));
+						}
+					break;
+					case 'compact':
+						$query = "select * from ".$this->Table->name()." ".$where.$order.$limit.$offset;
+						$sth = $this->_dbh->query($query);
+						if($sth->rowCount()) while($row = $sth->fetch()) {
+							$this->add($row);
+						}
+					break;
+					case 'full':
+						$query = "select `".$this->idAttribute."` from ".$this->Table->name()." ".$where.$order.$limit.$offset;
+						$sth = $this->_dbh->query($query);
+						if($sth->rowCount()) while($id = $sth->fetchColumn()) {
+							$this->create(array(
+								$this->idAttribute => $id
+							))->fetch($options)->addTo($this);
+						}
+					break;
 				}
 			}
 			
@@ -149,10 +165,18 @@
 			return $array;
 		}
 		
-		public function toArray($fields=NULL) {
+		public function toArray($options=array()) {
 			$array = array();
-			if(count($this->models)) foreach($this->models as $model) {
-				array_push($array,$model->toArray($fields));
+			if(!$this->length) return $array;
+			
+			if($options['bulk'] == 'ids') {
+				foreach($this->models as $model) {
+					array_push($array,$model->id);
+				}
+			} else {
+				foreach($this->models as $model) {
+					array_push($array,$model->toArray($options));
+				}
 			}
 			return $array;
 		}
@@ -167,7 +191,7 @@
 				}
 			}
 			
-			$system_params = array('ids','fields','compact','q','max_id','min_id','count','offset');
+			$system_params = array('ids','fields','bulk','q','max_id','min_id','count','offset');
 			if(count($options)) foreach($options as $key => $value){
 				// передается массив идентификаторов или перечень полей выборки
 				if($key == 'ids' && !is_array($value)) {

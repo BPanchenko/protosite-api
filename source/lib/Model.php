@@ -4,6 +4,11 @@
 		protected $_dbh;
 		protected $_folder = "temp";
         protected $_table = "";			// Основная таблица данных модели
+        protected $_defaults = array(
+			"fetch" => array(
+				'bulk' => 'full'
+			)
+		);
 		public $changed = array();	// Хеш измененных атрибутов модели
 		public $idAttribute;
 		public $Collection = NULL;
@@ -33,8 +38,6 @@
 		
 		public function addTo($Collection) {
 			if(!($Collection instanceof Collection)) {
-				print "SAVE Model ".get_class($this);
-				pa($this->toArray());
 				throw new ErrorException("IncorrectCollection");
 			}
 			$Collection->add($this);
@@ -64,19 +67,20 @@
 			return true;
 		}
 		
-		public function fetch($fields=NULL){
+		public function fetch($options=array()){
 			if($this->isNew()) return $this;
+			$options = array_merge($this->_defaults['fetch'], $options);
 			
 			$columns = "*";
-			if(!empty($fields)) {
-				$_fields = Data::str2array($fields);
-				if(count($_fields)) {
-					$fields = array();
-					foreach($_fields as $field)
-						if($this->Table->hasField($field)) array_push($fields, $field);
-					if(count($fields)) {
-						if(!in_array($this->idAttribute,$fields)) array_unshift($fields, $this->idAttribute);
-						$columns = "`".implode("`,`",$fields)."`";
+			if(!empty($options['fields'])) {
+				$fields = Data::str2array($options['fields']);
+				if(count($fields)) {
+					$_fields = array();
+					foreach($fields as $field)
+						if($this->Table->hasField($field)) array_push($_fields, $field);
+					if(count($_fields)) {
+						if(!in_array($this->idAttribute,$_fields)) array_unshift($_fields, $this->idAttribute);
+						$columns = "`".implode("`,`",$_fields)."`";
 					}
 				}
 			}
@@ -85,10 +89,7 @@
 								" from ".$this->_table.
 								" where `".$this->idAttribute."`=".$this->id." limit 1;";
 			$sth = $this->_dbh->query($query);
-			if(!$sth) print $query;
-			if(!$sth->rowCount()) {
-				var_dump($sth);
-				print $query;
+			if(!$sth || !$sth->rowCount()) {
 				throw new ErrorException("WrongModelID");
 			}
 			$this->set($this->parse($sth->fetch(PDO::FETCH_ASSOC)));
@@ -294,9 +295,9 @@
 			return $array;
 		}
 		
-		public function toArray($fields=NULL) {
+		public function toArray($options=array()) {
 			if(!count($this->_attributes)) return NULL;
-			if(!empty($fields) && is_string($fields)) $fields = Data::str2array($fields);
+			if(!empty($options['fields'])) $fields = Data::str2array($fields);
 			
 			$result = array();
 			if(count($fields)) {
