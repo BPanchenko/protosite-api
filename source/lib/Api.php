@@ -16,7 +16,7 @@
 			self::$Request->method = strtolower($_SERVER['REQUEST_METHOD']);
 			self::$Request->data = self::fetchRequestData();
 			
-			$_uri = explode('?',$_SERVER['REQUEST_URI']);
+			$_uri = explode('?', $_SERVER['REQUEST_URI']);
 			$_parts = explode('/',$_uri[0]);
 			self::$Request->uri = $_uri[0];
 					
@@ -37,7 +37,6 @@
 			}
 			
 			
-			
 			$uri_points = explode('/', self::$Request->uri);
 			self::$Request->points = array();
 			foreach($uri_points as $pos=>$point) if($point) {
@@ -50,11 +49,26 @@
 					continue;
 				}
 				
+				// checkpoint 'self' defines the authorized user ID
+				if($point === 'self') {
+					if(self::$User->isNew() && !self::$User->has('access_token')) {
+						throw new ApiException('AccessTokenRequired');
+					}
+					array_push(self::$Request->points, array(
+						'type' => 'id',
+						'val' => self::$User->id
+					));
+					continue;
+				}
+				
 				// if the class exists, the point is a class
-				if(class_exists(ucfirst($point), true)) {
+				$_tmp = explode('-', $point);
+				$_tmp = array_map(ucfirst, $_tmp);
+				$classname = implode('', $_tmp);
+				if(class_exists($classname, true)) {
 					array_push(self::$Request->points, array(
 						'type' => 'class',
-						'val' => ucfirst($point)
+						'val' => $classname
 					));
 					continue;
 				}

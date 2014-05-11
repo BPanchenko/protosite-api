@@ -8,8 +8,8 @@
 			"fetch" => array(
 				'bulk' => 'compact',
 				'search_fields' => array('name'),
-				'order_key' => "id",
-				'order_by' => "desc",
+				'order_key' => 'id',
+				'order_by' => 'desc',
 				'offset' => 0,
 				'count' => 20
 			)
@@ -120,7 +120,7 @@
 					case 'compact':
 						$query = "select * from ".$this->Table->name()." ".$where.$order.$limit.$offset;
 						$sth = $this->_dbh->query($query);
-						if($sth->rowCount()) while($row = $sth->fetch()) {
+						if($sth->rowCount()) while($row = $sth->fetch(PDO::FETCH_ASSOC)) {
 							$this->add($row);
 						}
 					break;

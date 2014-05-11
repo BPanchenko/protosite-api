@@ -10,6 +10,48 @@
 					'ru' => "Неизвестная ошибка API"
 				)
 			),
+			'AccessDenied' => array(
+				'code' => 400,
+				'error_message' => array(
+					'en' => "Access denied",
+					'ru' => "Доступ запрещен"
+				)
+			),
+			'AccessTokenInvalid' => array(
+				'code' => 400,
+				'error_message' => array(
+					'en' => "Invalid a access token",
+					'ru' => "Недействительный ключ доступа"
+				)
+			),
+			'AccessTokenRequired' => array(
+				'code' => 400,
+				'error_message' => array(
+					'en' => "Required a access token",
+					'ru' => "Требуется ключ доступа"
+				)
+			),
+			'AuthEmailEmpty' => array(
+				'code' => 400,
+				'error_message' => array(
+					'en' => "",
+					'ru' => ""
+				)
+			),
+			'AuthEmailNotFound' => array(
+				'code' => 400,
+				'error_message' => array(
+					'en' => "",
+					'ru' => ""
+				)
+			),
+			'AuthPasswordWrong' => array(
+				'code' => 400,
+				'error_message' => array(
+					'en' => "",
+					'ru' => ""
+				)
+			),
 			'RequestManyCheckpoints' => array(
 				'code' => 400,
 				'error_message' => array(

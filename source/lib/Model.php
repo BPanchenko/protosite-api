@@ -72,27 +72,31 @@
 			$options = array_merge($this->_defaults['fetch'], $options);
 			
 			$columns = "*";
-			if(!empty($options['fields'])) {
-				$fields = Data::str2array($options['fields']);
-				if(count($fields)) {
-					$_fields = array();
-					foreach($fields as $field)
-						if($this->Table->hasField($field)) array_push($_fields, $field);
-					if(count($_fields)) {
-						if(!in_array($this->idAttribute,$_fields)) array_unshift($_fields, $this->idAttribute);
-						$columns = "`".implode("`,`",$_fields)."`";
-					}
+			$fields = Data::str2array($options['fields']);
+			if(count($fields)) {
+				$_fields = array();
+				foreach($fields as $field) {
+					if($this->Table->hasField($field)) array_push($_fields, $field);
+				}
+				if(count($_fields)) {
+					if(!in_array($this->idAttribute,$_fields)) array_unshift($_fields, $this->idAttribute);
+					$columns = "`".implode("`,`",$_fields)."`";
 				}
 			}
 			
 			$query = "select ".$columns.
-								" from ".$this->_table.
-								" where `".$this->idAttribute."`=".$this->id." limit 1;";
+					" from ".$this->_table.
+					" where `".$this->idAttribute."`=".$this->id." limit 1;";
 			$sth = $this->_dbh->query($query);
 			if(!$sth || !$sth->rowCount()) {
 				throw new ErrorException("WrongModelID");
 			}
 			$this->set($this->parse($sth->fetch(PDO::FETCH_ASSOC)));
+			
+			if(($options['bulk'] == 'full' || in_array('photos',$fields))
+				&& $this->TableLinks && $this->TableLinks->hasField('photo_id')) {
+				$this->_setPhotos();
+			}
 			
 			return $this;
 		}
@@ -316,6 +320,24 @@
 			} else $result = $this->_attributes;
 			return $result;
         }
+		
+		/**
+		 * Общие методы для всех моделей приложения
+		 */
+		protected function _setPhotos() {
+			if($this->isNew()) return $this;
+			$sth = $this->_dbh->query("select `photo_id`, `description` 
+										from ".$this->_table_links." 
+										where `".$this->idAttribute."` = ".$this->id." 
+										order by `photo_id` asc;");
+			$photo_ids = array();
+			$Photos = new Photos();
+			if($sth->rowCount()) while($row = $sth->fetch(PDO::FETCH_ASSOC)) {
+				$Photos->create($row)->fetch()->addTo($Photos);
+			}
+			$this->set('photos',$Photos);
+			return $this;
+		}
 		
 		public function __set($attr, $value) { return $this->set($attr, $value); }
 		public function __isset($attr) { return $this->has($attr); }
