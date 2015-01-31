@@ -1,62 +1,87 @@
-<?php
-require_once 'headers.php';
-require_once 'inc.php';
+<?
+	$Request = http\Request::init();
+	$Response = http\Response::init();
+	print date("Y-m-d HH:mm", 1421442000);
+	if($Request->parameters()->has('access_token'))
+		$AuthUser = new User(array(
+			'access_token' => $Request->parameters('access_token')
+		));
 	
 	try {
-		Api::init();
-		
-		// the initialization of an object based on the checkpoints of the request
-		$obj = NULL;
-		foreach(Api::$Request->points as $point) {
-			switch($point['type']) {
+		$points = $Request->parts();
+		foreach($points as $i=>$part) {
+			if($points[$i-1]->type === 'method') {
+				$Request->parameters('__uri__')->push($part->value);
+				continue;
+			}
+			
+			switch($part->type) {
+				case 'self':
+					if(is_null($AuthUser)) {
+						throw new AppException('AccessTokenRequired');
+					}
+					$part->type = 'object';
+					$part->instance = new $AuthUser;
+				break;
+				
 				case 'class':
-					if($obj) {
-						$obj = $obj->append(new $point['val'])->child;
-					} else {
-						$obj = new $point['val'];
+					$classname = $part->value;
+					$part->type = 'object';
+					$part->instance = new $classname;
+					
+					$_prev = $points[$i-1];
+					if($_prev->type === 'object') {
+						$part->instance->attachTo($_prev->instance);
 					}
 				break;
-				case 'id':
-					if(!$obj) throw new ApiException('IdForAnUndefinedObject', $point);
-					$obj = $obj->create($point['val']);
+				
+				case 'string':
+					if($points[$i-1]->type !== 'object' || !method_exists($points[$i-1]->instance, $Request->method . '__' . $part->value)) {
+						throw new AppException('MethodNotExist');
+					}
+					$part->type = 'method';
+					$part->value = $Request->method . '__' . $part->value;
+					$part->instance = $points[$i-1]->instance;
 				break;
-				case 'method':
-					if(!$obj) throw new ApiException('MethodForAnUndefinedObject', $point);
-					if(!method_exists($obj, $point['val'])) throw new ApiException('MethodNotExists', $point);
-					Api::$Response->data = call_user_func(array($obj, $point['val']), Api::$Request->data);
-					goto end;
+				
+				case 'int':
+					
+					if($points[$i-1]->type !== 'object') {
+						throw new AppException('ParentObjectIsNotExists');
+					}
+					if(!($points[$i-1]->instance instanceof \base\Collection)) {
+						throw new AppException('ParentObjectIsNotCollection');
+					}
+					
+					$part->type = 'object';
+					$part->instance = $points[$i-1]->instance->create($part->value);
 				break;
-				default: throw new ApiException('UnknowCheckpoint', $point);
 			}
 		}
+		$endpoint = end($points);
 		
-		switch(Api::$Request->method) {
-			case 'get':
-				Api::$Response->data = $obj->fetch(Api::$Request->data)->toArray(Api::$Request->data['field']);
-			break;
-			case 'post':
-				if($obj instanceof Collection) {
-					$obj = $obj->create(Api::$Request->data);
-				} elseif($obj instanceof Model) {
-					$obj->set(Api::$Request->data);
-				}
-				Api::$Response->data = $obj->save()->fetch()->toArray(Api::$Request->data['field']);
-			break;
-			case 'put':
-				if(!($obj instanceof Model)) throw new ApiException('ChangeNotModel', $point);
-				Api::$Response->data = $obj->set(Api::$Request->data)->save()->fetch()->toArray(Api::$Request->data['field']);
-			break;
-			case 'delete':
-				if(!($obj instanceof Model) || $obj->isNew()) throw new ApiException('ChangeNotModel', $point);
-				Api::$Response->data = $obj->delete();
-			break;
+		// close endpoint
+		if($endpoint->type == 'method') {
+			$Response->get('meta')->code = 200;
+			$Response->set('data', call_user_func(array(&$endpoint->instance, $endpoint->value)));
 		}
 		
+		if($endpoint->type === 'object')
+			$Response->set('data', $endpoint->fetch()->toJSON());
 		
-	} catch (ApiException $e) {
-		Api::$Response->meta = $e->toArray();
+	} catch (AppException $e) {
+		$Response->setStatusCode($e->code(), $e->type);
+		$Response->get('meta')->error_message = $e->type;
+		
+	} catch (PDOException $e) {
+		$Response->get('meta')->code = '400.' . $e->getCode();
+		$Response->get('meta')->error_type = 'PDOException';
+		$Response->get('meta')->error_message = $e->getMessage();
+		
+	} catch (Exception $e) {
+		$Response->get('meta')->code = 400;
+		$Response->get('meta')->error_message = $e->getMessage();
 	}
 	
-	end:
-	Api::issue();
+	$Response->send();
 ?>
