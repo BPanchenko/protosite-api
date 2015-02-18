@@ -3,7 +3,6 @@ namespace DB\SQLite;
 require_once dirname(__FILE__) . '/../Schema.php';
 
 	class Schema extends \DB\Schema {
-		const STORAGE = '';
 		
 		public $columnTypes=array(
 				   'pk' => 'integer PRIMARY KEY AUTOINCREMENT NOT NULL',
@@ -27,7 +26,7 @@ require_once dirname(__FILE__) . '/../Schema.php';
 			$this->_schema = $schema;
 			$dsn = 'sqlite:';
 			$dir = '/'.trim($dir, '/').'/';
-			$dsn .= ($schema == 'memory') ? ":memory:" : self::STORAGE . $dir . $schema . ".sqlite";
+			$dsn .= ($schema == 'memory') ? ":memory:" : DB_STORAGE_DIR . $dir . $schema . ".sqlite";
 			
 			try {
 				parent::__construct($dsn);

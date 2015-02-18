@@ -3,10 +3,10 @@ namespace DB;
 require_once dirname(__FILE__) . '/Schema.php';
 
 	class Table {
+		public $_schema;
 		
 		protected $_query;
 		protected $_name;
-		protected $_schema;
 		protected $_isSQLite;
 		protected $_isMySql;
 		
@@ -27,8 +27,7 @@ require_once dirname(__FILE__) . '/Schema.php';
 				$this->_schema = new \DB\MySql\Schema(str_replace('mysql:', '',$options['dsn']), $options['user'], $options['pass']);
 			}
 			
-			$this->_schema->from($this->_name);
-			
+			$this->reset();
 		}
 		
 		public function IsSQLite() { return $this->_isSQLite; }
@@ -42,6 +41,19 @@ require_once dirname(__FILE__) . '/Schema.php';
 		}
 		
 		
+		
+		/****/
+		public function reset() {
+			$this->_schema->reset();
+			$this->_schema->from($this->_name);
+			return $this;
+		}
+		
+		/****/
+		public function groupBy($sql) {
+			$this->_schema->groupBy($sql);
+			return $this;
+		}
 		
 		/****/
 		public function select($columns='*', $option='') {
@@ -92,8 +104,13 @@ require_once dirname(__FILE__) . '/Schema.php';
 		}
 		
 		/****/
+		public function fetch($fetch_style = \PDO::FETCH_OBJ) {
+			return $this->_schema->fetch($fetch_style);
+		}
+		
+		/****/
 		public function fetchColumn() {
-			return $this->_schema->fetchColumn($fetch_style);
+			return $this->_schema->fetchColumn();
 		}
 		
 		/****/

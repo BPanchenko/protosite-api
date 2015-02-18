@@ -5,6 +5,9 @@ namespace DB;
 		
 		protected $_query;
 		protected $_params;
+		protected $__defaults_query;
+		protected $__defaults_params;
+		
 		protected $_schema;
 		protected $_tableNames;
 		
@@ -61,8 +64,8 @@ namespace DB;
 		
 		/****/
 		public function reset() {
-			$this->_query = array();
-			$this->_params = array();
+			$this->_query = $this->__defaults_query ? $this->_defaults_query : array();
+			$this->_params = $this->__defaults_params ? $this->_defaults_params : array();
 			return $this;
 		}
 		
@@ -155,6 +158,12 @@ namespace DB;
 		}
 		
 		/****/
+		public function groupBy($sql) {
+			$this->_query['group'] =  $sql;
+			return $this;
+		}
+		
+		/****/
 		public function order($columns) {
 			if(!is_array($columns))
 				$columns=preg_split('/\s*,\s*/',trim($columns),-1,PREG_SPLIT_NO_EMPTY);
@@ -201,7 +210,7 @@ namespace DB;
 		
 		/****/
 		public function fetchAll($fetch_style = \PDO::FETCH_OBJ) {
-			print $sql = $this->_buildQuery();
+			$sql = $this->_buildQuery();
 			try {
 				if(count($this->_params)) {
 					$sth = $this->prepare($sql);

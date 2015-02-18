@@ -1,7 +1,7 @@
 <?php
 namespace base;
 
-	class Model implements \ArrayAccess {
+	class Model extends Component implements \ArrayAccess {
 		
 		/* Data of model */
         protected $_attributes = array();
@@ -14,11 +14,14 @@ namespace base;
 		public $collection;
 		
 		
-		function __construct($data=array(), $linked=NULL) {
+		function __construct($data=array(), $parent=NULL) {
+			
 			$this->_attributes = $this->_defaults;
 			
-			if(!is_null($linked) && $linked instanceof Collection)
-				$this->collection = $linked;
+			if(!is_null($parent) && $parent instanceof Collection) {
+				$this->collection = $parent;
+				$this->attachTo($this->collection);
+			}
 			
 			if($data instanceof stdClass)
 				$data = json_decode(json_encode($data), true);
@@ -45,11 +48,6 @@ namespace base;
 		public function offsetUnset($offset) {
 			return $this->remove($attr, $value);
 		}
-		
-		/**
-		 * @method fetch()
-		 */
-		public function fetch() { return $this; }
 		
 		/**
 		 * @method has()

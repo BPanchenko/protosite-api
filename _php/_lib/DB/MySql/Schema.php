@@ -3,9 +3,6 @@ namespace DB\MySql;
 require_once dirname(__FILE__) . '/../Schema.php';
 
 	class Schema extends \DB\Schema {
-		const HOST = '';
-		const USER = '';
-		const PASS = '';
 		
 		/* depricated */
 		public $columnTypes=array(
@@ -28,12 +25,12 @@ require_once dirname(__FILE__) . '/../Schema.php';
 		
 		function __construct($schema, $user='', $pass='') {
 			$this->_schema = $schema;
-			$dsn = "mysql:host=" . self::HOST . ";dbname=" . $this->_schema;
+			$dsn = "mysql:host=" . DB_ROOT_HOST . ";dbname=" . $this->_schema;
 			
 			if(empty($user))
-				$user = self::USER;
+				$user = DB_ROOT_USER;
 			if(empty($pass))
-				$pass = self::PASS;
+				$pass = DB_ROOT_PASS;
 			
 			try {
 				parent::__construct($dsn, $user, $pass);

@@ -17,7 +17,7 @@ namespace http;
 			self::$_instance = new self;
 			self::$_instance->method = strtoupper($_SERVER['REQUEST_METHOD']);
 			self::$_instance->_parameters = new \base\Model(array(
-				'__uri__' => new \base\CaseInsensitiveArray
+				'__uri__' => array()
 			));
 			
 			return self::$_instance;
@@ -32,8 +32,11 @@ namespace http;
 			return NULL;
 		}
 		
-		public function parameters($key) {
-			
+		public function parameters($key, $value) {
+			if(isset($value))
+				$this->_parameters->set($this->_parameters->parse(array(
+					$key => $value
+				)));
 			return $this->_parameters->has($key) ? $this->_parameters->get($key) : $this->_parameters;
 		}
 		
@@ -42,7 +45,12 @@ namespace http;
 				return $this->_parts;
 			
 			$_res = array();
-			$_uri = trim($_SERVER['REQUEST_URI'], '/');
+			if(strrpos($_SERVER['REQUEST_URI'],'?'))
+				$_uri = substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'],'?'));
+			else
+				$_uri = $_SERVER['REQUEST_URI'];
+			
+			$_uri = trim($_uri, '/');
 			$_parts = explode('/', $_uri);
 			
 			foreach ($_parts as $i=>$_part) {
@@ -74,6 +82,12 @@ namespace http;
 			}
 			
 			return ($this->_parts = $_parts);
+		}
+		
+		protected function _prepareFetchSettings($query) {
+			$_settings = array();
+			
+			return $_settings;
 		}
 		
 		private function __construct() {}

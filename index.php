@@ -1,7 +1,18 @@
 <?
 	$Request = http\Request::init();
 	$Response = http\Response::init();
-	print date("Y-m-d HH:mm", 1421442000);
+	
+	
+	if(isset($_GET['debug'])) {
+		echo "\n\n//*********************************";
+		echo "\n// DATE\n";
+		echo date("c", 1420045200);
+	}
+	
+	if(isset($_GET['fields'])) {
+		$_GET['fields'] = explode(',', $_GET['fields']);
+	}
+	
 	if($Request->parameters()->has('access_token'))
 		$AuthUser = new User(array(
 			'access_token' => $Request->parameters('access_token')
@@ -9,9 +20,18 @@
 	
 	try {
 		$points = $Request->parts();
+		
+		if(isset($_GET['debug'])) {
+			echo "\n\n//*********************************";
+			echo "\n// POINTS OF REQUEST\n";
+			var_dump($points);
+		}
+		
+		
 		foreach($points as $i=>$part) {
 			if($points[$i-1]->type === 'method') {
-				$Request->parameters('__uri__')->push($part->value);
+				$Request->parameters('__uri__', array($part->value));
+				unset($points[$i]);
 				continue;
 			}
 			
@@ -47,34 +67,66 @@
 				case 'int':
 					
 					if($points[$i-1]->type !== 'object') {
-						throw new AppException('ParentObjectIsNotExists');
+						throw new AppException('ParentIsNotExists');
 					}
 					if(!($points[$i-1]->instance instanceof \base\Collection)) {
-						throw new AppException('ParentObjectIsNotCollection');
+						throw new AppException('ParentIsNotCollection');
 					}
 					
+					$_prev = $points[$i-1];
 					$part->type = 'object';
-					$part->instance = $points[$i-1]->instance->create($part->value);
+					
+					if(isset($_GET['debug']))
+						var_dump(get_class($_prev->instance) . ' -> create()');
+					
+					$part->instance = $_prev->instance->create($part->value);
 				break;
 			}
 		}
 		$endpoint = end($points);
 		
+		/*
+		if(isset($_GET['debug'])) {
+			echo "\n\n//*********************************";
+			echo "\n// ENDPOINT\n";
+			var_dump("@class " . get_class($endpoint));
+		}
+		*/
+		
 		// close endpoint
 		if($endpoint->type == 'method') {
 			$Response->get('meta')->code = 200;
-			$Response->set('data', call_user_func(array(&$endpoint->instance, $endpoint->value)));
+			
+			// go method
+			$params = $Request->parameters('__uri__');
+			$query = $_GET;
+			$Response->set('data', call_user_func(array(&$endpoint->instance, $endpoint->value), $params, $query));
 		}
 		
-		if($endpoint->type === 'object')
-			$Response->set('data', $endpoint->fetch()->toJSON());
+		if($endpoint->type === 'object') {
+			$Response->get('meta')->code = 200;
+			
+			$options = array(
+				'fields' => explode(',', $_GET['fields'])
+			);
+			list($where, $fields, $count, $offset) = array();
+			$endpoint->instance->fetch($where, $fields, $count, $offset);
+			
+			$Response->set('data', $endpoint->instance->toArray());
+		}
 		
 	} catch (AppException $e) {
 		$Response->setStatusCode($e->code(), $e->type);
 		$Response->get('meta')->error_message = $e->type;
 		
+	} catch (SystemException $e) {
+		// 500-е ошибки
+		$Response->get('meta')->code = $e->getCode();
+		$Response->get('meta')->error_type = $e->getType();
+		$Response->get('meta')->error_message = $e->getMessage();
+		
 	} catch (PDOException $e) {
-		$Response->get('meta')->code = '400.' . $e->getCode();
+		$Response->get('meta')->code = '500.' . $e->getCode();
 		$Response->get('meta')->error_type = 'PDOException';
 		$Response->get('meta')->error_message = $e->getMessage();
 		

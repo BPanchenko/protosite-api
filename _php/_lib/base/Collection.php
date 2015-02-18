@@ -1,14 +1,14 @@
 <?php
 namespace base;
 
-	class Collection {
+	class Collection extends Component implements \ArrayAccess {
 		public static $classModel = Model;
 		public $models = array();
 		public $length = 0;
 		public $pagination;
 		protected $_columns = array();
 		
-		function __construct($data = array()) {
+		function __construct($data = array(), $parent = NULL) {
 			if(is_array($data) && count($data))
 				foreach($data as $item) {
 					$this->add($item);
@@ -19,6 +19,41 @@ namespace base;
 			$this->pagination->total = 0;
 			$this->pagination->page = 1;
 			$this->pagination->limit = 20;
+		}
+		
+		/** 
+		 ============ */
+		public function offsetExists($offset) {
+			return isset($this->models[$offset]);
+		}
+		public function offsetGet($offset) {
+			return $this->offsetExists($offset) ? $this->models[$offset] : NULL;
+		}
+
+		public function offsetSet($offset, $model) {
+			if (is_null($offset)) {
+				$this->models[] = $model;
+			} else {
+				$this->models[$offset] = $model;
+			}
+			return $this;
+		}
+
+		public function offsetUnset($offset) {
+			$index = NULL;
+			var_dump($offset instanceof Model);
+			/*
+			if($offset instanceof Model)
+				foreach($this->models as $ind=>$model) {
+					if($model::$idAttribute == $offset::$idAttribute && $model->id == $offset->id)
+						$index = $ind;
+				}
+			elseif(is_numeric($offset))
+				$index = (int)$offset;
+			*/
+			unset($this->models[$index]);
+			
+			return is_null($index) ? false : true;
 		}
 		
 		/**
@@ -55,7 +90,7 @@ namespace base;
 		 */
 		public function create($data){
 			try {
-				$model = new static::$classModel($data);
+				$model = new static::$classModel($data, $this);
 				$this->add($model);
 			} catch(ErrorException $e) {
 				if($e->getMessage() == 'WrongModelID') return NULL;
@@ -74,12 +109,6 @@ namespace base;
 				call_user_func($fn, $model, $index, $this);
 			return $this;
 		}
-		
-		/**
-		 * Извлечение коллекции из источника данных.
-		 * 
-		 */
-		public function fetch($options) { return $this; }
 		
 		/**
 		 * Выполняет поиск элемента коллекции,
