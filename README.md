@@ -1,8 +1,8 @@
 ﻿<h1>REST API</h1>
 <p>
-	Шаблон строки запроса к API: <code>/api/{collection_name}/[{item_id|collection_method}/[{item_method|method_parametr}/][{method_parametr}/]]</code>.<br>
+	Шаблон строки запроса к API: <code>/api/{collection_name}/[{item_id|collection_method}/[{item_method|model_method|method_parametr}/][{method_parametr}/]]</code>.<br>
 	<br><br>
-	<h5>Общие GET-параметры:</h5>
+	<h5>Общие GET-параметры запросов к API:</h5>
 	<dl>
 		<dt class="request__param_name"><q>bulk<.q></dt>
 			<dd class="request__param_description">
@@ -21,7 +21,7 @@
 		<dt><q>excluded_fields</q></dt>
 			<dd>
             	Перечень атрибутов модели, которые не должны присутствовать в результате запроса.<br>
-                Фреймворк заполняет параметр значенияем по умолчанию, при переопределении вы увидите неожиданные поля.
+                Фреймворк заполняет параметр значением по умолчанию, при переопределении вы увидите неожиданные поля. Атрибутами, исключаемыми из резульатов выборки по умолчанию, в общем случае являются: id, is_del
             </dd>
 		<dt><q>where</q></dt>
 			<dd>
@@ -88,79 +88,76 @@
 	</p>
 	<br><br>
 	<h2>Backbone.php</h2>
-	Программная среда API реализована по образу и подобию Backbone.js.<br>
-	Сущности сайта описываются с помощью классов:
-	<ul>
-		<li><q>Model</q> для описание свойств отдельной сущности;</li>
-		<li><q>Collection</q> для описания набора сущностей.</li>
-	</ul>
 	<p>
-		Пример описания классов модели и коллекции для реализации отдельной сущности сайта:<br>
-		<pre>
-			class Item extends Model {
-				protected $_table = "`db_name`.`table_name`";
-				
-				/** Gun API Methods
-				 * param $options - хеш параметров из программной среды, обычно это массив $_GET
-				 * _______________   __________________
-				 * request_method | | model_method
-				public function GET_method($options=array()) {
-					...
-					return $result;
-				}
-				public function GET_lastmodify($params_uri, $body_request) {
-					$_ts = $this->table->select('updated')
-								->order('`updated` desc')
-								->fetchColumn();
-					return date("c", $_ts);
-				}
-				
-				public function PUT_method($options=array()) {
-					...
-					return $result;
-				}
-				public function DELETE_method($method_parametr, $options=array()) {
-					...
-					return $result;
-				}
+		Программная среда API реализована по образу и подобию <a href="" target="_blank">Backbone.js</a>.
+		Модели и Коллекции являются компонентами фреймворка, наследниками от абстрактного класса <q>Component</q>.
+	</p>
+	
+	<h2>Конечные точки API как публичные методы объектов.</h2>
+	<p>
+		...
+	</p>
+	<pre>
+		class Items extends Collection {
+			public $ModelClass = Item;
+			
+			/** Gun API Methods
+			 * param $options - хеш параметров из программной среды,
+			 *                  обычно это массив $_GET, $_POST или $_PUT
+			 *  _______________   __________________
+			 *  request_method | | collection_method
+			public function  get_method($method_parametr, $options=array()) {
+				...
+				return $result;
+			}
+			public function post_method($method_parametr, $options=array()) {
+				...
+				return $result;
+			}
+			public function put_method($method_parametr, $options=array()) {
+				...
+				return $result;
+			}
+			public function delete_method($method_parametr, $options=array()) {
+				...
+				return $result;
+			}
+		}
+	</pre>
+	
+	<h3>Пользовательские методы HTTP-запросов.</h3>
+	<p>
+		Объявляются в классе, в зависимости от метода запроса, с приставкой: 'get_', 'post_', 'put_' или 'delete_'.
+	</p>
+	
+	<pre>
+		class Item extends Model {
+			protected $_table = "`db_name`.`table_name`";
+			
+			/** Gun API Methods
+			 * param $options - хеш параметров из программной среды, обычно это массив $_GET
+			 * _______________   __________________
+			 * request_method | | model_method
+			public function get_method($options=array()) {
+				...
+				return $result;
+			}
+			public function get_lastmodify() {
+				$_ts = $this->_table->select('updated')
+							->order('`updated` desc')
+							->limit(1)
+							->fetchColumn();
+				return date("c", $_ts);
 			}
 			
-			class Items extends Collection {
-				public $ModelClass = Item;
-				
-				/** Gun API Methods
-				 * param $options - хеш параметров из программной среды,
-				 *                  обычно это массив $_GET, $_POST или $_PUT
-				 *  _______________   __________________
-				 *  request_method | | collection_method
-				public function  GET_method($method_parametr, $options=array()) {
-					...
-					return $result;
-				}
-				public function POST_method($method_parametr, $options=array()) {
-					...
-					return $result;
-				}
-				public function PUT_method($method_parametr, $options=array()) {
-					...
-					return $result;
-				}
+			public function put_method(array $uri_parametrs) {
+				...
+				return $result;
 			}
-		</pre>
-	</p>
-	<h3>Model</h3>
-	<p>
-		Методы и свойства класса <q>Model</q>:
-		
-	</p>
-	<h3>Collection</h3>
-	<p>
-		Коллекция определяет свойства и методы, описывающие работу с набором моделей.
-		
-	</p>
-	<p></p>
-	<p></p>
-	<p></p>
-	<p></p>
-	<p></p>
+			public function delete_method(array $uri_parametrs) {
+				...
+				return $result;
+			}
+		}
+	</pre>
 </p>
