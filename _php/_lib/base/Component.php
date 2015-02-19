@@ -28,7 +28,23 @@ namespace base;
 		
 		public function fetch($options) {
 			
-			if(is_string($this->_table)) $this->_initTable();
+			if(is_string($this->_table))
+				$this->_initTable();
+			
+			// 
+			if(isset($options['fields']))
+				$options['fields'] = str2array($options['fields']);
+			else
+				$options['fields'] = $this->_table->fields();
+				
+			//
+			if(!isset($options['excluded_fields'])) {
+				// TODO: `excluded_fields` by default
+			}
+			if(isset($options['excluded_fields'])) {
+				$options['excluded_fields'] = str2array($options['excluded_fields']);
+				// TODO: remove items from `fields` that are present in the `excluded_fields`
+			}
 			
 			// 
 			$_fields = array();
@@ -37,19 +53,11 @@ namespace base;
 			}
 			
 			$_opt = array(
-				'where' => (array)$options['where'],
-				'fields' => is_array($options['fields']) ? $options['fields'] : '*',
+				'where' => is_array($options['where']) ? $options['where'] : '*',
+				'fields' => is_array($options['fields']) ? $options['fields'] : NULL,
 				'order' => '`id` DESC',
-				'count' => 20,
-				'offset' => 0
 			);
 			$options = array_merge($_default_options, $options);
-			
-			// 
-			if(isset($options['fields']))
-				$options['fields'] = str2array($options['fields']);
-			else
-				$options['fields'] = $this->_table->columns();
 			
 			// 
 			$res = $this->_table->reset()
