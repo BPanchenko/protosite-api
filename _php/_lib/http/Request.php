@@ -1,5 +1,6 @@
 <?php
 namespace http;
+require_once dirname(__FILE__) . '/RequestParameters.php';
 
 	class Request {
 		protected static $_instance; 
@@ -16,9 +17,11 @@ namespace http;
 			
 			self::$_instance = new self;
 			self::$_instance->method = strtoupper($_SERVER['REQUEST_METHOD']);
-			self::$_instance->_parameters = new \base\Model(array(
+			
+			self::$_instance->_parameters = new RequestParameters(RequestParameters::parse(array_merge($_GET, array(
 				'__uri__' => array()
-			));
+			))));
+			var_dump(self::$_instance->_parameters->toJSON());
 			
 			return self::$_instance;
 		}

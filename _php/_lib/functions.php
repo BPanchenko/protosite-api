@@ -44,7 +44,7 @@
 			$dir = "collections/";
 		
 		$path = str_replace('.:','',get_include_path())."/";
-		print $file = $path . $dir . $filename .".php";
+		$file = $path . $dir . $filename .".php";
 		
 		if(is_file($file))
 			include_once $file;

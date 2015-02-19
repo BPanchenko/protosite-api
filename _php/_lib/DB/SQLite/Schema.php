@@ -4,7 +4,7 @@ require_once dirname(__FILE__) . '/../Schema.php';
 
 	class Schema extends \DB\Schema {
 		
-		public $columnTypes=array(
+		public $columnTypes = array(
 				   'pk' => 'integer PRIMARY KEY AUTOINCREMENT NOT NULL',
 				'bigpk' => 'integer PRIMARY KEY AUTOINCREMENT NOT NULL',
 			   'string' => 'varchar(255)',
