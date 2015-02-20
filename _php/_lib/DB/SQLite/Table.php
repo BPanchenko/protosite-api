@@ -7,6 +7,7 @@ require_once dirname(__FILE__) . '/Schema.php';
 		protected $_name = '';
 		protected $_columns;
 		protected $_defaults_query;
+		protected $_primary_key;
 		
 		function __construct($dns) {
 			list($this->_name, $dir, $file_name) = $this->_prepareTable($dns);
@@ -53,29 +54,41 @@ require_once dirname(__FILE__) . '/Schema.php';
 					}
 				$this->_columns[$_name]['_str'] = $_str;
 				$this->_columns[$_name]['type'] = $_type;
+				
+				if($_type == 'pk')
+					$this->_primary_key = $_name;
 			}
-			
 			//$this->query("SELECT `sql` FROM `sqlite_master` WHERE `tbl_name` = :tbl_name;");
 			return $this->_columns;
 		}
 		
 		/****/
+		public function fields() {
+			if(!$this->_columns) $this->columns();
+			return
+				array_keys($this->columns);
+		}
+		
+		/****/
 		public function columnType($column_name) {
-			if(!$this->_columns)
-				$this->columns();
-			
+			if(!$this->_columns) $this->columns();
 			return
 				$this->hasColumn($column_name) ? $this->_columns[$column_name]['type'] : NULL;
 		}
 		
 		/****/
 		public function hasColumn($column_name) {
-			if(!$this->_columns)
-				$this->columns();
-			
+			if(!$this->_columns) $this->columns();
 			return
 				array_key_exists($column_name, $this->_columns);
 		}
+		
+		/****/
+		public function primaryKey() {
+			return $this->_primary_key;
+		}
+		
+		/* SQL-Constructor */
 		
 		/****/
 		public function fetchColumn() {
