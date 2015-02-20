@@ -31,11 +31,20 @@ namespace base;
 			if(is_string($this->_table))
 				$this->_initTable();
 			
-			// 
+			// @array $options['fields']
+			
 			if(isset($options['fields']))
 				$options['fields'] = str2array($options['fields']);
 			else
 				$options['fields'] = $this->_table->fields();
+			
+			if(!isset($options['order']))
+				$options['order'] = '`' . $this->_table->primaryKey() . '` DESC';
+			
+			if(isset($_GET['debug'])) {
+				var_dump("// Table Options");
+				var_dump($options);
+			}
 				
 			//
 			if(!isset($options['excluded_fields'])) {
@@ -47,23 +56,11 @@ namespace base;
 			}
 			
 			// 
-			$_fields = array();
-			if(isset($options['excluded_fields'])) {
-				$options['excluded_fields'] = str2array($options['excluded_fields']);
-			}
-			
-			$_opt = array(
-				'where' => is_array($options['where']) ? $options['where'] : '*',
-				'fields' => is_array($options['fields']) ? $options['fields'] : NULL,
-				'order' => '`id` DESC',
-			);
-			$options = array_merge($_default_options, $options);
-			
-			// 
 			$res = $this->_table->reset()
 								->select($options['fields'])
 								->limit($options['count'])
 								->offset($options['offset'])
+								->order($options['order'])
 								->fetchAll(\PDO::FETCH_ASSOC);
 			
 			return $this->set($res);

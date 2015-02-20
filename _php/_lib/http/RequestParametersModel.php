@@ -1,6 +1,13 @@
 <?php
 namespace http;
-	class RequestParameters extends \base\Model {
+	class RequestParametersModel extends \base\Model {
+			
+		protected $_defaults = array(
+			'fields' => NULL,
+			'excluded_fields' => array('is_del'),
+			'count' => 20,
+			'offset' => 0
+		);
 		
 		/****/
 		public function parse(array $data = array()) {
@@ -10,6 +17,13 @@ namespace http;
 				
 			if(isset($data['excluded_fields']))
 				$data['excluded_fields'] = str2array($data['excluded_fields']);
+			
+			if(isset($data['order']) && strpos($data['order'], '`') === false) {
+				if(strpos($data['order'], '-') === 0)
+					$data['order'] = '`' . str_replace('-','',$data['order']) . '` DESC';
+				else
+					$data['order'] = '`' . str_replace('-','',$data['order']) . '` ASC';
+			}
 			
 			return $data;
 		}
