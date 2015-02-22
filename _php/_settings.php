@@ -5,4 +5,7 @@
 	define('DB_ROOT_USER', '');
 	define('DB_ROOT_PASS', '');
 	define('DB_STORAGE_DIR', '');
+	
+	define('FETCH_DEFAULT_COUNT', 200);
+	define('FETCH_DEFAULT_OFFSET', 0);
 ?>

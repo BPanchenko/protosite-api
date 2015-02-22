@@ -5,8 +5,8 @@ namespace http;
 		protected $_defaults = array(
 			'fields' => NULL,
 			'excluded_fields' => array('is_del'),
-			'count' => 20,
-			'offset' => 0
+			'count' => FETCH_DEFAULT_COUNT,
+			'offset' => FETCH_DEFAULT_OFFSET
 		);
 		
 		/****/

@@ -20,7 +20,8 @@ namespace base;
 			
 			if(!is_null($parent) && $parent instanceof Collection) {
 				$this->collection = $parent;
-				$this->attachTo($this->collection);
+			} else {
+				$this->attachTo($parent);
 			}
 			
 			if($data instanceof stdClass)

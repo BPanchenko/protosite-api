@@ -3,9 +3,12 @@ namespace base;
 
 	abstract class Component {
 		
-		protected $_table = '';
-		protected $_parent;
 		protected $_childrens = array();
+		protected $_defaults_fetch_settings = array(
+			
+		);
+		protected $_parent;
+		protected $_table = '';
 		
 		public function trigger($name) {
 			
