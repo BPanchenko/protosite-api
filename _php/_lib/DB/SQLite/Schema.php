@@ -10,7 +10,7 @@ require_once dirname(__FILE__) . '/../Schema.php';
 			   'string' => 'varchar(255)',
 				 'text' => 'text',
 			  'integer' => 'integer',
-			   'bigint' => 'integer',
+			   'bigint' => 'bigint(20)',
 				'float' => 'float',
 			  'decimal' => 'decimal',
 			 'datetime' => 'datetime',

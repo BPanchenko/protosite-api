@@ -10,15 +10,19 @@ require_once dirname(__FILE__) . '/Schema.php';
 		protected $_primary_key;
 		
 		function __construct($dns) {
-			list($this->_name, $dir, $file_name) = $this->_prepareTable($dns);
+			if(preg_match('/^sqlite:([\w]+)\/([\w]+).([\w]+)/', $dns, $_matches)) {
+				$dir = $_matches[1];
+				$file_name = $_matches[2];
+				$this->_name = $_matches[3];
+			} else 
+				throw new \SystemException('WrongSQLiteTableName');
+			
 			parent::__construct($file_name, $dir);
 			
-			if(is_string($this->_name))
-				$this->_defaults_query = array(
-					'from' => $this->_name
-				);
-			else
-				throw new \SystemException('WrongTableName');
+			$this->_defaults_query = array(
+				'from' => $this->_name
+			);
+			$this->_columns();
 		}
 		
 		/****/
@@ -62,6 +66,8 @@ require_once dirname(__FILE__) . '/Schema.php';
 			return $this->_columns;
 		}
 		
+		/* < TODO: use php trait ... */
+		
 		/****/
 		public function fields() {
 			if(!$this->_columns) $this->columns();
@@ -104,6 +110,8 @@ require_once dirname(__FILE__) . '/Schema.php';
 		
 		public function drop() { return $this->dropTable($this->_name); }
 		public function name() { return $this->_name; }
+		
+		/* </ use php trait ... */
 		
 		private function _prepareTable($dns) {
 			$_parts = explode('.', str_replace(array('sqlite:'), '', $dns));

@@ -4,8 +4,11 @@ namespace base;
 	abstract class Component {
 		
 		protected $_childrens = array();
-		protected $_defaults_fetch_settings = array(
-			
+		protected $_default_fetch_options = array(
+			'fields' => array(),
+			'excluded_fields' => array('is_del'),
+			'order' => NULL,
+			'count' => 100
 		);
 		protected $_parent;
 		protected $_table = '';
@@ -20,8 +23,10 @@ namespace base;
 		}
 		
 		public function attachTo($parent_object) {
-			$this->_parent = $parent_object;
-			$parent_object->attach($this);
+			if($parent_object instanceof \base\Component) {
+				$this->_parent = $parent_object;
+				$parent_object->attach($this);
+			}
 			return $this;
 		}
 		
@@ -31,17 +36,24 @@ namespace base;
 		
 		public function fetch($options) {
 			
-			if(is_string($this->_table))
-				$this->_initTable();
+			if(is_null($options))
+				$options = $this->_default_fetch_options;
+			elseif(is_array($options))
+				$options = array_merge($this->_default_fetch_options, $options);
+			else
+				throw new SystemException("WrongFetchOptions");
 			
-			// @array $options['fields']
+			if(empty($this->_table))
+				return $this; // TODO: remove?
+			else
+				$this->_table = $this->initTable($this->_table);
 			
 			if(isset($options['fields']))
 				$options['fields'] = str2array($options['fields']);
 			else
 				$options['fields'] = $this->_table->fields();
 			
-			if(!isset($options['order']))
+			if(is_null($options['order']))
 				$options['order'] = '`' . $this->_table->primaryKey() . '` DESC';
 			
 			if(isset($_GET['debug'])) {
@@ -69,20 +81,29 @@ namespace base;
 			return $this->set($res);
 		}
 		
-		protected function _initTable() {
-			if(empty($this->_table))
-				throw new SystemException('EmptyComponentTableName');
+		/**
+		 * @method initTable - helper method component framework.
+		 * The initialization of an object of class Table.
+		 * @param $table - 
+		 */
+		public function initTable($table) {
+			
+			if($table instanceof \DB\Schema)
+				return $table;
+				
+			if(empty($table))
+				throw new SystemException('EmptyTableName');
 			
 			if(strpos($this->_table, 'sqlite:') === 0)
-				$this->_table = new \DB\SQLite\Table($this->_table);
+				$table = new \DB\SQLite\Table($table);
 				
-			if(strpos($this->_table, 'mysql:') === 0)
-				$this->_table = new \DB\MySql\Table($this->_table);
+			if(strpos($table, 'mysql:') === 0)
+				$table = new \DB\MySql\Table($table);
 			
-			if(!($this->_table instanceof \DB\Schema))
+			if(!($table instanceof \DB\Schema))
 				throw new SystemException('FailInitComponentTable');
 			
-			return $this;
+			return $table;
 		}
 	}
 

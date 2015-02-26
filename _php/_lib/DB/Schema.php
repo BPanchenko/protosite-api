@@ -214,9 +214,9 @@ namespace DB;
 			try {
 				if(count($this->_params)) {
 					$sth = $this->prepare($sql);
-					var_dump($sth);
-				} else
+				} else {
 					$sth = $this->query($sql);
+				}
 					
 			} catch (PDOException $e) {
 				print $e->getMessage();
