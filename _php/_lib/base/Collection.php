@@ -19,6 +19,8 @@ namespace base;
 			$this->pagination->total = 0;
 			$this->pagination->page = 1;
 			$this->pagination->limit = 20;
+			
+			parent::__construct();
 		}
 		
 		/** 

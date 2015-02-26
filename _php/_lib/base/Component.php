@@ -12,6 +12,22 @@ namespace base;
 		);
 		protected $_parent;
 		protected $_table = '';
+		protected $_tables = array();
+		
+		
+		function __construct() {
+			if(is_string($this->_table) && $this->_table)
+				$this->_table = $this->initTable($this->_table);
+			
+			if(is_array($this->_tables) && count($this->_tables))
+				foreach($this->_tables as $_tb_name=>$_tb_dns) {
+					if(strpos($_tb_dns, '{model_id}') !== false && !$this->isNew()) {
+						$_tb_dns = str_replace('{model_id}', $this->id, $_tb_dns);
+						$this->_tables[$_tb_name] = $this->initTable($_tb_dns);
+					} else
+						$this->_tables[$_tb_name] = $this->initTable($_tb_dns);
+				}
+		}
 		
 		public function trigger($name) {
 			
@@ -42,11 +58,6 @@ namespace base;
 				$options = array_merge($this->_default_fetch_options, $options);
 			else
 				throw new SystemException("WrongFetchOptions");
-			
-			if(empty($this->_table))
-				return $this; // TODO: remove?
-			else
-				$this->_table = $this->initTable($this->_table);
 			
 			if(isset($options['fields']))
 				$options['fields'] = str2array($options['fields']);
@@ -92,16 +103,16 @@ namespace base;
 				return $table;
 				
 			if(empty($table))
-				throw new SystemException('EmptyTableName');
+				throw new \SystemException('EmptyTableName');
 			
-			if(strpos($this->_table, 'sqlite:') === 0)
+			if(strpos($table, 'sqlite:') === 0)
 				$table = new \DB\SQLite\Table($table);
 				
 			if(strpos($table, 'mysql:') === 0)
 				$table = new \DB\MySql\Table($table);
 			
 			if(!($table instanceof \DB\Schema))
-				throw new SystemException('FailInitComponentTable');
+				throw new \SystemException('FailInitComponentTable');
 			
 			return $table;
 		}

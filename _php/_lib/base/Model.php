@@ -31,6 +31,8 @@ namespace base;
 				$this->set($this->parse($data));
 			elseif(is_numeric($data))
 				$this->set(array('id'=>$data));
+				
+			parent::__construct();
 		}
 		
 		/** 
