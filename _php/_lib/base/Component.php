@@ -46,6 +46,10 @@ namespace base;
 			return $this;
 		}
 		
+		public function isValid() {
+			return true;
+		}
+		
 		
 		/* Synchronization of the component with database support
 		 ========================================================================== */

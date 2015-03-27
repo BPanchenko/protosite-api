@@ -110,12 +110,24 @@ namespace base;
 			
 			return $this;
 		}
+		
+		
+		/**
+		 * @method delete()
+		 */
+		public function delete() {
+			$res = $this->_table->update($table, array( "is_del" => 1 ), "`".static::$idAttribute."` = " . $this->id);
+			return true;
+		}
+		
+		
 		/**
 		 * @method remove()
 		 */
 		public function remove($attr) {
 			$attributes = str2array($attr);
-			foreach($attributes as $key) unset($this->_attributes[$key]);
+			foreach($attributes as $key)
+				unset($this->_attributes[$key]);
 			return $this;
 		}
 		

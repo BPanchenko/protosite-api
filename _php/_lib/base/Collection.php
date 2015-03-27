@@ -43,16 +43,6 @@ namespace base;
 
 		public function offsetUnset($offset) {
 			$index = NULL;
-			var_dump($offset instanceof Model);
-			/*
-			if($offset instanceof Model)
-				foreach($this->models as $ind=>$model) {
-					if($model::$idAttribute == $offset::$idAttribute && $model->id == $offset->id)
-						$index = $ind;
-				}
-			elseif(is_numeric($offset))
-				$index = (int)$offset;
-			*/
 			unset($this->models[$index]);
 			
 			return is_null($index) ? false : true;

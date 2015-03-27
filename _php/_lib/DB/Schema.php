@@ -63,6 +63,16 @@ namespace DB;
 		}
 		
 		/****/
+		public function addColumn($table, $column, $type) {
+			/*
+				return 'ALTER TABLE ' . $this->db->quoteTableName($table)
+				. ' ADD ' . $this->db->quoteColumnName($column) . ' '
+				. $this->getColumnType($type);
+			*/
+			return $this;
+		}
+		
+		/****/
 		public function reset() {
 			$this->_query = is_array($this->__defaults_query) ? $this->_defaults_query : array();
 			$this->_params = is_array($this->__defaults_params) ? $this->_defaults_params : array();

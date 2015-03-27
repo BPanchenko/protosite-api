@@ -48,6 +48,9 @@
 	</dl>
 	<h3>Примеры целевых запросов(конечных точек) API</h3>
 	<p>
+		В качестве примера рассматривается API блога.
+	</p>
+	<p>
 		<h4><code>GET: /list/</code></h4>
 		<p>Массив статей.</p>
 		<h4><code>POST: /list/</code></h4>
@@ -63,7 +66,11 @@
 			Возвращает обработанную модель.
 		</p>
 		<h4><code>DELETE: /list/{item_id}</code></h4>
-		<p>Удаление сущности.</p>
+		<p>
+			Удаление модели. Подразумевает определение ячейки <code>`tb_list`.`is_del`</code> равным <q>1</q>.<br>
+			Рекомендуется переопределять этот метод в модели для оптимизации источника данных.
+			Возвращает HTTP-статус <q>204 No Content</q>. 
+		</p>
 	</p>
 	<h3>Ветка доступа к данным пользователей</h3>
 	<p>
@@ -103,11 +110,6 @@
 		Модели и Коллекции являются компонентами фреймворка, наследниками от абстрактного класса <q>Component</q>.
 	</p>
 	<br><br>
-	<h2></h2>
-	<p>
-		<a href="https://github.com/interagent/http-api-design" target="_blank">HTTP API Design Guide</a>,<br>
-		<a href="https://instagram.com/developer/#" target="_blank">Instagram API</a>
-	</p>
 	
 	<h2>Конечные точки API как публичные методы объектов.</h2>
 	<p>
@@ -176,4 +178,9 @@
 			}
 		}
 	</pre>
+	<hr>
+	<hr>
+	<p>
+		Спасибо <a href="http://backbonejs.org/" target="_blank">Backbone.js</a> и <a href="https://github.com/interagent/http-api-design/blob/master/README.md">HTTP API Design Guide</a> и заочно <a href="https://ru.wikipedia.org/wiki/WebDAV">WebDAV</a>!
+	</p>
 </p>

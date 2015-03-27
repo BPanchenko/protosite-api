@@ -6,7 +6,7 @@
 	if(isset($_GET['debug'])) {
 		echo "\n\n//*********************************";
 		echo "\n// DATE\n";
-		echo date("c", 1420045200);
+		echo date("c");
 	}
 	
 	if(isset($_GET['fields'])) {
@@ -53,6 +53,8 @@
 					if($_prev->type === 'object') {
 						$part->instance->attachTo($_prev->instance);
 					}
+					if(get_class($part->instance) == 'Events')
+						var_dump($part->instance);
 				break;
 				
 				case 'string':
@@ -104,15 +106,40 @@
 		}
 		
 		if($endpoint->type === 'object') {
-			$Response->get('meta')->code = 200;
 			
-			$options = array(
-				'fields' => explode(',', $_GET['fields'])
-			);
-			list($where, $fields, $count, $offset) = array();
-			$endpoint->instance->fetch($where, $fields, $count, $offset);
+			if (!$endpoint->instance->isValid()) {
+				$Response->setStatusCode(422, 'Unprocessable Entity');
+				$Response->sendHeaders();
+				exit();
+			}
 			
-			$Response->set('data', $endpoint->instance->toArray());
+			$Response->setStatusCode(200, 'OK');
+			
+			if(isset($_GET['debug'])) {
+				print_r("// Request->parameters()->toArray" . "\n");
+				var_dump($Request->parameters()->toArray());
+			}
+			$endpoint->instance->fetch($Request->parameters()->toArray());
+			
+			
+			if ($endpoint->instance instanceof \base\Collection && 
+				$Request->method == 'POST'
+			) {
+				$Response->setStatusCode(201, 'Created');
+				$model = $endpoint->instance->create($Request->body());
+				
+			} elseif ($Request->method == 'PUT') {
+				$Response->setStatusCode(202, 'Accepted');
+				$endpoint->instance->save($Request->body());
+				
+			} elseif ($Request->method == 'DELETE') {
+				$Response->setStatusCode(204, 'No Content');
+				$Response->sendHeaders();
+				exit();
+			}
+			
+			if($Response->is_empty('data'))
+				$Response->set('data', $endpoint->instance->toArray());
 		}
 		
 	} catch (AppException $e) {
@@ -132,6 +159,7 @@
 		
 	} catch (Exception $e) {
 		$Response->get('meta')->code = 400;
+		$Response->setStatusCode(400, 'Bad Request');
 		$Response->get('meta')->error_message = $e->getMessage();
 	}
 	

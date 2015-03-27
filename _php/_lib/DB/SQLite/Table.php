@@ -108,6 +108,16 @@ require_once dirname(__FILE__) . '/Schema.php';
 			return parent::fetchAll($fetch_style);
 		}
 		
+		/****/
+		public function save(array $columns) {
+			return parent::save($this->_name, $columns);
+		}
+		
+		/****/
+		public function update($columns = array(), $conditions='', $params=array()) {
+			return parent::update($this->_name, $columns, $conditions='', $params);
+		}
+		
 		public function drop() { return $this->dropTable($this->_name); }
 		public function name() { return $this->_name; }
 		

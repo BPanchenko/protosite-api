@@ -142,6 +142,14 @@ namespace http;
 		}
 		
 		/**
+		 * 
+		 */
+		public function is_empty($name) {
+			return empty($this->content->$name);
+		}
+		
+		
+		/**
 		 * @return integer the HTTP status code to send with the response.
 		 */
 		public function getStatusCode() {
