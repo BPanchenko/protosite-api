@@ -25,8 +25,7 @@ namespace base;
 		}
 		
 		
-		/** 
-		 ============ */
+		/****/
 		public function offsetExists($offset) {
 			return isset($this->models[$offset]);
 		}
