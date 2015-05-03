@@ -116,31 +116,31 @@
 		...
 	</p>
 	<pre>
-		class Items extends Collection {
-			public $ModelClass = Item;
-			
-			/** Gun API Methods
-			 * param $options - хеш параметров из программной среды,
-			 *                  обычно это массив $_GET, $_POST или $_PUT
-			 *  _______________   __________________
-			 *  request_method | | collection_method
-			public function  get_method($method_parametr, $options=array()) {
-				...
-				return $result;
-			}
-			public function post_method($method_parametr, $options=array()) {
-				...
-				return $result;
-			}
-			public function put_method($method_parametr, $options=array()) {
-				...
-				return $result;
-			}
-			public function delete_method($method_parametr, $options=array()) {
-				...
-				return $result;
-			}
+	class Items extends Collection {
+		public $ModelClass = Item;
+		
+		/** Gun API Methods
+		 * param $options - хеш параметров из программной среды,
+		 *                  обычно это массив $_GET, $_POST или $_PUT
+		 *  _______________   __________________
+		 *  request_method | | collection_method
+		public function  get_method($method_parametr, $options=array()) {
+			...
+			return $result;
 		}
+		public function post_method($method_parametr, $options=array()) {
+			...
+			return $result;
+		}
+		public function put_method($method_parametr, $options=array()) {
+			...
+			return $result;
+		}
+		public function delete_method($method_parametr, $options=array()) {
+			...
+			return $result;
+		}
+	}
 	</pre>
 	
 	<h3>Пользовательские методы HTTP-запросов.</h3>
@@ -149,38 +149,38 @@
 	</p>
 	
 	<pre>
-		class Item extends Model {
-			protected $_table = "`db_name`.`table_name`";
-			
-			/** Gun API Methods
-			 * param $options - хеш параметров из программной среды, обычно это массив $_GET
-			 * _______________   __________________
-			 * request_method | | model_method
-			public function get_method($options=array()) {
-				...
-				return $result;
-			}
-			public function get_lastmodify() {
-				$_ts = $this->_table->select('updated')
-							->order('`updated` desc')
-							->limit(1)
-							->fetchColumn();
-				return date("c", $_ts);
-			}
-			
-			public function put_method(array $uri_parametrs) {
-				...
-				return $result;
-			}
-			public function delete_method(array $uri_parametrs) {
-				...
-				return $result;
-			}
+	class Item extends Model {
+		protected $_table = "`db_name`.`table_name`";
+		
+		/** Gun API Methods
+		 * param $options - хеш параметров из программной среды, обычно это массив $_GET
+		 * _______________   __________________
+		 * request_method | | model_method
+		public function get_method($options=array()) {
+			...
+			return $result;
 		}
+		public function get_lastmodify() {
+			$_ts = $this->_table->select('updated')
+						->order('`updated` desc')
+						->limit(1)
+						->fetchColumn();
+			return date("c", $_ts);
+		}
+		
+		public function put_method(array $uri_parametrs) {
+			...
+			return $result;
+		}
+		public function delete_method(array $uri_parametrs) {
+			...
+			return $result;
+		}
+	}
 	</pre>
 	<hr>
 	<hr>
 	<p>
-		Спасибо <a href="http://backbonejs.org/" target="_blank">Backbone.js</a> и <a href="https://github.com/interagent/http-api-design/blob/master/README.md">HTTP API Design Guide</a> и заочно <a href="https://ru.wikipedia.org/wiki/WebDAV">WebDAV</a>!
+		Спасибо <a href="http://backbonejs.org/" target="_blank">Backbone.js</a>, <a href="https://github.com/interagent/http-api-design/blob/master/README.md">HTTP API Design Guide</a> и заочно <a href="https://ru.wikipedia.org/wiki/WebDAV">WebDAV</a>!
 	</p>
 </p>
