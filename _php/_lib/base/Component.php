@@ -85,15 +85,24 @@ namespace base;
 				// TODO: remove items from `fields` that are present in the `excluded_fields`
 			}
 			
+			// build where expression
+			$where_parts = array();
+			if($this instanceof \base\Model)
+				array_push($where_parts, "`" . $this->_table->primaryKey() . "` = '" . $this->id . "'");
+			
+			$where_expression = join($where_parts, ' AND ');
+			
+			
 			// 
 			$res = $this->_table->reset()
 								->select($options['fields'])
+								->where($where_expression)
 								->limit($options['count'])
 								->offset($options['offset'])
 								->order($options['order'])
 								->fetchAll(\PDO::FETCH_ASSOC);
 			
-			return $this->set($res);
+			return $this->set( $this instanceof \base\Model ? $res[0] : $res);
 		}
 		
 		/**
