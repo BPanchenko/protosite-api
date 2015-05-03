@@ -8,6 +8,7 @@ namespace base;
 		public $pagination;
 		protected $_columns = array();
 		
+		
 		function __construct($data = array(), $parent = NULL) {
 			if(is_array($data) && count($data))
 				foreach($data as $item) {
@@ -22,6 +23,7 @@ namespace base;
 			
 			parent::__construct();
 		}
+		
 		
 		/** 
 		 ============ */
@@ -47,6 +49,7 @@ namespace base;
 			
 			return is_null($index) ? false : true;
 		}
+		
 		
 		/**
 		 * Добавление элемента в коллекцию
@@ -76,6 +79,7 @@ namespace base;
 			return $this->models[$index];
 		}
 		
+		
 		/**
 		 * Создание модели внутри коллекции.
 		 * Новая модель автоматически добавляется в коллекцию.
@@ -90,6 +94,7 @@ namespace base;
 			return $model;
 		}
 		
+		
 		/**
 		 * Обход элементов коллекции.
 		 * Для каждого элемента вызывается функция, переданая в параметре метода.
@@ -101,6 +106,7 @@ namespace base;
 				call_user_func($fn, $model, $index, $this);
 			return $this;
 		}
+		
 		
 		/**
 		 * Выполняет поиск элемента коллекции,
@@ -115,6 +121,7 @@ namespace base;
 			return $this->where($attributes, true);
 		}
 		
+		
 		/**
 		 * Возвращает модель из коллекции по ее идентификатору.
 		 */
@@ -126,6 +133,47 @@ namespace base;
 			
 			return NULL;
 		}
+		
+		
+		/**
+		 * Поиск модели с минимальным значением атрибута $attr
+		 */
+		public function max($attr) {
+			$result = NULL;
+			
+			for ($i = 0; $i <= $this->length; $i++) {
+				if(!$this[$i]->has($attr))
+					continue;
+				
+				if(is_null($result))
+					$result = $this[$i];
+				elseif($result->get($attr) < $this[$i]->get($attr))
+					$result = $this[$i];
+			}
+			
+			return $result;
+		}
+		
+		
+		/**
+		 * Поиск модели с минимальным значением атрибута $attr
+		 */
+		public function min($attr) {
+			$result = NULL;
+			
+			for ($i = 0; $i <= $this->length; $i++) {
+				if(!method_exists($this[$i], 'has') || !$this[$i]->has($attr))
+					continue;
+				
+				if(is_null($result))
+					$result = $this[$i];
+				elseif($result->get($attr) > $this[$i]->get($attr))
+					$result = $this[$i];
+			}
+			
+			return $result;
+		}
+		
 		
 		/**
 		 * Возвращает индекс модели в коллекции.
@@ -144,6 +192,7 @@ namespace base;
 			return $index;
 		}
 		
+		
 		/****/
 		public function set($data, $end=0) {
 			if(is_array($data) && count($data))
@@ -152,6 +201,7 @@ namespace base;
 				}
 			return $this;
 		}
+		
 		
 		/**
 		 * Выбирает срез коллекции начиная с идекса $start и заканчивая индексом $end.
@@ -162,13 +212,15 @@ namespace base;
 			return  array_slice ($this->models, $offset, $length);
 		}
 		
+		
 		/**
 		 * Преобразует коллекцию в простой массив,
 		 * каждый элемент которого является ассоциативным массивом атрибутов модели.
 		 */
 		public function toArray($options=array()) {
 			$array = array();
-			if(!$this->length) return $array;
+			if(!$this->length)
+				return $array;
 			
 			if($options['bulk'] == 'ids') {
 				foreach($this->models as $model) {
@@ -185,6 +237,7 @@ namespace base;
 		public function toJSON($options=array()) {
 			return json_encode($this->toArray($options));
 		}
+		
 		
 		/**
 		 * Выполняет поиск элементов коллекции,
