@@ -94,7 +94,7 @@ namespace base;
 				if(isset($this->_attributes[$key]) && $this->_attributes[$key] !== $val) {
 					$this->_previous[$key] = $this->_attributes[$key];
 					$this->_changed[$key] = $val;
-				} elseif ($this->_attributes[$key] == $val) continue;
+				} elseif ($this->_attributes[$key] === $val) continue;
 				
 				if(is_array($this->_attributes[$key]) && is_array($val)) {
 					// для сохранения массива данных используется слияние старых и новых данных 
