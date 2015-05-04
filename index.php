@@ -1,4 +1,5 @@
 <?
+	
 	$Request = http\Request::init();
 	$Response = http\Response::init();
 	
@@ -148,11 +149,13 @@
 		
 	} catch (SystemException $e) {
 		// 500-е ошибки
+		$Response->setStatusCode(500, 'Internal Server Error');
 		$Response->get('meta')->code = $e->getCode();
 		$Response->get('meta')->error_type = $e->getType();
 		$Response->get('meta')->error_message = $e->getMessage();
 		
 	} catch (PDOException $e) {
+		$Response->setStatusCode(500, 'PDOException');
 		$Response->get('meta')->code = '500.' . $e->getCode();
 		$Response->get('meta')->error_type = 'PDOException';
 		$Response->get('meta')->error_message = $e->getMessage();
