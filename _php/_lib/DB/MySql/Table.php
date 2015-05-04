@@ -12,6 +12,7 @@ require_once dirname(__FILE__) . '/Schema.php';
 		protected $_primary_key;
 		
 		function __construct($table, $user, $pass) {
+			$table = str_replace('`', '', $table);
 			if(preg_match('/^mysql:([\w]+).([\w]+)/', $table, $_matches)) {
 				$this->_schema = $_matches[1];
 				$this->_name = $_matches[2];
@@ -113,6 +114,11 @@ require_once dirname(__FILE__) . '/Schema.php';
 		
 		/****/
 		public function save(array $columns) {
+			// check columns among the fields of database table
+			foreach($columns as $column=>$value)
+				if(!$this->hasColumn($column))
+					unset($columns[$column]);
+			
 			return parent::save($this->_name, $columns);
 		}
 		

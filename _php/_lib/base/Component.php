@@ -129,6 +129,30 @@ namespace base;
 			
 			return $table;
 		}
+		
+		
+		/* Insert or update a component in the database
+		 ========================================================================== */
+		
+		public function save($data) {
+			if($data instanceof \stdClass)
+				$data = json_decode(json_encode($data), true);
+			
+			if(is_array($data) && count($data))
+				$this->set($this->parse($data));
+			
+			// save models of collection
+			if($this instanceof \base\Collection) {
+				foreach($this as $model)
+					$model->save();
+				return $this;
+			}
+			
+			// save model
+			$this->_table->save($this->toArray());
+			
+			return $this;
+		}
 	}
 
 ?>

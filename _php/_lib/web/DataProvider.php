@@ -1,5 +1,5 @@
 <?php
-namespace Data;
+namespace web;
 require_once dirname(__FILE__) . '/Curl.php';
 
 	/**

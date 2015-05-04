@@ -139,7 +139,7 @@ namespace DB;
 		
 		/****/
 		public function where($conditions, array $params = array()) {
-			$this->_query['where']=$conditions;
+			$this->_query['where'] = $conditions;
 			
 			foreach($params as $name=>$value)
 				$this->_params[$name]=$value;
@@ -152,7 +152,7 @@ namespace DB;
 			$this->_query['where'] .= ' AND ' . $conditions;
 			
 			foreach($params as $name=>$value)
-				$this->_params[$name]=$value;
+				$this->_params[$name] = $value;
 				
 			return $this;
 		}

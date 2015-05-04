@@ -1,5 +1,5 @@
 <?
-namespace Data;
+namespace web;
 
 use \base\CaseInsensitiveArray;
 
@@ -52,6 +52,26 @@ use \base\CaseInsensitiveArray;
             $this->setOpt(CURLOPT_CUSTOMREQUEST, 'GET');
 			$this->setOpt(CURLOPT_HTTPGET, true);
 			
+			return $this->exec();
+		}
+
+		public function post($url, $data = array()) {
+			if (is_array($data))
+				$this->setData($data);
+	
+			$this->setOpt(CURLOPT_URL, $this->buildURL($url));
+			$this->setOpt(CURLOPT_CUSTOMREQUEST, 'POST');
+			$this->setOpt(CURLOPT_POST, true);
+			$this->setOpt(CURLOPT_POSTFIELDS, $this->_data);
+			
+			return $this->exec();
+		}
+	
+		public function options($url, $data = array())
+		{
+			$this->unsetHeader('Content-Length');
+			$this->setOpt(CURLOPT_URL, $this->buildURL($url, $data));
+			$this->setOpt(CURLOPT_CUSTOMREQUEST, 'OPTIONS');
 			return $this->exec();
 		}
 		

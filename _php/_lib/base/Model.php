@@ -24,10 +24,11 @@ namespace base;
 				$this->attachTo($parent);
 			}
 			
-			if($data instanceof stdClass)
+			if($data instanceof \stdClass)
 				$data = json_decode(json_encode($data), true);
 			
-			if(is_array($data))
+			
+			if(is_array($data) && count($data))
 				$this->set($this->parse($data));
 			elseif(is_numeric($data))
 				$this->set(array('id'=>$data));
@@ -52,22 +53,29 @@ namespace base;
 			return $this->remove($attr, $value);
 		}
 		
+		
 		/**
 		 * @method has()
 		 */
 		public function has($attr) {
 			return array_key_exists($attr, $this->_attributes);
 		}
+		
+		
 		/**
 		 * @method get()
 		 */
         public function get($attr) {
 			return $this->has($attr) ? $this->_attributes[$attr] : NULL;
         }
+		
+		
 		/**
 		 * @method parse()
 		 */
 		public function parse($data) { return $data; }
+		
+		
 		/**
 		 * @method set()
 		 */
