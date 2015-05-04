@@ -1,6 +1,6 @@
 <?php
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, PUT, PATH, DELETE");
+header("Access-Control-Allow-Methods: GET, POST, PUT, PATH, DELETE, OPTIONS");
 header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Max-Age: 0");
 header("Cache-Control: public, max-age=0, must-revalidate");
