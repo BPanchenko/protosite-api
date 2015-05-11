@@ -15,16 +15,24 @@ namespace base;
 		protected $_tables = array();
 		
 		
-		function __construct() {
+		function __construct($data = array(), $parent = NULL) {
+			
+			
+			if($parent instanceof \base\Component)
+				$this->attachTo($parent);
+			
 			if(is_string($this->_table) && $this->_table)
 				$this->_table = $this->initTable($this->_table);
 			
 			if(is_array($this->_tables) && count($this->_tables))
 				foreach($this->_tables as $_tb_name=>$_tb_dns) {
+					if($_tb_dns instanceof \PDO)
+						continue;
+					
 					if(strpos($_tb_dns, '{model_id}') !== false && !$this->isNew()) {
 						$_tb_dns = str_replace('{model_id}', $this->id, $_tb_dns);
 						$this->_tables[$_tb_name] = $this->initTable($_tb_dns);
-					} else
+					} elseif(strpos($_tb_dns, '{model_id}') === false)
 						$this->_tables[$_tb_name] = $this->initTable($_tb_dns);
 				}
 		}
@@ -34,7 +42,8 @@ namespace base;
 		}
 		
 		public function attach($parent_object) {
-			array_push($_childrens, $parent_object);
+			if($parent instanceof \Component)
+				array_push($_childrens, $parent_object);
 			return $this;
 		}
 		
@@ -43,6 +52,9 @@ namespace base;
 				$this->_parent = $parent_object;
 				$parent_object->attach($this);
 			}
+			if($this instanceof \base\Model && $parent_object instanceof \base\Collection)
+				$this->collection = $parent_object;
+			
 			return $this;
 		}
 		

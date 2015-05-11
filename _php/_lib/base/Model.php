@@ -3,7 +3,6 @@ namespace base;
 
 	class Model extends Component implements \ArrayAccess {
 		
-		/* Data of model */
         protected $_attributes = array();
 		protected $_changed = array();
 		protected $_defaults = array();
@@ -18,15 +17,8 @@ namespace base;
 			
 			$this->_attributes = $this->_defaults;
 			
-			if(!is_null($parent) && $parent instanceof Collection) {
-				$this->collection = $parent;
-			} else {
-				$this->attachTo($parent);
-			}
-			
 			if($data instanceof \stdClass)
 				$data = json_decode(json_encode($data), true);
-			
 			
 			if(is_array($data) && count($data))
 				$this->set($this->parse($data));
@@ -112,7 +104,7 @@ namespace base;
 				}
 				
 				if($key == static::$idAttribute || $key == 'id') {
-					$this->id = $this->_attributes['id'] = $this->_attributes[static::$idAttribute] = $val;
+					$this->id = $this->_attributes[static::$idAttribute] = $val;
 				}
 			}
 			
