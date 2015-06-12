@@ -131,7 +131,7 @@
 				$Response->setStatusCode(202, 'Accepted');
 				$endpoint->instance->save($Request->body());
 				
-			} elseif ($Request->method == 'DELETE') {
+			} elseif ($Request->method == 'DELETE' || $Request->method == 'OPTIONS') {
 				$Response->setStatusCode(204, 'No Content');
 				$Response->sendHeaders();
 				exit();
