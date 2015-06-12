@@ -51,11 +51,9 @@
 					$part->instance = new $classname;
 					
 					$_prev = $points[$i-1];
-					if($_prev->type === 'object') {
+					if($_prev->type === 'object')
 						$part->instance->attachTo($_prev->instance);
-					}
-					if(get_class($part->instance) == 'Events')
-						var_dump($part->instance);
+					
 				break;
 				
 				case 'string':
@@ -133,14 +131,14 @@
 				$Response->setStatusCode(202, 'Accepted');
 				$endpoint->instance->save($Request->body());
 				
-			} elseif ($Request->method == 'DELETE' || $Request->method == 'OPTIONS') {
+			} elseif ($Request->method == 'DELETE') {
 				$Response->setStatusCode(204, 'No Content');
 				$Response->sendHeaders();
 				exit();
 			}
 			
 			if($Response->is_empty('data'))
-				$Response->set('data', $endpoint->instance->toArray());
+				$endpoint->instance->prepareResponse($Response);
 		}
 		
 	} catch (AppException $e) {
