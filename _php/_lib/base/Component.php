@@ -165,6 +165,15 @@ namespace base;
 			
 			return $this;
 		}
+		
+		
+		/* Prepare api response
+		 ========================================================================== */
+		
+		public function prepareResponse($Response) {
+			$Response->set('data', $this->toArray());
+			return $this;
+		}
 	}
 
 ?>
