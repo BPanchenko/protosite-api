@@ -1,6 +1,6 @@
 <?php
 namespace base;
-
+	
 	class Collection extends Component implements \ArrayAccess {
 		public static $classModel = Model;
 		public $models = array();
@@ -258,6 +258,23 @@ namespace base;
 						return $model;
 					else
 						array_push($_result, $model);
+			}
+			
+			return $_result;
+		}
+		
+		
+		/**
+		 * Вернет массив значений свойства каждого элемента коллекции.
+		 */
+		public function pluck($attr){
+			$_result = array();
+			
+			foreach($this->models as $model) {
+				if(!$model->has($attr))
+					continue;
+				if(!in_array($model->get($attr), $_result))
+					array_push($_result, $model->get($attr));
 			}
 			
 			return $_result;
