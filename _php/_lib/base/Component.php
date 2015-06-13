@@ -99,20 +99,28 @@ namespace base;
 			
 			// build where expression
 			$where_parts = array();
-			if($this instanceof \base\Model)
-				array_push($where_parts, "`" . $this->_table->primaryKey() . "` = '" . $this->id . "'");
+			if($this instanceof \base\Model) {
+				if($this->_table->hasColumn(static::$idAttribute))
+					array_push($where_parts, "`" . static::$idAttribute . "` = '" . $this->id . "'");
+				else
+					array_push($where_parts, "`" . $this->_table->primaryKey() . "` = '" . $this->id . "'");
+			}
 			
 			$where_expression = join($where_parts, ' AND ');
 			
 			
 			// 
-			$res = $this->_table->reset()
-								->select($options['fields'])
-								->where($where_expression)
-								->limit($options['count'])
-								->offset($options['offset'])
-								->order($options['order'])
-								->fetchAll(\PDO::FETCH_ASSOC);
+			$this->_table->reset()->select($options['fields'])
+						 ->where($where_expression);
+			
+			if($this instanceof \base\Model)
+				$this->_table->limit(1);
+			else
+				$this->_table->limit($options['count'])
+						 ->offset($options['offset'])
+						 ->order($options['order']);
+			
+			$res = $this->_table->fetchAll(\PDO::FETCH_ASSOC);
 			
 			return $this->set( $this instanceof \base\Model ? $res[0] : $res);
 		}

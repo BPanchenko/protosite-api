@@ -71,7 +71,7 @@ require_once dirname(__FILE__) . '/RequestParametersModel.php';
 					
 				} elseif(is_numeric($_value)) {
 					$_part->type = 'int'; // point is a identifier
-					$_part->value = (int)$_value;
+					$_part->value = $_value < PHP_INT_MAX ? (int)$_value : $_value;
 					
 				} elseif($_value === 'self') {
 					$_part->type = 'self'; // checkpoint 'self' defines the authorized user ID
