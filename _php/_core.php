@@ -32,7 +32,7 @@ require_once PHP_DIR . "/app/AppException.php";
 require_once PHP_LIB_DIR . "/http/Request.php";
 require_once PHP_LIB_DIR . "/http/Response.php";
 
-require_once PHP_DIR . "/models/Profile.php";
+require_once PHP_DIR . "/models/Article.php";
 
-require_once PHP_DIR . "/collections/Profiles.php";
+require_once PHP_DIR . "/collections/Articles.php";
 ?>
