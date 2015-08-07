@@ -350,9 +350,18 @@ namespace http;
 		public function getIsEmpty() {
 			return in_array($this->getStatusCode(), array(201, 204, 304));
 		}
-		
+
+        /**
+         * Prepare content of response
+         * @return $this
+         */
 		public function prepare() {
+            if(is_array($this->get('data'))) {
+                $this->get('meta')->length = count($this->get('data'));
+            }
+
 			$this->content = json_encode($this->content);
+
 			return $this;
 		}
 	}
