@@ -74,6 +74,13 @@
 					'en' => "Not registered file type",
 					'ru' => "Не зарегистрированный тип файла"
 				)
+			),
+			'UnprocessableEntity' => array(
+				'code' => 422,
+				'error_message' => array(
+					'en' => "Unprocessable Entity",
+					'ru' => "Сущность не поддерживается"
+				)
 			)
 		);
 		
