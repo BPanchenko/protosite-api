@@ -112,7 +112,7 @@ namespace base;
 			// 
 			$this->_table->reset()->select($options['fields'])
 						 ->where($where_expression);
-			
+
 			if($this instanceof \base\Model)
 				$this->_table->limit(1);
 			else
@@ -182,6 +182,13 @@ namespace base;
 			$Response->set('data', $this->toArray());
 			return $this;
 		}
+
+        /**
+         * Magic methods
+         */
+        public function __toString() { return '{' . get_called_class() . ':' . json_encode($this->toArray()) .'}'; }
+        public function __call($name, $arguments) { echo "Call undefined method '$name' " . implode(', ', $arguments). "\n"; }
+        public static function __callStatic($name, $arguments) { echo "Call undefined static method '$name' " . implode(', ', $arguments). "\n"; }
 	}
 
 ?>

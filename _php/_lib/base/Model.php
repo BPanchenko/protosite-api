@@ -189,8 +189,5 @@ namespace base;
 		public function __get($attr) { return $this->get($attr); }
 		public function __set($attr, $value) { return $this->set($attr, $value); }
 		public function __isset($attr) { return $this->has($attr); }
-		public function __toString() { return '{' . get_called_class() . ':' . json_encode($this->toArray()) .'}'; }
-		public function __call($name, $arguments) { echo "Call undefined method '$name' " . implode(', ', $arguments). "\n"; }
-		public static function __callStatic($name, $arguments) { echo "Call undefined static method '$name' " . implode(', ', $arguments). "\n"; }
 	}
 ?>
