@@ -1,4 +1,4 @@
-<?
+<?php
 
     $Log = new system\Log;
 	$Request = http\Request::init();
@@ -7,12 +7,44 @@
     if($Request->uri() == '/favicon.ico') exit();
 
     $Log->write($Request->ip() . "\t" . $Request->uri() . "\n");
-	
-	if(isset($_GET['debug'])) {
-		echo "\n\n//*********************************";
-		echo "\n// DATE\n";
-		echo date("c");
-	}
+    $lastRequests = $Log->read();
+
+    // calc the count of requests for the period
+    $for_last5seconds = time() - 5;
+    $cnt_from_ip = 0;
+    $for_last20seconds = time() - 20;
+    $cnt_all_requests = 0;
+    foreach($lastRequests as $ts => $item) {
+        $ts = (float)$ts;
+        if($ts > $for_last5seconds && $Request->ip() == $item[0]) $cnt_from_ip++;
+        if($ts > $for_last20seconds) $cnt_all_requests++; else break;
+    }
+
+    // exit if
+    if ($cnt_from_ip > 20 || $cnt_all_requests > 400) {
+        $Response->setStatusCode(429);
+        $Response->get('meta')->error_message = 'Too Many Requests';
+
+        if($cnt_from_ip > 20)
+            $Response->setHeader('Retry-After', 5);
+        if($cnt_all_requests > 400)
+            $Response->setHeader('Retry-After', 20);
+
+        $Response->send();
+        exit();
+    }
+
+    if(isset($_GET['debug'])) {
+        echo "\n\n//*********************************";
+        echo "\n// DATE\n";
+        echo date("c");
+    }
+
+    if(isset($_GET['debug'])) {
+        echo "\n\n//*********************************";
+        echo "\n// LIST OF THE LAST REQUESTS\n";
+        var_dump($lastRequests);
+    }
 	
 	if(isset($_GET['fields'])) {
 		$_GET['fields'] = explode(',', $_GET['fields']);
@@ -28,7 +60,7 @@
 		
 		if(isset($_GET['debug'])) {
 			echo "\n\n//*********************************";
-			echo "\n// POINTS OF REQUEST\n";
+			echo "\n// POINTS OF THE REQUEST\n";
 			var_dump($points);
 		}
 		
@@ -167,6 +199,6 @@
 		$Response->setStatusCode(400, 'Bad Request');
 		$Response->get('meta')->error_message = $e->getMessage();
 	}
-	
+
 	$Response->send();
 ?>
