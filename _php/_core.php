@@ -13,6 +13,7 @@ define('PHP_LIB_DIR', dirname(__FILE__) . "/_lib");
 require_once PHP_DIR . "/_settings.php";
 require_once PHP_DIR . "/_lib/functions.php";
 
+require_once PHP_LIB_DIR . "/system/Log.php";
 require_once PHP_LIB_DIR . "/system/SystemException.php";
 
 require_once PHP_LIB_DIR . "/base/CaseInsensitiveArray.php";

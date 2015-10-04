@@ -10,6 +10,7 @@ require_once dirname(__FILE__) . '/RequestParametersModel.php';
 		private $_parts;
 		private $_headers;
 		private $_parameters;
+        private $_uri;
 		
 		static public function init() {
 			if (is_object(self::$_instance))
@@ -19,6 +20,7 @@ require_once dirname(__FILE__) . '/RequestParametersModel.php';
 			self::$_instance->method = strtoupper($_SERVER['REQUEST_METHOD']);
 
             self::$_instance->_headers = new \base\Model(getallheaders());
+            self::$_instance->_uri = $_SERVER['REQUEST_URI'];
 
             $request_parameters = array_merge($_GET, array(
                 '__uri__' => array()
@@ -94,6 +96,10 @@ require_once dirname(__FILE__) . '/RequestParametersModel.php';
 			
 			return ($this->_parts = $_parts);
 		}
+
+        public function uri(){
+            return self::$_instance->_uri;
+        }
 		
 		private function __construct() {}
 		private function __clone() {}

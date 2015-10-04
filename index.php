@@ -1,8 +1,12 @@
 <?
-	
+
+    $Log = new system\Log;
 	$Request = http\Request::init();
 	$Response = http\Response::init();
-	
+
+    if($Request->uri() == '/favicon.ico') exit();
+
+    $Log->write($Request->ip() . "\t" . $Request->uri() . "\n");
 	
 	if(isset($_GET['debug'])) {
 		echo "\n\n//*********************************";
