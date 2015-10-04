@@ -97,7 +97,7 @@ namespace http;
 		/**
 		* @var HeaderCollection
 		*/
-		private $_headers;
+		private $_headers = array();
 		
 		private $_body;
 		protected static $_instance;
@@ -186,6 +186,7 @@ namespace http;
 			$this->prepare();
 			$this->trigger(self::EVENT_AFTER_PREPARE);
 			$this->sendHeaders();
+			// $this->sendCookies();
 			$this->sendContent();
 			$this->trigger(self::EVENT_AFTER_SEND);
 			$this->isSent = true;
@@ -210,19 +211,26 @@ namespace http;
 			
 			return $this;
 		}
+
+
+        public function setHeader($name, $value = '') {
+            if(!$this->_headers[$name])
+                $this->_headers[$name] = (array)$value;
+            else
+                array_push($this->_headers[$name], $value);
+            return $this;
+        }
 		
 		/**
 		 * Sends the response headers to the client
 		 */
 		protected function sendHeaders() {
-			if (headers_sent())
-				return $this;
-			
+
 			$statusCode = $this->getStatusCode();
 			header("HTTP/{$this->version} $statusCode {$this->statusText}");
-			if ($this->_headers) {
-				$headers = $this->getHeaders();
-				foreach ($headers as $name => $values) {
+
+			if (count($this->_headers))
+				foreach ($this->_headers as $name => $values) {
 					$name = str_replace(' ', '-', ucwords(str_replace('-', ' ', $name)));
 					// set replace for first occurrence of header but false afterwards to allow multiple
 					$replace = true;
@@ -231,8 +239,6 @@ namespace http;
 						$replace = false;
 					}
 				}
-			}
-			// $this->sendCookies();
 			
 			return $this;
 		}
