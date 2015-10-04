@@ -17,22 +17,31 @@ require_once dirname(__FILE__) . '/RequestParametersModel.php';
 			
 			self::$_instance = new self;
 			self::$_instance->method = strtoupper($_SERVER['REQUEST_METHOD']);
-			
-			self::$_instance->_parameters = new RequestParametersModel(RequestParametersModel::parse(array_merge($_GET, array(
-				'__uri__' => array()
-			))));
+
+            self::$_instance->_headers = new \base\Model(getallheaders());
+
+            $request_parameters = array_merge($_GET, array(
+                '__uri__' => array()
+            ));
+			self::$_instance->_parameters = new RequestParametersModel($request_parameters);
 			
 			return self::$_instance;
 		}
 		
 		public function headers() {
-			if(!is_null($this->_headers))
-				return $this->_headers;
-			
-			var_dump(getallheaders());
-			
-			return NULL;
+            return $this->_headers;
 		}
+
+        public function ip($check_proxy = true) {
+            if ($check_proxy && $_SERVER['HTTP_CLIENT_IP']) {
+                $ip = $_SERVER['HTTP_CLIENT_IP'];
+            } else if ($check_proxy && $_SERVER['HTTP_X_FORWARDED_FOR']) {
+                $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+            } else {
+                $ip = $_SERVER['REMOTE_ADDR'];
+            }
+            return $ip;
+        }
 		
 		public function parameters($key, $value) {
 			if(isset($value))
@@ -84,12 +93,6 @@ require_once dirname(__FILE__) . '/RequestParametersModel.php';
 			}
 			
 			return ($this->_parts = $_parts);
-		}
-		
-		protected function _prepareFetchSettings($query) {
-			$_settings = array();
-			
-			return $_settings;
 		}
 		
 		private function __construct() {}
