@@ -104,21 +104,59 @@ namespace base;
 				// TODO: remove items from `fields` that are present in the `excluded_fields`
 			}
 
-			// build where expression
-			$where_parts = array();
-			if($this instanceof \base\Model) {
-				if($this->_table->hasColumn(static::$idAttribute))
-					array_push($where_parts, "`" . static::$idAttribute . "` = '" . $this->id . "'");
-				else
-					array_push($where_parts, "`" . $this->_table->primaryKey() . "` = '" . $this->id . "'");
-			}
+            // build where expression
+            $_conditions = array();
 
-			$where_expression = join($where_parts, ' AND ');
+            if($this instanceof \base\Collection) {
+                if(is_array($options['where']))
+                    $_conditions = $options['where'];
+
+                else if(is_string($options['where'])) {
+                    $_conditions = explode(',', $options['where']);
+                    foreach($_conditions as $_i => $_condition) {
+                        preg_match('/([^\s!]+)([!]?:)([^:\s]+)/', $_condition, $_temp);
+
+                        if(count($_temp) != 4) {
+                            unset($_conditions[$_i]);
+                            continue;
+                        }
+
+                        $column = $_temp[1];
+                        $expr = $_temp[2];
+                        $value = $_temp[3];
+
+                        if($this->_table->hasColumn($column))
+                            $column = '`' . $column . '`';
+                        else {
+                            unset($_conditions[$_i]);
+                            continue;
+                        }
+
+                        if(is_numeric($value))
+                            $expr = str_replace(':', '=', $expr);
+                        else {
+                            $expr = str_replace(array('!:', ':'), array('NOT LIKE', 'LIKE'), $expr);
+                            $value = '"' . addslashes($value) . '"';
+                        }
+
+                        $_conditions[$_i] = $column . ' ' . $expr . ' ' . $value;
+                    }
+                }
+
+            } else if($this instanceof \base\Model) {
+                if($this->_table->hasColumn(static::$idAttribute))
+                    array_push($_conditions, "`" . static::$idAttribute . "` = '" . $this->id . "'");
+                else
+                    array_push($_conditions, "`" . $this->_table->primaryKey() . "` = '" . $this->id . "'");
+            }
+
+            $_where = join(' AND ', $_conditions);
 
 
 			//
-			$this->_table->reset()->select($options['fields'])
-						 ->where($where_expression);
+			$this->_table->reset()
+                         ->select($options['fields'])
+						 ->where($_where);
 
 			if($this instanceof \base\Model)
 				$this->_table->limit(1);
