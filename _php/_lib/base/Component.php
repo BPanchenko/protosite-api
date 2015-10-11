@@ -68,41 +68,42 @@ namespace base;
 
 		public function fetch($options) {
 
-			if(is_null($options))
-				$options = $this->_default_fetch_options;
-			elseif(is_array($options))
-				$options = array_merge($this->_default_fetch_options, $options);
-			else
-				throw new SystemException("WrongFetchOptions");
+            if(is_null($options))
+                $options = $this->_default_fetch_options;
+            elseif(is_array($options))
+                $options = array_merge($this->_default_fetch_options, $options);
+            else
+                throw new SystemException("WrongFetchOptions");
 
-			if(isset($options['fields']))
-				$options['fields'] = str2array($options['fields']);
-			else
-				$options['fields'] = $this->_table->fields();
+            if(isset($options['fields']))
+                $options['fields'] = str2array($options['fields']);
+            else
+                $options['fields'] = $this->_table->fields();
 
-			if(is_null($options['order']))
-				$options['order'] = '`' . $this->_table->primaryKey() . '` DESC';
-			else {
-				$_order = $options['order'];
-				if(strpos($_order, '-') === 0)
-					$options['order'] = '`' . substr($_order, 1) . '` ASC';
-				else
-					$options['order'] = '`' . $_order . '` DESC';
-				}
+            if(is_null($options['order']))
+                $options['order'] = '`' . $this->_table->primaryKey() . '` DESC';
+            else {
+                $_order = $options['order'];
+                if(strpos($_order, '-') === 0)
+                    $options['order'] = '`' . substr($_order, 1) . '` ASC';
+                else
+                    $options['order'] = '`' . $_order . '` DESC';
+            }
 
-			if(isset($_GET['debug'])) {
-				var_dump("// Table Options");
-				var_dump($options);
-			}
+            if(isset($_GET['debug'])) {
+                var_dump("// Table Options");
+                var_dump($options);
+            }
 
-			//
-			if(!isset($options['excluded_fields'])) {
-				// TODO: `excluded_fields` by default
-			}
-			if(isset($options['excluded_fields'])) {
-				$options['excluded_fields'] = str2array($options['excluded_fields']);
-				// TODO: remove items from `fields` that are present in the `excluded_fields`
-			}
+            //
+            if(!isset($options['excluded_fields'])) {
+                // TODO: `excluded_fields` by default
+            }
+            if(isset($options['excluded_fields'])) {
+                $options['excluded_fields'] = str2array($options['excluded_fields']);
+                // TODO: remove items from `fields` that are present in the `excluded_fields`
+            }
+
 
             // build where expression
             $_conditions = array();
@@ -114,7 +115,7 @@ namespace base;
                 else if(is_string($options['where'])) {
                     $_conditions = explode(',', $options['where']);
                     foreach($_conditions as $_i => $_condition) {
-                        preg_match('/([^\s!]+)([!]?:)([^:\s]+)/', $_condition, $_temp);
+                        preg_match('/([^\s!]+)([!]?:|==)([^:\s]+)/', $_condition, $_temp);
 
                         if(count($_temp) != 4) {
                             unset($_conditions[$_i]);
@@ -133,7 +134,7 @@ namespace base;
                         }
 
                         if(is_numeric($value))
-                            $expr = str_replace(':', '=', $expr);
+                            $expr = str_replace(array(':', '=='), '=', $expr);
                         else {
                             $expr = str_replace(array('!:', ':'), array('NOT LIKE', 'LIKE'), $expr);
                             $value = '"' . addslashes($value) . '"';
@@ -153,21 +154,21 @@ namespace base;
             $_where = join(' AND ', $_conditions);
 
 
-			//
-			$this->_table->reset()
-                         ->select($options['fields'])
-						 ->where($_where);
+            //
+            $this->_table->reset()
+                ->select($options['fields'])
+                ->where($_where);
 
-			if($this instanceof \base\Model)
-				$this->_table->limit(1);
-			else
-				$this->_table->limit($options['count'])
-						 ->offset($options['offset'])
-						 ->order($options['order']);
+            if($this instanceof \base\Model)
+                $this->_table->limit(1);
+            else
+                $this->_table->limit($options['count'])
+                    ->offset($options['offset'])
+                    ->order($options['order']);
 
-			$res = $this->_table->fetchAll(\PDO::FETCH_ASSOC);
+            $res = $this->_table->fetchAll(\PDO::FETCH_ASSOC);
 
-			return $this->set( $this instanceof \base\Model ? $res[0] : $res);
+            return $this->set( $this instanceof \base\Model ? $res[0] : $res);
 		}
 
 		/**
