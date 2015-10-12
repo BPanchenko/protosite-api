@@ -20,33 +20,19 @@
 						"ъ" => "", "Ъ" => "");
 		return preg_match("/[а-яА-Я]/",$string) ? strtr($string, $trans) : $string;
 	}
-	
-	function str2array($data) {
-		if(!empty($data)) {
-				$str = str_replace(array(';','\t','\n'),',',$data);
-				$str = preg_replace('~[^-_a-z0-9,]+~u','',$str);
-				$array = explode(',',$str);
-				if(!is_array($array) && !empty($array)) $array[0] = $array;
-		} elseif(is_array($data)) $array = $data;
-		else $array = NULL;
-		return $array;
-	}
-	
-	function __autoload($classname) {
-		$filename = ucfirst($classname);
-		
-		$dir = "classes/";
-		if(strpos($classname, 'View') !== false)
-			$dir = "views/";
-		if(strpos($classname, 'Model') !== false)
-			$dir = "models/";
-		if(strpos($classname, 'Collection') !== false)
-			$dir = "collections/";
-		
-		$path = str_replace('.:','',get_include_path())."/";
-		$file = $path . $dir . $filename .".php";
-		
-		if(is_file($file))
-			include_once $file;
-	}
+    
+    function str2array($data) {
+        $result = NULL;
+
+        if(is_array($data))
+            $result = $data;
+        else if(!empty($data)) {
+            $str = str_replace(array(';','\t','\n'),',',$data);
+            $str = preg_replace('~[^-_a-z0-9,]+~u','',$str);
+            $array = explode(',',$str);
+            if(!is_array($array) && !empty($array)) $array[0] = $array;
+        }
+
+        return $result;
+    }
 ?>
