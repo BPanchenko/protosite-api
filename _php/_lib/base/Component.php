@@ -113,7 +113,6 @@ namespace base;
             //
             if(isset($options['excluded_fields'])) {
                 $options['excluded_fields'] = str2array($options['excluded_fields']);
-                var_dump($options['excluded_fields']);
                 foreach($options['excluded_fields'] as $_field) {
                     $i = array_search($_field, $options['fields']);
                     if($i) unset($options['fields'][$i]);
