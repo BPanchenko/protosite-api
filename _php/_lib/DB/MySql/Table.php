@@ -4,8 +4,9 @@ require_once dirname(__FILE__) . '/Schema.php';
 
 	class Table extends \DB\MySql\Schema {
 		
-		protected $_name = '';
-		protected $_schema = '';
+		protected $_name;
+		protected $_schema;
+        protected $_fullname;
 		
 		protected $_columns;
 		protected $_defaults_query;
@@ -16,6 +17,7 @@ require_once dirname(__FILE__) . '/Schema.php';
 			if(preg_match('/^mysql:([\w]+).([\w]+)/', $table, $_matches)) {
 				$this->_schema = $_matches[1];
 				$this->_name = $_matches[2];
+                $this->_fullname = '`' . $this->_schema . '`.`' . $this->_name . '`';
 			} else 
 				throw new SystemException('WrongMySqlTableName');
 			
@@ -58,27 +60,24 @@ require_once dirname(__FILE__) . '/Schema.php';
 		}
 		
 		/* < TODO: use php trait ... */
-		
-		/****/
-		public function fields() {
-			if(!$this->_columns) $this->columns();
-			return
-				array_keys($this->columns);
-		}
-		
-		/****/
-		public function columnType($column_name) {
-			if(!$this->_columns) $this->columns();
-			return
-				$this->hasColumn($column_name) ? $this->_columns[$column_name]['type'] : NULL;
-		}
-		
-		/****/
-		public function hasColumn($column_name) {
-			if(!$this->_columns) $this->columns();
-			return
-				array_key_exists($column_name, $this->_columns);
-		}
+
+        /****/
+        public function fields() {
+            if(!$this->_columns) $this->columns();
+            return array_keys($this->_columns);
+        }
+
+        /****/
+        public function columnType($column_name) {
+            if(!$this->_columns) $this->columns();
+            return $this->hasColumn($column_name) ? $this->_columns[$column_name]['type'] : NULL;
+        }
+
+        /****/
+        public function hasColumn($column_name) {
+            if(!$this->_columns) $this->columns();
+            return array_key_exists($column_name, $this->_columns);
+        }
 		
 		/****/
 		public function primaryKey() {
@@ -129,6 +128,7 @@ require_once dirname(__FILE__) . '/Schema.php';
 		
 		public function drop() { return $this->dropTable($this->_name); }
 		public function name() { return $this->_name; }
+        public function fullname() { return $this->_fullname; }
 		
 		/* </ use php trait ... */
 	}
