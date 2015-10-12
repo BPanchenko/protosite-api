@@ -66,7 +66,27 @@ namespace base;
 		/* Synchronization of the component with database support
 		 ========================================================================== */
 
-		public function fetch($options) {
+        public function fetch($options) {
+            $options = $this->_prepareFetchOptions($options);
+
+            //
+            $this->_table->reset()
+                ->select($options['fields'])
+                ->where($options['where']);
+
+            if($this instanceof \base\Model)
+                $this->_table->limit(1);
+            else
+                $this->_table->limit($options['count'])
+                    ->offset($options['offset'])
+                    ->order($options['order']);
+
+            $res = $this->_table->fetchAll(\PDO::FETCH_ASSOC);
+
+            return $this->set( $this instanceof \base\Model ? $res[0] : $res);
+        }
+
+        protected function _prepareFetchOptions($options) {
 
             if(is_null($options))
                 $options = $this->_default_fetch_options;
@@ -75,7 +95,7 @@ namespace base;
             else
                 throw new SystemException("WrongFetchOptions");
 
-            if(isset($options['fields']))
+            if(!empty($options['fields']))
                 $options['fields'] = str2array($options['fields']);
             else
                 $options['fields'] = $this->_table->fields();
@@ -127,7 +147,7 @@ namespace base;
                         $value = $_temp[3];
 
                         if($this->_table->hasColumn($column))
-                            $column = '`' . $column . '`';
+                            $column = '`' . $this->_table->name() . '`.`' . $column . '`';
                         else {
                             unset($_conditions[$_i]);
                             continue;
@@ -151,27 +171,13 @@ namespace base;
                     array_push($_conditions, "`" . $this->_table->primaryKey() . "` = '" . $this->id . "'");
             }
 
-            $_where = join(' AND ', $_conditions);
+            $options['where'] = join(' AND ', $_conditions);
+
+            return $options;
+        }
 
 
-            //
-            $this->_table->reset()
-                ->select($options['fields'])
-                ->where($_where);
-
-            if($this instanceof \base\Model)
-                $this->_table->limit(1);
-            else
-                $this->_table->limit($options['count'])
-                    ->offset($options['offset'])
-                    ->order($options['order']);
-
-            $res = $this->_table->fetchAll(\PDO::FETCH_ASSOC);
-
-            return $this->set( $this instanceof \base\Model ? $res[0] : $res);
-		}
-
-		/**
+        /**
 		 * @method initTable - helper method component framework.
 		 * The initialization of an object of class Table.
 		 * @param $table -
