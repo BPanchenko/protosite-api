@@ -110,18 +110,19 @@ namespace base;
                     $options['order'] = '`' . $_order . '` DESC';
             }
 
-            if(isset($_GET['debug'])) {
-                var_dump("// Table Options");
-                var_dump($options);
-            }
-
             //
-            if(!isset($options['excluded_fields'])) {
-                // TODO: `excluded_fields` by default
-            }
             if(isset($options['excluded_fields'])) {
                 $options['excluded_fields'] = str2array($options['excluded_fields']);
-                // TODO: remove items from `fields` that are present in the `excluded_fields`
+                var_dump($options['excluded_fields']);
+                foreach($options['excluded_fields'] as $_field) {
+                    $i = array_search($_field, $options['fields']);
+                    if($i) unset($options['fields'][$i]);
+                }
+            }
+
+            if(isset($_GET['debug'])) {
+                var_dump("// Fetch options");
+                var_dump($options);
             }
 
 
