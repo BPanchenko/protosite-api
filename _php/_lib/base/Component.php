@@ -50,6 +50,7 @@ namespace base;
 		 ========================================================================== */
 
         public function fetch($options) {
+            $this->_defineTables();
             $options = $this->_prepareFetchOptions($options);
 
             //
