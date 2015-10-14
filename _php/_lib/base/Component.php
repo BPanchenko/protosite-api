@@ -16,25 +16,8 @@ namespace base;
 
 
 		function __construct($data = array(), $parent = NULL) {
-
-
 			if($parent instanceof \base\Component)
 				$this->attachTo($parent);
-
-			if(is_string($this->_table) && $this->_table)
-				$this->_table = $this->initTable($this->_table);
-
-			if(is_array($this->_tables) && count($this->_tables))
-				foreach($this->_tables as $_tb_name=>$_tb_dns) {
-					if($_tb_dns instanceof \PDO)
-						continue;
-
-					if(strpos($_tb_dns, '{model_id}') !== false && !$this->isNew()) {
-						$_tb_dns = str_replace('{model_id}', $this->id, $_tb_dns);
-						$this->_tables[$_tb_name] = $this->initTable($_tb_dns);
-					} elseif(strpos($_tb_dns, '{model_id}') === false)
-						$this->_tables[$_tb_name] = $this->initTable($_tb_dns);
-				}
 		}
 
 		public function trigger($name) {
@@ -84,6 +67,26 @@ namespace base;
             $res = $this->_table->fetchAll(\PDO::FETCH_ASSOC);
 
             return $this->set( $this instanceof \base\Model ? $res[0] : $res);
+        }
+
+        protected function _defineTables (){
+
+            if(is_string($this->_table) && $this->_table)
+                $this->_table = self::initTable($this->_table);
+
+            if(is_array($this->_tables) && count($this->_tables))
+                foreach($this->_tables as $_tb_name=>$_tb_dns) {
+                    if($_tb_dns instanceof \PDO)
+                        continue;
+
+                    if(strpos($_tb_dns, '{model_id}') !== false && !$this->isNew()) {
+                        $_tb_dns = str_replace('{model_id}', $this->id, $_tb_dns);
+                        $this->_tables[$_tb_name] = self::initTable($_tb_dns);
+                    } elseif(strpos($_tb_dns, '{model_id}') === false)
+                        $this->_tables[$_tb_name] = self::initTable($_tb_dns);
+                }
+
+            return $this;
         }
 
         protected function _prepareFetchOptions($options) {
@@ -176,13 +179,12 @@ namespace base;
             return $options;
         }
 
-
         /**
 		 * @method initTable - helper method component framework.
 		 * The initialization of an object of class Table.
 		 * @param $table -
 		 */
-		public function initTable($table) {
+		public static function initTable($table) {
 
 			if($table instanceof \DB\Schema)
 				return $table;
