@@ -18,6 +18,7 @@ namespace base;
 		function __construct($data = array(), $parent = NULL) {
 			if($parent instanceof \base\Component)
 				$this->attachTo($parent);
+<<<<<<< HEAD
 			
             if(is_string($this->_table) && $this->_table)
                 $this->_table = self::initTable($this->_table);
@@ -33,6 +34,8 @@ namespace base;
                     } elseif(strpos($_tb_dns, '{model_id}') === false)
                         $this->_tables[$_tb_name] = self::initTable($_tb_dns);
                 }
+=======
+>>>>>>> 842f403cde29c5e0feca5c01f3bd7895fe9c7999
 		}
 
 		public function trigger($name) {
@@ -65,6 +68,7 @@ namespace base;
 		 ========================================================================== */
 
         public function fetch($options) {
+            $this->_defineTables();
             $options = $this->_prepareFetchOptions($options);
 
             //
@@ -83,6 +87,30 @@ namespace base;
 
             return $this->set( $this instanceof \base\Model ? $res[0] : $res);
         }
+<<<<<<< HEAD
+=======
+
+        protected function _defineTables (){
+
+            if(is_string($this->_table) && $this->_table)
+                $this->_table = self::initTable($this->_table);
+
+            if(is_array($this->_tables) && count($this->_tables))
+                foreach($this->_tables as $_tb_name=>$_tb_dns) {
+                    if($_tb_dns instanceof \PDO)
+                        continue;
+
+                    if(strpos($_tb_dns, '{model_id}') !== false && !$this->isNew()) {
+                        $_tb_dns = str_replace('{model_id}', $this->id, $_tb_dns);
+                        $this->_tables[$_tb_name] = self::initTable($_tb_dns);
+                    } elseif(strpos($_tb_dns, '{model_id}') === false)
+                        $this->_tables[$_tb_name] = self::initTable($_tb_dns);
+                }
+
+            return $this;
+        }
+
+>>>>>>> 842f403cde29c5e0feca5c01f3bd7895fe9c7999
         protected function _prepareFetchOptions($options) {
 
             if(is_null($options))
