@@ -201,4 +201,10 @@
 	}
 
 	$Response->send();
+
+    if(isset($_GET['debug'])) {
+        echo "\n\n//*********************************";
+        echo "\n// MEMORY USAGE\n";
+        echo memory_get_usage();
+    }
 ?>
