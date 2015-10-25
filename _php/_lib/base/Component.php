@@ -104,15 +104,14 @@ namespace base;
             else
                 $options['fields'] = $this->_table->fields();
 
-            if(is_null($options['order']))
-                $options['order'] = '`' . $this->_table->primaryKey() . '` DESC';
-            else {
+            if(is_string($options['order'])) {
                 $_order = $options['order'];
                 if(strpos($_order, '-') === 0)
                     $options['order'] = '`' . substr($_order, 1) . '` ASC';
                 else
                     $options['order'] = '`' . $_order . '` DESC';
-            }
+            } elseif(is_string($this->_table->primaryKey()))
+                $options['order'] = '`' . $this->_table->primaryKey() . '` DESC';
 
             //
             if(isset($options['excluded_fields'])) {
