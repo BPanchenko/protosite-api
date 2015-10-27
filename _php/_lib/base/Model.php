@@ -57,8 +57,12 @@ namespace base;
 		/**
 		 * @method get()
 		 */
-        public function get($attr) {
-			return $this->has($attr) ? $this->_attributes[$attr] : NULL;
+		public function get($attr) {
+			if($attr == 'id')
+				return $this->id;
+			if($this->has($attr))
+				return $this->_attributes[$attr];
+			return NULL;
         }
 		
 		
