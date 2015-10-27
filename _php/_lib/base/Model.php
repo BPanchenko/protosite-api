@@ -50,7 +50,10 @@ namespace base;
 		 * @method has()
 		 */
 		public function has($attr) {
-			return array_key_exists($attr, $this->_attributes);
+			if($attr == 'id')
+				return !!$this->id;
+			else
+				return array_key_exists($attr, $this->_attributes);
 		}
 		
 		
