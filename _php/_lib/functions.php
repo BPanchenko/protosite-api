@@ -31,6 +31,7 @@
             $str = preg_replace('~[^-_a-z0-9,]+~u','',$str);
             $array = explode(',',$str);
             if(!is_array($array) && !empty($array)) $array[0] = $array;
+            $result = $array;
         }
 
         return $result;
