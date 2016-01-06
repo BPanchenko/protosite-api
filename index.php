@@ -3,6 +3,7 @@
     $Log = new system\Log;
 	$Request = http\Request::init();
 	$Response = http\Response::init();
+    $start_ts = microtime(true);
 
     if($Request->uri() == '/favicon.ico') exit();
 
@@ -206,5 +207,9 @@
         echo "\n\n//*********************************";
         echo "\n// MEMORY USAGE\n";
         echo memory_get_usage();
+
+        echo "\n\n//*********************************";
+        echo "\n// EXECUTION TIME\n";
+        echo (microtime(true) - $start_ts).'s';
     }
 ?>
