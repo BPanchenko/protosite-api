@@ -55,7 +55,7 @@ namespace base;
 
 			if($this instanceof \base\Model && $parent_object instanceof \base\Collection) {
                 $this->collection = $parent_object;
-                if($this->collection->_table instanceof \PDO)
+                if($this->collection->_table instanceof \PDO && $this->_table == $this->collection->_table->dns)
                     $this->_table = $this->collection->_table;
             }
 			
@@ -105,11 +105,15 @@ namespace base;
                 $options['fields'] = $this->_table->fields();
 
             if(is_string($options['order'])) {
-                $_order = $options['order'];
-                if(strpos($_order, '-') === 0)
-                    $options['order'] = '`' . substr($_order, 1) . '` ASC';
-                else
-                    $options['order'] = '`' . $_order . '` DESC';
+                $_orders = explode(',', $options['order']);
+                foreach($_orders as $_i=>$_order) {
+                    if(strpos($_order, '-') === 0)
+                        $_orders[$_i] = '`' . substr($_order, 1) . '` ASC';
+                    else
+                        $_orders[$_i] = '`' . $_order . '` DESC';
+                }
+                $options['order'] = join(', ', $_orders);
+
             } elseif(is_string($this->_table->primaryKey()))
                 $options['order'] = '`' . $this->_table->primaryKey() . '` DESC';
 
