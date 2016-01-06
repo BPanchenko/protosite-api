@@ -21,7 +21,7 @@ namespace base;
 			$this->pagination->page = 1;
 			$this->pagination->limit = 20;
 			
-			parent::__construct();
+			parent::__construct($data, $parent);
 		}
 		
 		
