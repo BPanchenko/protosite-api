@@ -107,7 +107,9 @@ namespace base;
             if(is_string($options['order'])) {
                 $_orders = explode(',', $options['order']);
                 foreach($_orders as $_i=>$_order) {
-                    if(strpos($_order, '-') === 0)
+                    if($options['order'] == 'random')
+                        $_orders[$_i] = 'RAND()';
+                    elseif(strpos($_order, '-') === 0)
                         $_orders[$_i] = '`' . substr($_order, 1) . '` ASC';
                     else
                         $_orders[$_i] = '`' . $_order . '` DESC';
