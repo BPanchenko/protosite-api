@@ -151,7 +151,7 @@ namespace base;
 		/**
 		 * @method isValid()
 		 */
-		public function isValid() { return true; }
+		public function isValid() { return !!$this->id; }
 		
 		/**
 		 * @method toArray()
