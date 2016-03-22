@@ -86,8 +86,10 @@ namespace base;
 			
 			// предварительное приведение типов
 			foreach($attributes as $key => $val) {
-				if(is_numeric($val) && $val < PHP_INT_MAX) {
-					$val = (int)$val;
+                if(is_double($val) && $val < PHP_INT_MAX) {
+					$val = doubleval($val);
+				} elseif(is_numeric($val) && $val < PHP_INT_MAX) {
+                    $val = strpos($val, '.') != false ? floatval($val) : intval($val);
 				} elseif(is_string($val)) {
 					$val = trim($val);
 				}
@@ -151,7 +153,7 @@ namespace base;
 		/**
 		 * @method isValid()
 		 */
-		public function isValid() { return !!$this->id; }
+		public function isValid() { return true; }
 		
 		/**
 		 * @method toArray()
