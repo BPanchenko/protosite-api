@@ -260,7 +260,7 @@ namespace base;
 						array_push($_result, $model);
 			}
 			
-			return $first ? NULL : $_result;
+			return $_result;
 		}
 		
 		
