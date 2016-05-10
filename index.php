@@ -156,14 +156,18 @@
 				var_dump($Request->parameters()->toArray());
 			}
 			$endpoint->instance->fetch($Request->parameters()->toArray());
-			
-			
-			if ($endpoint->instance instanceof \base\Collection && 
+
+			if ($endpoint->instance->paging)
+                $Response->get('meta')->paging = $endpoint->instance->paging;
+			if ($endpoint->instance->total)
+                $Response->get('meta')->total = $endpoint->instance->total;
+
+            if ($endpoint->instance instanceof \base\Collection &&
 				$Request->method == 'POST'
 			) {
 				$Response->setStatusCode(201, 'Created');
 				$model = $endpoint->instance->create($Request->body());
-				
+
 			} elseif ($Request->method == 'PUT') {
 				$Response->setStatusCode(202, 'Accepted');
 				$endpoint->instance->save($Request->body());

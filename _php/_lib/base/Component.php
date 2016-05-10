@@ -73,6 +73,12 @@ namespace base;
 		public function fetch($options) {
             $options = $this->_prepareFetchOptions($options);
 
+            //
+            $this->_table->reset()
+                ->select("count(*)")
+                ->where($options['where']);
+            $this->total = (int)$this->_table->fetchColumn();
+
 			// 
 			$this->_table->reset()
                          ->select($options['fields'])
@@ -86,9 +92,39 @@ namespace base;
 						 ->order($options['order']);
 			
 			$res = $this->_table->fetchAll(\PDO::FETCH_ASSOC);
+
+            if($this instanceof \base\Collection)
+                $this->paging = $this->buildPaging($options['offset'], $options['count'], $this->total);
 			
 			return $this->set( $this instanceof \base\Model ? $res[0] : $res);
 		}
+
+        public function buildPaging($offset = 0, $count = 20, $total = 0) {
+            $_cnt_pages = PAGING_CNT_PAGES;
+            $_page = $offset / $count;
+
+            $paging = new \stdClass;
+            $paging->current = $_page + 1;
+            $paging->prev = $_page;
+            $paging->pages = array();
+            $paging->last = ceil($total / $count);
+            $paging->next = $_page + 2;
+
+            if($paging->next > $paging->last) $paging->next = $paging->last;
+
+            $page = $start = $paging->current - $_cnt_pages/2;
+            if($start <= 0) $page = $start = 1;
+            $end = $paging->current + $_cnt_pages/2;
+            if($end < $_cnt_pages) $end = $_cnt_pages;
+            elseif($end >= $paging->last) $end = $paging->last;
+
+            do {
+                array_push($paging->pages, $page);
+                $page++;
+            } while($page <= $end);
+
+            return $paging;
+        }
 
         protected function _prepareFetchOptions($options) {
 

@@ -8,4 +8,5 @@
 	
 	define('FETCH_DEFAULT_COUNT', 200);
 	define('FETCH_DEFAULT_OFFSET', 0);
+	define('PAGING_CNT_PAGES', 6);
 ?>
