@@ -107,7 +107,7 @@ namespace base;
 				
 				if(is_array($this->_attributes[$key]) && is_array($val)) {
 					// для сохранения массива данных используется слияние старых и новых данных 
-					$this->_attributes[$key] = array_merge($this->_attributes[$key], $val);
+					$this->_attributes[$key] = $val + $this->_attributes[$key];
 				} else {
 					$this->_attributes[$key] = $val;
 				}
@@ -153,7 +153,7 @@ namespace base;
 		/**
 		 * @method isValid()
 		 */
-		public function isValid() { return true; }
+		public function isValid() { return !!$this->id; }
 		
 		/**
 		 * @method toArray()

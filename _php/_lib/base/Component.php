@@ -9,8 +9,10 @@ namespace base;
             'excluded_fields' => array('is_del'),
             'where' => 'is_del:0',
 			'order' => NULL,
-			'count' => 100
+			'count' => FETCH_DEFAULT_COUNT,
+            'offset' => FETCH_DEFAULT_OFFSET
 		);
+		protected $_fetch_options = array();
 		protected $_parent;
 		protected $_table = '';
 		protected $_tables = array();
@@ -127,13 +129,13 @@ namespace base;
         }
 
         protected function _prepareFetchOptions($options) {
+            $_opt = $this->_fetch_options + $this->_default_fetch_options;
 
-            if(is_null($options))
-                $options = $this->_default_fetch_options;
-            elseif(is_array($options))
-                $options = array_merge($this->_default_fetch_options, $options);
+            if(is_array($options))
+                $options = $options + $_opt;
             else
-                throw new SystemException("WrongFetchOptions");
+                $options = $_opt;
+
 
             if(!empty($options['fields']))
                 $options['fields'] = str2array($options['fields']);
