@@ -83,6 +83,12 @@ namespace base;
 			
 			$attributes = array();
 			is_array($attr) ? $attributes = $attr : $attributes[$attr] = $value;
+
+            if(count($attributes)) {
+                $_changed = array();
+                $_previous = array();
+            } else
+                return $this;
 			
 			// предварительное приведение типов
 			foreach($attributes as $key => $val) {
@@ -101,8 +107,8 @@ namespace base;
 				// то он сохраняется в хеше измененных атрибутов, а также
 				// прежнее значение сохраняется в $this->_previous.
 				if(isset($this->_attributes[$key]) && $this->_attributes[$key] !== $val) {
-					$this->_previous[$key] = $this->_attributes[$key];
-					$this->_changed[$key] = $val;
+                    $_previous[$key] = $this->_attributes[$key];
+					$_changed[$key] = $val;
 				} elseif ($this->_attributes[$key] === $val) continue;
 				
 				if(is_array($this->_attributes[$key]) && is_array($val)) {
@@ -115,7 +121,22 @@ namespace base;
 				if($key == static::$idAttribute || $key == 'id') {
 					$this->id = $this->_attributes[static::$idAttribute] = $val;
 				}
+
+                $this->trigger(self::EVENT_CHANGE . ":$key", array(
+                    "value" => $val,
+                    "previous" => $_previous[$key]
+                ));
 			}
+
+            $this->_changed = $_changed;
+            $this->_previous = $_previous;
+
+            if(count($_changed)) {
+                $this->trigger(self::EVENT_CHANGE, array(
+                    "changed" => $_changed,
+                    "previous" => $_previous
+                ));
+            }
 			
 			return $this;
 		}

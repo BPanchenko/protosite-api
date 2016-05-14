@@ -2,6 +2,8 @@
 namespace base;
 
 	abstract class Component {
+
+        const EVENT_CHANGE = 'change';
 		
 		protected $_children = array();
 		protected $_default_fetch_options = array(
@@ -16,6 +18,8 @@ namespace base;
 		protected $_parent;
 		protected $_table = '';
 		protected $_tables = array();
+
+        private $_events = array();
 		
 		
 		function __construct($data = array(), $parent = NULL) {
@@ -36,10 +40,6 @@ namespace base;
                     } elseif(strpos($_tb_dns, '{model_id}') === false)
                         $this->_tables[$_tb_name] = self::initTable($_tb_dns);
                 }
-		}
-		
-		public function trigger($name) {
-			
 		}
 		
 		public function attach($child) {
@@ -63,10 +63,56 @@ namespace base;
 			
 			return $this;
 		}
-		
-		public function isValid() {
-			return true;
-		}
+
+
+        /* Events bus
+         ========================================================================== */
+
+        public function trigger($name, $event = null) {
+            if(empty($this->_events[$name])) return $this;
+
+            if(is_null($event)) $event = array();
+            if(is_null($event['target'])) $event['target'] = $this;
+
+            foreach ($this->_events[$name] as $handler) {
+                $event['data'] = $handler[1];
+                call_user_func($handler[0], $event);
+            }
+
+            return $this;
+        }
+
+        public function on($name, $handler, $data = null, $append = true)
+        {
+            if ($append || empty($this->_events[$name])) {
+                $this->_events[$name][] = array($handler, $data);
+            } else {
+                array_unshift($this->_events[$name], array($handler, $data));
+            }
+            return $this;
+        }
+
+        public function off($name, $handler = null)
+        {
+            if (empty($this->_events[$name])) return false;
+
+            if (is_null($handler)) {
+                unset($this->_events[$name]);
+                return true;
+            } else {
+                $removed = false;
+                foreach ($this->_events[$name] as $i => $event) {
+                    if ($event[0] === $handler) {
+                        unset($this->_events[$name][$i]);
+                        $removed = true;
+                    }
+                }
+                if ($removed) {
+                    $this->_events[$name] = array_values($this->_events[$name]);
+                }
+                return $removed;
+            }
+        }
 		
 		
 		/* Synchronization of the component with database support
