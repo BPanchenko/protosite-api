@@ -123,29 +123,31 @@ namespace base;
 
             //
             $this->_table->reset()
-                ->select("count(*)")
-                ->where($options['where']);
-            $this->total = (int)$this->_table->fetchColumn();
+                ->select($options['fields'])
+                ->where($options['where'])
+                ->order($options['order']);
 
-			// 
-			$this->_table->reset()
-                         ->select($options['fields'])
-						 ->where($options['where']);
+            if($this instanceof \base\Model && $this->isValid()) {
+                $this->_table->limit(1);
+                $res = $this->_table->fetch(\PDO::FETCH_ASSOC);
+            }
 
-			if($this instanceof \base\Model)
-				$this->_table->limit(1);
-			else
-				$this->_table->limit($options['count'])
-						 ->offset($options['offset'])
-						 ->order($options['order']);
-			
-			$res = $this->_table->fetchAll(\PDO::FETCH_ASSOC);
-
-            if($this instanceof \base\Collection)
+            if($this instanceof \base\Collection) {
+                //
+                $this->_table->limit($options['count'])
+                    ->offset($options['offset']);
+                //
+                $this->total = (int)$this->_table->reset()
+                    ->select("count(*)")
+                    ->where($options['where'])->fetchColumn();
+                //
                 $this->paging = $this->buildPaging($options['offset'], $options['count'], $this->total);
-			
-			return $this->set( $this instanceof \base\Model ? $res[0] : $res);
-		}
+                //
+                $res = $this->_table->fetchAll(\PDO::FETCH_ASSOC);
+            }
+
+            return $this->set($res);
+        }
 
         public function buildPaging($offset = 0, $count = 20, $total = 0) {
             $_cnt_pages = PAGING_CNT_PAGES;
