@@ -159,6 +159,7 @@ namespace base;
         }
 
         public function buildPaging($offset = 0, $count = 20, $total = 0) {
+            $total = !$total ? $this->length : $total;
             $_cnt_pages = PAGING_CNT_PAGES;
             $_page = $offset / $count;
 
