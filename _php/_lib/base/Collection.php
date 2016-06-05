@@ -6,6 +6,7 @@ namespace base;
 		public $models = array();
 		public $length = 0;
 		public $pagination;
+        public $total = 0;
 		protected $_columns = array();
 		
 		

@@ -157,9 +157,11 @@
 			}
 			$endpoint->instance->fetch($Request->parameters()->toArray());
 
-			if ($endpoint->instance->paging)
+            if (property_exists($endpoint->instance, 'length'))
+                $Response->get('meta')->length = $endpoint->instance->length;
+            if (property_exists($endpoint->instance, 'paging'))
                 $Response->get('meta')->paging = $endpoint->instance->paging;
-			if ($endpoint->instance->total)
+            if (property_exists($endpoint->instance, 'total'))
                 $Response->get('meta')->total = $endpoint->instance->total;
 
             if ($endpoint->instance instanceof \base\Collection &&

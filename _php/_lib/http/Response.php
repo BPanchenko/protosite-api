@@ -362,12 +362,7 @@ namespace http;
          * @return $this
          */
 		public function prepare() {
-            if(is_array($this->get('data')) && is_null($this->get('meta')->length)) {
-                $this->get('meta')->length = count($this->get('data'));
-            }
-
 			$this->content = json_encode($this->content);
-
 			return $this;
 		}
 	}

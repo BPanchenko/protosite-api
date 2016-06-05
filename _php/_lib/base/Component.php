@@ -117,33 +117,42 @@ namespace base;
 		
 		/* Synchronization of the component with database support
 		 ========================================================================== */
-		
-		public function fetch($options) {
+
+        public function fetch($options) {
             $options = $this->_prepareFetchOptions($options);
 
-            //
-            $this->_table->reset()
-                ->select($options['fields'])
-                ->where($options['where'])
-                ->order($options['order']);
+            // fetch Model
+            if($this instanceof \base\Model) {
+                $this->_table->reset()
+                    ->select($options['fields'])
+                    ->where($options['where'])
+                    ->limit(1);
 
-            if($this instanceof \base\Model && $this->isValid()) {
-                $this->_table->limit(1);
-                $res = $this->_table->fetch(\PDO::FETCH_ASSOC);
+                $res = $this->_table->fetchAll(\PDO::FETCH_ASSOC);
+                $res = $res[0];
             }
 
+            // fetch Collection
             if($this instanceof \base\Collection) {
                 //
-                $this->_table->limit($options['count'])
+                $this->_table->reset()
+                    ->select($options['fields'])
+                    ->where($options['where'])
+                    ->order($options['order'])
+                    ->limit($options['count'])
                     ->offset($options['offset']);
                 //
-                $this->total = (int)$this->_table->reset()
+                $res = $this->_table->fetchAll(\PDO::FETCH_ASSOC);
+                $this->length = count($res);
+
+                // set total
+                $this->_table->reset()
                     ->select("count(*)")
-                    ->where($options['where'])->fetchColumn();
+                    ->where($options['where']);
+                $this->total = (int)$this->_table->fetchColumn();
+
                 //
                 $this->paging = $this->buildPaging($options['offset'], $options['count'], $this->total);
-                //
-                $res = $this->_table->fetchAll(\PDO::FETCH_ASSOC);
             }
 
             return $this->set($res);
