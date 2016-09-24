@@ -54,7 +54,7 @@
 					'ru' => "Неверный пароль"
 				)
 			),
-			'MethodNotExist' => array(
+			'MethodNotAllowed' => array(
 				'code' => 405,
 				'error_message' => array(
 					'en' => "Method is not supported",

@@ -166,9 +166,9 @@ namespace http;
 			if ($value === NULL)
 				$value = 200;
 			
-			$this->_statusCode = $this->content->meta->code = (int) $value;
+			$this->_statusCode = $this->content->meta->code = (int)$value;
 			
-			if ($text === NULL)
+			if (is_null($text))
 				$this->statusText = isset(static::$httpStatuses[$this->_statusCode]) ? static::$httpStatuses[$this->_statusCode] : '';
 			else
 				$this->statusText = $text;
@@ -227,7 +227,7 @@ namespace http;
 		protected function sendHeaders() {
 
 			$statusCode = $this->getStatusCode();
-			header("HTTP/{$this->version} $statusCode {$this->statusText}");
+			header("HTTP/{$this->version} {$statusCode} {$this->statusText}");
 
 			if (count($this->_headers))
 				foreach ($this->_headers as $name => $values) {

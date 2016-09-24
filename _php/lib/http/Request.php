@@ -45,8 +45,8 @@ class Request {
         return $ip;
     }
 
-    public function parameters($key, $value) {
-        if(isset($value))
+    public function parameters($key = NULL, $value = NULL) {
+        if(!is_null($value))
             $this->_parameters->set($this->_parameters->parse(array(
                 $key => $value
             )));

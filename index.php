@@ -95,7 +95,7 @@ try {
 
             case 'string':
                 if($points[$i-1]->type !== 'object' || !method_exists($points[$i-1]->instance, $Request->method . '__' . $part->value)) {
-                    throw new AppException('MethodNotExist');
+                    throw new AppException('MethodNotAllowed');
                 }
                 $part->type = 'method';
                 $part->value = $Request->method . '__' . $part->value;
@@ -185,8 +185,8 @@ try {
     }
 
 } catch (AppException $e) {
-    $Response->setStatusCode($e->code(), $e->type);
-    $Response->get('meta')->error_message = $e->type;
+    $Response->setStatusCode($e->code());
+    $Response->get('meta')->error_message = $e->message();
 
 } catch (SystemException $e) {
     // 500-е ошибки
