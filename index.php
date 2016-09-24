@@ -8,7 +8,7 @@ $start_ts = microtime(true);
 if($Request->uri() == '/favicon.ico') exit();
 
 $Log->write($Request->ip() . "\t" . $Request->uri() . "\n");
-$lastRequests = $Log->read();
+$lastRequests = $Log->read(401);
 
 // calc the count of requests for the period
 $for_last5seconds = time() - 5;
