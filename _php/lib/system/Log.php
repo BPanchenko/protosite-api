@@ -8,7 +8,7 @@ namespace system;
         private  $_path;
 
         function __construct($filename) {
-            $this->_dir = str_replace('.:', '', get_include_path()) . '/logs/';
+            $this->_dir = LOG_DIR;
 
             if(!$this->filename($filename))
                 $this->filename($_SERVER['HTTP_HOST'] . '--' . date('Ymd') . '.log');
@@ -17,7 +17,7 @@ namespace system;
         public function dir($string) {
             if($string) {
                 $this->_dir = $string;
-                $this->_path = $this->_dir . $this->_filename;
+                $this->_path = $this->_dir . '/' . $this->_filename;
             }
             return $this->_dir;
         }
@@ -25,7 +25,7 @@ namespace system;
         public function filename($string) {
             if($string) {
                 $this->_filename = $string;
-                $this->_path = $this->_dir . $this->_filename;
+                $this->_path = $this->_dir . '/' . $this->_filename;
             }
             return $this->_filename;
         }
@@ -61,7 +61,8 @@ namespace system;
         }
 
         public function write($str) {
-            file_put_contents($this->_path, microtime(true) . "\t" . $str, FILE_APPEND);
+            var_dump($this->_path);
+            var_dump(file_put_contents($this->_path, microtime(true) . "\t" . $str, FILE_APPEND));
             return $this;
         }
     }

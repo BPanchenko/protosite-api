@@ -22,11 +22,11 @@
     }
 
     // exit if
-    if ($cnt_from_ip > 20 || $cnt_all_requests > 400) {
+    if ($cnt_from_ip > 4 || $cnt_all_requests > 400) {
         $Response->setStatusCode(429);
         $Response->get('meta')->error_message = 'Too Many Requests';
 
-        if($cnt_from_ip > 20)
+        if($cnt_from_ip > 4)
             $Response->setHeader('Retry-After', 5);
         if($cnt_all_requests > 400)
             $Response->setHeader('Retry-After', 20);

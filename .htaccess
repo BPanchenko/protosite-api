@@ -22,4 +22,4 @@ Options -Indexes
 </IfModule>
 
 php_value default_charset utf-8
-php_value auto_prepend_file /home/_php/_core.php
+php_value auto_prepend_file /home/bp/api.protosite.rocks/docs/_php/init.php
