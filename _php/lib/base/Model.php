@@ -171,10 +171,6 @@ namespace base;
 		 * @method isNew()
 		 */
 		public function isNew(){ return !(bool)$this->id; }
-		/**
-		 * @method isValid()
-		 */
-		public function isValid() { return !!$this->id; }
 		
 		/**
 		 * @method toArray()
