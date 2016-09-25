@@ -21,7 +21,7 @@ class Table extends \DB\MySql\Schema {
         }
 
         $this->_schema = count($temp) == 2 ? $temp[1] : DB_NAME;
-        $this->_name = count($temp) == 2 ? $temp[2] : $temp[1];
+        $this->_name = count($temp) == 2 ? $temp[1] : $temp[0];
         $this->_fullname = '`' . $this->_schema . '`.`' . $this->_name . '`';
 
         parent::__construct($this->_schema, $user, $pass);

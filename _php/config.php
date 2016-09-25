@@ -8,6 +8,7 @@ define('DB_ROOT_PASS', 'nua-B4ZA');
 define('DB_STORAGE_DIR', '/home/bp/api.protosite.rocks/docs/_php/storage');
 
 define('LOG_DIR', '/home/bp/api.protosite.rocks/docs/_php/logs');
+define('UPLOAD_PHOTOS_DIR', '/home/bp/api.protosite.rocks/docs/upload/photos');
 
 define('FETCH_DEFAULT_COUNT', 200);
 define('FETCH_DEFAULT_OFFSET', 0);

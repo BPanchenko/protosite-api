@@ -30,6 +30,8 @@ require_once PHP_LIB_DIR . "/http/Response.php";
 
 // application
 
+require_once PHP_DIR . "/models/Photo.php";
+require_once PHP_DIR . "/collections/Photos.php";
 require_once PHP_DIR . "/models/Post.php";
 require_once PHP_DIR . "/collections/Posts.php";
 
