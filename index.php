@@ -5,7 +5,7 @@ $Request = http\Request::init();
 $Response = http\Response::init();
 $start_ts = microtime(true);
 
-if($Request->uri() == '/favicon.ico') exit();
+if($Request->method == 'OPTIONS' || $Request->uri() == '/favicon.ico') exit();
 
 $Log->write($Request->ip() . "\t" . $Request->uri() . "\n");
 $lastRequests = $Log->read(401);
