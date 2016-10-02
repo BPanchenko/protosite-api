@@ -201,6 +201,8 @@ namespace base;
 					else
 						$result[$attr] = $value;
 			}
+
+            if (!$this->isNew()) $result['id'] = $this->id;
 			
 			return $result;
         }
