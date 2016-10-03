@@ -19,7 +19,7 @@ class Photos extends base\Collection {
 
         $temp = explode(".", $file['name']);
         $filename = preg_replace('~[^\w]+~u',"-", translit($temp[0]));
-        // TODO: check and creation of unique $filename
+        $filename = $this->_table->getUniqValue('filename', $filename);
         $extension = $extensions[array_search($file['type'], $types)];
 
         if(move_uploaded_file($file['tmp_name'], PHOTOS_UPLOAD_DIR .  '/' . $filename . "." . $extension)) {
