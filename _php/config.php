@@ -8,7 +8,7 @@ define('DB_ROOT_PASS', 'nua-B4ZA');
 define('DB_STORAGE_DIR', '/home/bp/api.protosite.rocks/docs/_php/storage');
 
 define('LOG_DIR', '/home/bp/api.protosite.rocks/docs/_php/logs');
-define('PHOTOS_UPLOAD_DIR', '/home/bp/api.protosite.rocks/docs/upload/photos');
+define('PHOTOS_UPLOAD_DIR', '/home/bp/api.protosite.rocks/docs/upload/photos/temp');
 define('PHOTOS_PATH', 'http://api.protosite.rocks/upload/photos');
 
 define('FETCH_DEFAULT_COUNT', 200);
