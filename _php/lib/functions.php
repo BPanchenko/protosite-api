@@ -1,39 +1,78 @@
 <?php
-	
-	function translit($string) {
-		$trans = array("а" => "a", "б" => "b", "в" => "v", "г" => "g",
-						"д" => "d", "е" => "e", "ё" => "e", "ж" => "zh",
-						"з" => "z", "и" => "i", "й" => "y", "к" => "k",
-						"л" => "l", "м" => "m", "н" => "n", "о" => "o",
-						"п" => "p", "р" => "r", "с" => "s", "т" => "t",
-						"у" => "u", "ф" => "f", "х" => "kh", "ц" => "ts",
-						"ч" => "ch", "ш" => "sh", "щ" => "shch", "ы" => "y",
-						"э" => "e", "ю" => "yu", "я" => "ya", "А" => "A",
-						"Б" => "B", "В" => "V", "Г" => "G", "Д" => "D",
-						"Е" => "E", "Ё" => "E", "Ж" => "Zh", "З" => "Z",
-						"И" => "I", "Й" => "Y", "К" => "K", "Л" => "L",
-						"М" => "M", "Н" => "N", "О" => "O", "П" => "P",
-						"Р" => "R", "С" => "S", "Т" => "T", "У" => "U",
-						"Ф" => "F", "Х" => "Kh", "Ц" => "Ts", "Ч" => "Ch",
-						"Ш" => "Sh", "Щ" => "Shch", "Ы" => "Y", "Э" => "E",
-						"Ю" => "Yu", "Я" => "Ya", "ь" => "", "Ь" => "",
-						"ъ" => "", "Ъ" => "");
-		return preg_match("/[а-яА-Я]/",$string) ? strtr($string, $trans) : $string;
-	}
-    
-    function str2array($data) {
-        $result = NULL;
 
-        if(is_array($data))
-            $result = $data;
-        else if(!empty($data)) {
-            $str = str_replace(array(';','\t','\n'),',',$data);
-            $str = preg_replace('~[^-_a-z0-9,]+~u','',$str);
-            $array = explode(',',$str);
-            if(!is_array($array) && !empty($array)) $array[0] = $array;
-            $result = $array;
-        }
+function getQueryWithoutParameter($param='') {
+    $query = trim($_SERVER{'QUERY_STRING'}, '?');
+    $params = array();
 
-        return $result;
+    $temp = explode('&', $query);
+    foreach($temp as $phrase) {
+        if(trim($phrase) && strpos($phrase, $param . '=') === false)
+            array_push($params, $phrase);
     }
+
+    return count($params) ? join('&', $params) : null;
+}
+
+function translit($string) {
+    $trans = array("а" => "a", "б" => "b", "в" => "v", "г" => "g",
+                    "д" => "d", "е" => "e", "ё" => "e", "ж" => "zh",
+                    "з" => "z", "и" => "i", "й" => "y", "к" => "k",
+                    "л" => "l", "м" => "m", "н" => "n", "о" => "o",
+                    "п" => "p", "р" => "r", "с" => "s", "т" => "t",
+                    "у" => "u", "ф" => "f", "х" => "kh", "ц" => "ts",
+                    "ч" => "ch", "ш" => "sh", "щ" => "shch", "ы" => "y",
+                    "э" => "e", "ю" => "yu", "я" => "ya", "А" => "A",
+                    "Б" => "B", "В" => "V", "Г" => "G", "Д" => "D",
+                    "Е" => "E", "Ё" => "E", "Ж" => "Zh", "З" => "Z",
+                    "И" => "I", "Й" => "Y", "К" => "K", "Л" => "L",
+                    "М" => "M", "Н" => "N", "О" => "O", "П" => "P",
+                    "Р" => "R", "С" => "S", "Т" => "T", "У" => "U",
+                    "Ф" => "F", "Х" => "Kh", "Ц" => "Ts", "Ч" => "Ch",
+                    "Ш" => "Sh", "Щ" => "Shch", "Ы" => "Y", "Э" => "E",
+                    "Ю" => "Yu", "Я" => "Ya", "ь" => "", "Ь" => "",
+                    "ъ" => "", "Ъ" => "");
+    return preg_match("/[а-яА-Я]/",$string) ? strtr($string, $trans) : $string;
+}
+
+function str2array($data) {
+    $result = NULL;
+
+    if(is_array($data))
+        $result = $data;
+    else if(!empty($data)) {
+        $str = str_replace(array(';','\t','\n'),',',$data);
+        $str = preg_replace('~[^-_a-z0-9,]+~u','',$str);
+        $array = explode(',',$str);
+        if(!is_array($array) && !empty($array)) $array[0] = $array;
+        $result = $array;
+    }
+
+    return $result;
+}
+
+function upload_file($FILE, $dir, $type) {
+    $extensions = array(
+        'images' => array('jpg','png','gif')
+    );
+    $types = array(
+        'images' => array('image/jpeg','image/png','image/gif')
+    );
+
+    if(!$FILE) throw new Exception('UPLOAD_ERR_NO_FILE');
+    if($FILE['error']) throw new Exception($_FILES['photos']['error']);
+    if(!in_array($FILE['type'], $types[$type])) throw new Exception('UPLOAD_ERR_WRONG_TYPE');
+
+    $temp = explode(".", $FILE['name']);
+    $filename = preg_replace('~[^\w]+~u',"-", translit($temp[0]));
+    $extension = $extensions[$type][array_search($FILE['type'], $types[$type])];
+
+    if(move_uploaded_file($FILE['tmp_name'], $dir.'/'.$filename.".".$extension)) {
+        return array(
+            'filename' => $filename,
+            'extension' => $extension
+        );
+    } else {
+        throw new Exception('UPLOAD_FAIL');
+    }
+}
 ?>
