@@ -326,6 +326,7 @@ abstract class Component {
 
         // save model
         $this->_table->save($this->toArray());
+        $this->set(static::$idAttribute, $this->_table->lastInsertId());
 
         return $this;
     }
