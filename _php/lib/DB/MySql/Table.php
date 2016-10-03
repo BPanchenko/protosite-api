@@ -65,6 +65,19 @@ class Table extends \DB\MySql\Schema {
     /* < TODO: use php trait ... */
 
     /****/
+    public function getUniqValue($column, $value) {
+        // sequence number in the value
+        if(preg_match("/\((\d+)\)$/", $value, $matches)) $a = $matches[1];
+        else $a = 0;
+        // calc the new value
+        while($a<10000 && $this->query("select COUNT(*) as `count` from ".$this->_name." where ".$column."='".$value."'")->fetchColumn()) {
+            $a++;
+            $a==2 ? $value .= "(".$a.")" : $value = str_replace("(".($a-1).")", "(".$a.")", $value);
+        }
+        return $value;
+    }
+
+    /****/
     public function fields() {
         if(!$this->_columns) $this->columns();
         return array_keys($this->_columns);
@@ -122,6 +135,12 @@ class Table extends \DB\MySql\Schema {
                 unset($columns[$column]);
 
         return parent::save($this->_name, $columns);
+    }
+
+    /****/
+    public function truncate() {
+        $this->exec("truncate table ".$this->_name);
+        return true;
     }
 
     /****/
