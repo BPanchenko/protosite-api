@@ -49,30 +49,4 @@ function str2array($data) {
 
     return $result;
 }
-
-function upload_file($FILE, $dir, $type) {
-    $extensions = array(
-        'images' => array('jpg','png','gif')
-    );
-    $types = array(
-        'images' => array('image/jpeg','image/png','image/gif')
-    );
-
-    if(!$FILE) throw new Exception('UPLOAD_ERR_NO_FILE');
-    if($FILE['error']) throw new Exception($_FILES['photos']['error']);
-    if(!in_array($FILE['type'], $types[$type])) throw new Exception('UPLOAD_ERR_WRONG_TYPE');
-
-    $temp = explode(".", $FILE['name']);
-    $filename = preg_replace('~[^\w]+~u',"-", translit($temp[0]));
-    $extension = $extensions[$type][array_search($FILE['type'], $types[$type])];
-
-    if(move_uploaded_file($FILE['tmp_name'], $dir.'/'.$filename.".".$extension)) {
-        return array(
-            'filename' => $filename,
-            'extension' => $extension
-        );
-    } else {
-        throw new Exception('UPLOAD_FAIL');
-    }
-}
 ?>
