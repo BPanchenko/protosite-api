@@ -19,7 +19,7 @@ class Schema extends \PDO {
      * @param string $options additional SQL fragment that will be appended to the generated SQL.
      * @param boolean $dropIsExists.
      */
-    public function createTable($name, array $columns, $options=NULL, $dropIsExists=false) {
+    public function createTable(string $name, array $columns, string $options='', bool $dropIsExists=false) {
 
         $cols = array();
         foreach($columns as $col=>$type)
@@ -27,7 +27,7 @@ class Schema extends \PDO {
 
         $sql = "CREATE TABLE IF NOT EXISTS ".$this->quote($name)." (\n".implode(",\n",$cols)."\n)";
 
-        if(!is_null($options))
+        if(!$options)
             $sql .= ' '.$options;
 
         if($dropIsExists && $this->hasTable($name))
@@ -41,7 +41,7 @@ class Schema extends \PDO {
     }
 
     /****/
-    public function renameTable($name, $newName) {
+    public function renameTable(string $name, string $newName) {
         $this->exec('RENAME TABLE ' . $this->quote($name) . ' TO ' . $this->quote($newName));
         return $this;
     }
@@ -80,7 +80,7 @@ class Schema extends \PDO {
     }
 
     /****/
-    public function select($columns='*', $option='') {
+    public function select(string $columns='*', string $option='') {
         if($columns == '*')
             return $this;
 
@@ -138,7 +138,7 @@ class Schema extends \PDO {
     }
 
     /****/
-    public function where($conditions, array $params = array()) {
+    public function where(string $conditions, array $params = array()) {
         $this->_query['where'] = $conditions;
 
         foreach($params as $name=>$value)
@@ -148,7 +148,7 @@ class Schema extends \PDO {
     }
 
     /****/
-    public function andWhere($conditions, array $params = array()) {
+    public function andWhere(string $conditions, array $params = array()) {
         $this->_query['where'] .= ' AND ' . $conditions;
 
         foreach($params as $name=>$value)
@@ -158,7 +158,7 @@ class Schema extends \PDO {
     }
 
     /****/
-    public function orWhere($conditions, array $params = array()) {
+    public function orWhere(string $conditions, array $params = array()) {
         $this->_query['where'] .= ' OR ' . $conditions;
 
         foreach($params as $name=>$value)
@@ -219,7 +219,7 @@ class Schema extends \PDO {
     }
 
     /****/
-    public function fetchAll($fetch_style = \PDO::FETCH_OBJ) {
+    public function fetchAll($fetch_style = \PDO::FETCH_OBJ): array {
         $sql = $this->_buildQuery();
         try {
             if(count($this->_params)) {
@@ -238,7 +238,7 @@ class Schema extends \PDO {
     }
 
     /****/
-    public function save($table, array $columns) {
+    public function save(string $table, array $columns): \DB\Schema {
         $params=array();
         $names=array();
         $placeholders=array();
@@ -262,7 +262,7 @@ class Schema extends \PDO {
     }
 
     /****/
-    public function insert($table, array $columns) {
+    public function insert(string $table, array $columns): \DB\Schema {
         $params=array();
         $names=array();
         $placeholders=array();
@@ -282,7 +282,7 @@ class Schema extends \PDO {
     }
 
     /****/
-    public function update($table, array $columns, $conditions='', array $params=array()) {
+    public function update(string $table, array $columns, $conditions='', array $params=array()): \DB\Schema {
         $keys = array_keys($columns);
         $update_parts = array();
         foreach($keys as $key)
@@ -298,19 +298,19 @@ class Schema extends \PDO {
     }
 
     /****/
-    public function hasTable($name) {
+    public function hasTable(string $name): bool {
         if(is_null($this->_tableNames))
             $this->tableNames();
         return in_array($name, $this->_tableNames);
     }
 
     /****/
-    public function quote($str) {
-        $str = str_replace(array('`', '"', "'"), '', $str);
-        if(strrpos($str,'.') === false)
-            return '`' . $str . '`';
+    public function quote(string $string, $paramtype = NULL): string {
+        $string = str_replace(array('`', '"', "'"), '', $string);
+        if(strrpos($string,'.') === false)
+            return '`' . $string . '`';
         else
-            $parts = array_map(explode('.',$str), function($part){
+            $parts = array_map(explode('.',$string), function ($part) {
                 return '`' . $part . '`';
             });
 
@@ -318,7 +318,7 @@ class Schema extends \PDO {
     }
 
     /****/
-    public function getColumnType($type) {
+    public function getColumnType($type): string {
         if(isset($this->columnTypes[$type]))
             return $this->columnTypes[$type];
 
@@ -330,7 +330,7 @@ class Schema extends \PDO {
             return $type;
     }
 
-    private function _buildQuery() {
+    private function _buildQuery(): string {
 
         $sql=!empty($this->_query['distinct']) ? 'SELECT DISTINCT' : 'SELECT';
         $sql.=' '.(!empty($this->_query['select']) ? $this->_query['select'] : '*');
@@ -363,14 +363,6 @@ class Schema extends \PDO {
             $sql.="\nOFFSET ".$this->_query['offset'];
 
         return $sql;
-    }
-
-    /**
-     * Magic methods
-     */
-    public function __call($method, $args) {
-
-        return $this;
     }
 }
 ?>

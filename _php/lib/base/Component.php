@@ -16,7 +16,7 @@ abstract class Component {
     );
     protected $_fetch_options = array();
     protected $_parent;
-    protected $_table = '';
+    protected $_table = NULL;
     protected $_tables = array();
 
     private $_events = array();
@@ -27,7 +27,7 @@ abstract class Component {
         if($parent instanceof \base\Component)
             $this->attachTo($parent);
 
-        if(is_string($this->_table) && $this->_table)
+        if(is_string($this->_table))
             $this->_table = self::initTable($this->_table);
 
         if(is_array($this->_tables) && count($this->_tables))
@@ -48,7 +48,7 @@ abstract class Component {
         return $this;
     }
 
-    public function attachTo($parent_object) {
+    public function attachTo($parent_object): \base\Component {
 
         if($parent_object instanceof \base\Component) {
             $this->_parent = $parent_object;
@@ -301,7 +301,7 @@ abstract class Component {
             $table = new \DB\MySql\Table($table);
 
         if(!($table instanceof \DB\Schema))
-            throw new \SystemException('FailInitComponentTable');
+            throw new \SystemException('FailInitTable');
 
         return $table;
     }

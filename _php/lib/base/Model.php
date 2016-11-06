@@ -49,7 +49,7 @@ namespace base;
 		/**
 		 * @method has()
 		 */
-		public function has($attr) {
+		public function has(string $attr = ''): bool {
 			if($attr == 'id')
 				return !!$this->id;
 			else
@@ -146,7 +146,16 @@ namespace base;
 		 * @method delete()
 		 */
 		public function delete() {
-			$res = $this->_table->update($table, array( "is_del" => 1 ), "`".static::$idAttribute."` = " . $this->id);
+			$res = $this->_table->update(array( "is_del" => 1 ), "`".static::$idAttribute."` = " . $this->id);
+			return true;
+		}
+
+
+		/**
+		 * @method destroy()
+		 */
+		public function destroy() {
+			// TODO: remove all records about the model in the database
 			return true;
 		}
 		
@@ -164,19 +173,18 @@ namespace base;
 		/**
 		 * @method isEmpty()
 		 */
-		public function isEmpty($attr=NULL){
-			return !count($this->_attributes) || !$this->has($attr) || !(boolean)trim($this->get($attr)) || !(boolean)count($this->get($attr));
+		public function isEmpty(string $attr = ''): bool {
+			return !count($this->_attributes) || !$this->has($attr) || !(bool)trim($this->get($attr)) || !(bool)count($this->get($attr));
 		}
 		/**
 		 * @method isNew()
 		 */
-		public function isNew(){ return !(bool)$this->id; }
+		public function isNew(): bool { return !(bool)$this->id; }
 		
 		/**
 		 * @method toArray()
 		 */
-		public function toArray($options=array()) {
-			if(!count($this->_attributes)) return NULL;
+		public function toArray(array $options=array()): array {
 			if(!empty($options['fields'])) $fields = str2array($options['fields']);
 			
 			$result = array();

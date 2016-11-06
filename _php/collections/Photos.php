@@ -7,7 +7,7 @@ class Photos extends base\Collection {
     /* public API
      ========================================================================== */
 
-    public function POST__upload(){
+    public function POST__upload(): array {
         $file =  $_FILES['file'];
 
         $extensions = array('jpg','png','gif');
