@@ -66,7 +66,7 @@ abstract class Component {
 
 
     /* Events bus
-     ========================================================================== */
+	 ========================================================================== */
 
     public function trigger($name, $event = null) {
         if(empty($this->_events[$name])) return $this;
@@ -116,7 +116,7 @@ abstract class Component {
 
 
     /* Synchronization of the component with database support
-     ========================================================================== */
+	 ========================================================================== */
 
     public function fetch($options) {
         $options = $this->_prepareFetchOptions($options);
@@ -159,21 +159,21 @@ abstract class Component {
     }
 
     public function buildPaging($offset = 0, $count = 20, $total = 0) {
-		
+
         $current = floor($offset / $count);
         $prev = $current - 1;
-		$last = floor($total / $count);
+        $last = floor($total / $count);
         $next = $current + 1;
 
         if($next > $last) $next = $last;
         if($prev < 0) $prev = $current;
 
         return array(
-			'current' => $current,
-			'prev' => $prev,
-			'next' => $next,
-			'last' => $last
-		);
+            'current' => $current,
+            'prev' => $prev,
+            'next' => $next,
+            'last' => $last
+        );
     }
 
     protected function _prepareFetchOptions($options) {
@@ -298,7 +298,7 @@ abstract class Component {
 
 
     /* Insert or update a component in the database
-     ========================================================================== */
+	 ========================================================================== */
 
     public function save($data) {
         if($data instanceof \stdClass)
@@ -323,7 +323,7 @@ abstract class Component {
 
 
     /* Prepare api response
-     ========================================================================== */
+	 ========================================================================== */
 
     public function prepareResponse($Response) {
         $Response->set('data', $this->toArray());
@@ -332,13 +332,13 @@ abstract class Component {
 
 
     /* Helpers
-     ========================================================================== */
+	 ========================================================================== */
 
     public function isValid() { return true; }
 
 
     /* Magic methods
-     ========================================================================== */
+	 ========================================================================== */
 
     public function __toString() { return '{' . get_called_class() . ':' . json_encode($this->toArray()) .'}'; }
     public function __call($name, $arguments) { echo "Call undefined method '$name' " . implode(', ', $arguments). "\n"; }
