@@ -18,6 +18,7 @@ class Request {
 
         self::$_instance = new self;
         self::$_instance->method = strtoupper($_SERVER['REQUEST_METHOD']);
+        self::$_instance->content_type = strtolower($_SERVER['CONTENT_TYPE']);
 
         self::$_instance->_headers = new \base\Model(getallheaders());
         self::$_instance->_uri = $_SERVER['REQUEST_URI'];
@@ -28,6 +29,25 @@ class Request {
         self::$_instance->_parameters = new RequestParametersModel($request_parameters);
 
         return self::$_instance;
+    }
+
+    public function getBody(): array {
+        $result = array();
+
+        if($this->method == 'GET') {
+            $result = count($_GET) ? $_GET : array();
+        } elseif($this->method == 'POST' && array_search($this->content_type, ['multipart/form-data', 'application/x-www-form-urlencoded']) !== false) {
+            $result = count($_POST) ? $_POST : array();
+        } else {
+            $data = file_get_contents("php://input");
+            if($this->content_type == 'application/json') {
+                $result = json_decode($data, true);
+            } elseif($data) {
+                parse_str($data, $result);
+            }
+        }
+
+        return $this->_parseBodyData($result);
     }
 
     public function headers() {
@@ -99,7 +119,26 @@ class Request {
     }
 
     public function uri(){
-        return self::$_instance->_uri;
+        return $this->_uri;
+    }
+
+    private function _parseBodyData(array $data): array {
+
+        foreach ($data as $key=>$value) {
+            $_val = is_string($value) ? trim(stripcslashes(urldecode($value))) : $value;
+
+            if(is_double($_val) && $_val < PHP_INT_MAX) {
+                $_val = doubleval($_val);
+            } elseif(is_numeric($_val) && $_val < PHP_INT_MAX) {
+                $_val = strpos($_val, '.') != false ? floatval($_val) : intval($_val);
+            }
+
+            if($_val == 'true') $data[$key] = 1;
+            elseif($_val == 'false') $data[$key] = 0;
+            else $data[$key] = $_val;
+        }
+
+        return $data;
     }
 
     private function __construct() {}
