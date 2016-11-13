@@ -10,19 +10,19 @@ abstract class Component {
         'fields' => array(),
         'excluded_fields' => array('is_del'),
         'where' => 'is_del:0',
-        'order' => '-id',
+        'order' => null,
         'count' => FETCH_DEFAULT_COUNT,
         'offset' => FETCH_DEFAULT_OFFSET
     );
     protected $_fetch_options = array();
     protected $_parent;
-    protected $_table = NULL;
+    protected $_table = null;
     protected $_tables = array();
 
     private $_events = array();
 
 
-    function __construct($data = array(), $parent = NULL) {
+    function __construct($data = array(), $parent = null) {
 
         if($parent instanceof \base\Component)
             $this->attachTo($parent);
