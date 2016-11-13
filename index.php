@@ -5,10 +5,14 @@ $Request = http\Request::init();
 $Response = http\Response::init();
 $start_ts = microtime(true);
 
-if($Request->method == 'OPTIONS' || $Request->uri() == '/favicon.ico') exit();
+if($Request->method == 'OPTIONS' || $Request->uri() == '/favicon.ico') {
+    $Response->setStatusCode(200, 'OK');
+    $Response->sendHeaders();
+    exit();
+}
 
 $Log->write($Request->ip() . "\t" . $Request->uri() . "\n");
-$lastRequests = $Log->read(401);
+$lastRequests = $Log->read();
 
 // calc the count of requests for the period
 $for_last5seconds = time() - 5;
@@ -168,11 +172,11 @@ try {
             $Request->method == 'POST'
         ) {
             $Response->setStatusCode(201, 'Created');
-            $model = $endpoint->instance->create($Request->body());
+            $endpoint->instance = $endpoint->instance->create($Request->getBody())->save();
 
         } elseif ($Request->method == 'PUT') {
             $Response->setStatusCode(202, 'Accepted');
-            $endpoint->instance->save($Request->body());
+            $endpoint->instance->save($Request->getBody());
 
         } elseif ($Request->method == 'DELETE' || $Request->method == 'OPTIONS') {
             $Response->setStatusCode(204, 'No Content');
