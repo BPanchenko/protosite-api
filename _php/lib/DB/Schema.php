@@ -111,7 +111,7 @@ class Schema extends \PDO {
     /****/
     public function selectDistinct($columns='*') {
         $this->select($columns)
-             ->_query['distinct'] = true;
+            ->_query['distinct'] = true;
 
         return $this;
     }
@@ -243,20 +243,23 @@ class Schema extends \PDO {
         $names=array();
         $placeholders=array();
         $equalities=array();
+
+        if(!$columns['created']) $columns['created'] = date("Y-m-d H:i:s");
+
         foreach($columns as $name=>$value) {
             $names[] = $this->quote($name);
             $placeholders[] = ':' . $name;
             $params[':' . $name] = $value;
-            if(!in_array($name, array('id', 'created')))
+            if(!in_array($name, array('updated', 'created')))
                 $equalities[] = end($names) . '=' . end($placeholders);
         }
 
         $sql = 'INSERT INTO ' . $this->quote($table)
-                . ' (' . implode(', ',$names) . ')'
-                . ' VALUES (' . implode(', ', $placeholders) . ')'
-                . ' ON DUPLICATE KEY UPDATE ' . implode(", ",$equalities);
+            . ' (' . implode(', ',$names) . ')'
+            . ' VALUES (' . implode(', ', $placeholders) . ')'
+            . ' ON DUPLICATE KEY UPDATE ' . implode(", ",$equalities);
         $this->prepare($sql)
-             ->execute($params);
+            ->execute($params);
 
         return $this;
     }
@@ -273,10 +276,10 @@ class Schema extends \PDO {
         }
 
         $sql='INSERT INTO ' . $this->quote($table)
-                . ' (' . implode(', ',$names) . ')'
-                . ' VALUES (' . implode(', ', $placeholders) . ')';
+            . ' (' . implode(', ',$names) . ')'
+            . ' VALUES (' . implode(', ', $placeholders) . ')';
         $this->prepare($sql)
-             ->execute($params);
+            ->execute($params);
 
         return $this;
     }
@@ -292,7 +295,7 @@ class Schema extends \PDO {
         if($conditions)
             $sql .= " WHERE " . $conditions;
         $this->prepare($sql)
-             ->execute(array_merge($columns, $params));
+            ->execute(array_merge($columns, $params));
 
         return $this;
     }
