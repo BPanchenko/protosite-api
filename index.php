@@ -172,11 +172,13 @@ try {
             $Request->method == 'POST'
         ) {
             $Response->setStatusCode(201, 'Created');
-            $endpoint->instance = $endpoint->instance->create($Request->getBody())->save();
+            $model = $endpoint->instance->create($Request->getBody());
+            $model->save()->fetch();
+            $endpoint->instance = $model;
 
-        } elseif ($Request->method == 'PUT') {
+        } elseif (array_search($Request->method, ['PATH', 'PUT']) !== false) {
             $Response->setStatusCode(202, 'Accepted');
-            $endpoint->instance->save($Request->getBody());
+            $endpoint->instance->save($Request->getBody())->fetch();
 
         } elseif ($Request->method == 'DELETE' || $Request->method == 'OPTIONS') {
             $Response->setStatusCode(204, 'No Content');
