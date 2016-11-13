@@ -10,7 +10,7 @@ abstract class Component {
         'fields' => array(),
         'excluded_fields' => array('is_del'),
         'where' => 'is_del:0',
-        'order' => NULL,
+        'order' => '-id',
         'count' => FETCH_DEFAULT_COUNT,
         'offset' => FETCH_DEFAULT_OFFSET
     );
@@ -196,9 +196,9 @@ abstract class Component {
                 if($options['order'] == 'random')
                     $_orders[$_i] = 'RAND()';
                 elseif(strpos($_order, '-') === 0)
-                    $_orders[$_i] = '`' . substr($_order, 1) . '` ASC';
+                    $_orders[$_i] = '`' . substr($_order, 1) . '` DESC';
                 else
-                    $_orders[$_i] = '`' . $_order . '` DESC';
+                    $_orders[$_i] = '`' . $_order . '` ASC';
             }
             $options['order'] = join(', ', $_orders);
 
