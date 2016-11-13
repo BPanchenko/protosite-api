@@ -159,31 +159,21 @@ abstract class Component {
     }
 
     public function buildPaging($offset = 0, $count = 20, $total = 0) {
-        $total = !$total ? $this->length : $total;
-        $_cnt_pages = PAGING_CNT_PAGES;
-        $_page = $offset / $count;
+		
+        $current = floor($offset / $count);
+        $prev = $current - 1;
+		$last = floor($total / $count);
+        $next = $current + 1;
 
-        $paging = new \stdClass;
-        $paging->current = $_page + 1;
-        $paging->prev = $_page;
-        $paging->pages = array();
-        $paging->last = ceil($total / $count);
-        $paging->next = $_page + 2;
+        if($next > $last) $next = $last;
+        if($prev < 0) $prev = $current;
 
-        if($paging->next > $paging->last) $paging->next = $paging->last;
-
-        $page = $start = $paging->current - $_cnt_pages/2;
-        if($start <= 0) $page = $start = 1;
-        $end = $paging->current + $_cnt_pages/2;
-        if($end < $_cnt_pages) $end = $_cnt_pages;
-        elseif($end >= $paging->last) $end = $paging->last;
-
-        do {
-            array_push($paging->pages, $page);
-            $page++;
-        } while($page <= $end);
-
-        return $paging;
+        return array(
+			'current' => $current,
+			'prev' => $prev,
+			'next' => $next,
+			'last' => $last
+		);
     }
 
     protected function _prepareFetchOptions($options) {
