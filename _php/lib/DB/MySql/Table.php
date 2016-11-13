@@ -20,7 +20,7 @@ class Table extends \DB\MySql\Schema {
             throw new SystemException('WrongMySqlTableName');
         }
 
-        $this->_schema = count($temp) == 2 ? $temp[1] : DB_NAME;
+        $this->_schema = count($temp) == 2 ? $temp[0] : DB_NAME;
         $this->_name = count($temp) == 2 ? $temp[1] : $temp[0];
         $this->_fullname = '`' . $this->_schema . '`.`' . $this->_name . '`';
 
@@ -122,7 +122,7 @@ class Table extends \DB\MySql\Schema {
     }
 
     /****/
-    public function fetchAll($fetch_style = \PDO::FETCH_OBJ) {
+    public function fetchAll($fetch_style = \PDO::FETCH_OBJ): array {
         $this->from($this->_name);
         return parent::fetchAll($fetch_style);
     }

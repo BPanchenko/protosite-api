@@ -80,7 +80,7 @@ class Schema extends \PDO {
     }
 
     /****/
-    public function select(string $columns='*', string $option='') {
+    public function select($columns='*', string $option='') {
         if($columns == '*')
             return $this;
 
@@ -238,7 +238,7 @@ class Schema extends \PDO {
     }
 
     /****/
-    public function save(string $table, array $columns): \DB\Schema {
+    public function save(string $table, array $columns) {
         $params=array();
         $names=array();
         $placeholders=array();
@@ -262,7 +262,7 @@ class Schema extends \PDO {
     }
 
     /****/
-    public function insert(string $table, array $columns): \DB\Schema {
+    public function insert(string $table, array $columns) {
         $params=array();
         $names=array();
         $placeholders=array();
@@ -282,7 +282,7 @@ class Schema extends \PDO {
     }
 
     /****/
-    public function update(string $table, array $columns, $conditions='', array $params=array()): \DB\Schema {
+    public function update(string $table, array $columns, $conditions='', array $params=array()) {
         $keys = array_keys($columns);
         $update_parts = array();
         foreach($keys as $key)

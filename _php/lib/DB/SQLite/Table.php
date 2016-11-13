@@ -69,7 +69,7 @@ class Table extends \DB\SQLite\Schema {
     /* < TODO: use php trait ... */
 
     /****/
-    public function fields() {
+    public function fields(): array {
         if(!$this->_columns) $this->columns();
         return
             array_keys($this->columns);
@@ -83,7 +83,7 @@ class Table extends \DB\SQLite\Schema {
     }
 
     /****/
-    public function hasColumn($column_name) {
+    public function hasColumn($column_name): bool {
         if(!$this->_columns) $this->columns();
         return
             array_key_exists($column_name, $this->_columns);
@@ -103,7 +103,7 @@ class Table extends \DB\SQLite\Schema {
     }
 
     /****/
-    public function fetchAll($fetch_style = \PDO::FETCH_OBJ) {
+    public function fetchAll($fetch_style = \PDO::FETCH_OBJ): array {
         $this->from($this->_name);
         return parent::fetchAll($fetch_style);
     }

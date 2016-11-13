@@ -45,11 +45,12 @@ class Request {
         return $ip;
     }
 
-    public function parameters($key = NULL, $value = NULL) {
-        if(!is_null($value))
+    public function parameters(string $key = '', $value = NULL) {
+        if(!is_null($value)) {
             $this->_parameters->set($this->_parameters->parse(array(
                 $key => $value
             )));
+        }
         return $this->_parameters->has($key) ? $this->_parameters->get($key) : $this->_parameters;
     }
 

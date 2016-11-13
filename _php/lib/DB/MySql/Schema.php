@@ -43,7 +43,7 @@ require_once dirname(__FILE__) . '/../Schema.php';
 		}
 		
 		
-		public function insert(string $table, array $columns): \DB\MySql\Schema {
+		public function insert(string $table, array $columns) {
 			$keys = array_keys($columns);
 			
 			$update_parts = array();
