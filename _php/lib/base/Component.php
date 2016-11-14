@@ -82,8 +82,7 @@ abstract class Component {
         return $this;
     }
 
-    public function on($name, $handler, $data = null, $append = true)
-    {
+    public function on(string $name, callable $handler, $data = null, bool $append = true) {
         if ($append || empty($this->_events[$name])) {
             $this->_events[$name][] = array($handler, $data);
         } else {
