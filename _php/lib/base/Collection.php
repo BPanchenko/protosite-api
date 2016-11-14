@@ -69,6 +69,9 @@ namespace base;
 			else {
 				array_push($this->models, $model);
 				$this->length++;
+				$this->trigger('add', array(
+					'model' => $model
+				));
 			}
 			
 			return $this;
