@@ -62,7 +62,7 @@ namespace base;
 				$model = new static::$classModel($data, $this);
 			}
 			
-			if(!isset($model)) return $this;
+			if(!$model->isValid()) return $this;
 			
 			if($this->get($model->id))
 				$this->get($model->id)->set($model->toArray());
@@ -271,7 +271,7 @@ namespace base;
 		/**
 		 * Вернет массив значений свойства каждого элемента коллекции.
 		 */
-		public function pluck($attr){
+		public function pluck(string $attr): array{
 			$_result = array();
 			
 			foreach($this->models as $model) {
@@ -282,6 +282,22 @@ namespace base;
 			}
 			
 			return $_result;
+		}
+
+
+		/* Prepare api response
+		 ========================================================================== */
+
+		public function prepareResponse($Response) {
+			$meta = $Response->get('meta');
+			$meta->length = $this->length;
+			$meta->paging = $this->paging;
+			$meta->total = $this->total;
+			
+			$Response->set('meta', $meta);
+			$Response->set('data', $this->toArray());
+
+			return $this;
 		}
 	}
 ?>

@@ -6,9 +6,9 @@ $Response = http\Response::init();
 $start_ts = microtime(true);
 
 if($Request->method == 'OPTIONS' || $Request->uri() == '/favicon.ico') {
-    $Response->setStatusCode(200, 'OK');
-    $Response->sendHeaders();
-    exit();
+	$Response->setStatusCode(200, 'OK');
+	$Response->sendHeaders();
+	exit();
 }
 
 $Log->write($Request->ip() . "\t" . $Request->uri() . "\n");
@@ -145,7 +145,7 @@ try {
         $Response->set('data', call_user_func(array(&$endpoint->instance, $endpoint->value), $params, $query));
     }
 
-    if($endpoint->type === 'object') {
+    if($endpoint->type == 'object') {
 
         if (!$endpoint->instance->isValid()) {
             $Response->setStatusCode(422, 'Unprocessable Entity');
@@ -159,22 +159,14 @@ try {
             print_r("// Request->parameters()->toArray" . "\n");
             var_dump($Request->parameters()->toArray());
         }
-        $endpoint->instance->fetch($Request->parameters()->toArray());
-
-        if (property_exists($endpoint->instance, 'length'))
-            $Response->get('meta')->length = $endpoint->instance->length;
-        if (property_exists($endpoint->instance, 'paging'))
-            $Response->get('meta')->paging = $endpoint->instance->paging;
-        if (property_exists($endpoint->instance, 'total'))
-            $Response->get('meta')->total = $endpoint->instance->total;
 
         if ($endpoint->instance instanceof \base\Collection &&
             $Request->method == 'POST'
         ) {
             $Response->setStatusCode(201, 'Created');
-            $model = $endpoint->instance->create($Request->getBody());
-            $model->save()->fetch();
-            $endpoint->instance = $model;
+			$model = $endpoint->instance->create($Request->getBody());
+			$model->save()->fetch();
+			$endpoint->instance = $model;
 
         } elseif (array_search($Request->method, ['PATH', 'PUT']) !== false) {
             $Response->setStatusCode(202, 'Accepted');
@@ -184,6 +176,8 @@ try {
             $Response->setStatusCode(204, 'No Content');
             $Response->sendHeaders();
             exit();
+        } else {
+			$endpoint->instance->fetch($Request->parameters()->toArray());
         }
 
         if($Response->is_empty('data'))
