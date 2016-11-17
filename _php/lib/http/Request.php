@@ -31,24 +31,24 @@ class Request {
         return self::$_instance;
     }
 
-    public function getBody(): array {
-        $result = array();
+	public function getBody(): array {
+		$result = array();
 
-        if($this->method == 'GET') {
-            $result = count($_GET) ? $_GET : array();
-        } elseif($this->method == 'POST' && array_search($this->content_type, ['multipart/form-data', 'application/x-www-form-urlencoded']) !== false) {
-            $result = count($_POST) ? $_POST : array();
-        } else {
-            $data = file_get_contents("php://input");
-            if($this->content_type == 'application/json') {
-                $result = json_decode($data, true);
-            } elseif($data) {
-                parse_str($data, $result);
-            }
-        }
+		if($this->method == 'GET') {
+			$result = count($_GET) ? $_GET : array();
+		} elseif($this->method == 'POST' && array_search($this->content_type, ['multipart/form-data', 'application/x-www-form-urlencoded']) !== false) {
+			$result = count($_POST) ? $_POST : array();
+		} else {
+			$data = file_get_contents("php://input");
+			if($this->content_type == 'application/json') {
+				$result = json_decode($data, true);
+			} elseif($data) {
+				parse_str($data, $result);
+			}
+		}
 
-        return $this->_parseBodyData($result);
-    }
+		return $this->_parseBodyData($result);
+	}
 
     public function headers() {
         return $this->_headers;
@@ -122,24 +122,24 @@ class Request {
         return $this->_uri;
     }
 
-    private function _parseBodyData(array $data): array {
+	private function _parseBodyData(array $data): array {
 
-        foreach ($data as $key=>$value) {
-            $_val = is_string($value) ? trim(stripcslashes(urldecode($value))) : $value;
+		foreach ($data as $key=>$value) {
+			$_val = is_string($value) ? trim(stripcslashes(urldecode($value))) : $value;
 
-            if(is_double($_val) && $_val < PHP_INT_MAX) {
-                $_val = doubleval($_val);
-            } elseif(is_numeric($_val) && $_val < PHP_INT_MAX) {
-                $_val = strpos($_val, '.') != false ? floatval($_val) : intval($_val);
-            }
+			if(is_double($_val) && $_val < PHP_INT_MAX) {
+				$_val = doubleval($_val);
+			} elseif(is_numeric($_val) && $_val < PHP_INT_MAX) {
+				$_val = strpos($_val, '.') != false ? floatval($_val) : intval($_val);
+			}
 
-            if($_val == 'true') $data[$key] = 1;
-            elseif($_val == 'false') $data[$key] = 0;
-            else $data[$key] = $_val;
-        }
+			if($_val == 'true') $data[$key] = 1;
+			elseif($_val == 'false') $data[$key] = 0;
+			else $data[$key] = $_val;
+		}
 
-        return $data;
-    }
+		return $data;
+	}
 
     private function __construct() {}
     private function __clone() {}

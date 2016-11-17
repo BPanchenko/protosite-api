@@ -49,7 +49,7 @@ namespace base;
 		/**
 		 * @method has()
 		 */
-		public function has(string $attr = ''): bool {
+		public function has(string $attr): bool {
 			if($attr == 'id')
 				return !!$this->id;
 			else
@@ -65,14 +65,14 @@ namespace base;
 				return $this->id;
 			if($this->has($attr))
 				return $this->_attributes[$attr];
-			return NULL;
+			return null;
         }
 		
 		
 		/**
 		 * @method parse()
 		 */
-		public function parse($data) { return $data; }
+		public function parse(array $data) { return $data; }
 		
 		
 		/**
@@ -145,7 +145,7 @@ namespace base;
 		/**
 		 * @method delete()
 		 */
-		public function delete() {
+		public function delete(): bool {
 			$res = $this->_table->update(array( "is_del" => 1 ), "`".static::$idAttribute."` = " . $this->id);
 			return true;
 		}
@@ -154,7 +154,7 @@ namespace base;
 		/**
 		 * @method destroy()
 		 */
-		public function destroy() {
+		public function destroy(): bool {
 			// TODO: remove all records about the model in the database
 			return true;
 		}
@@ -179,7 +179,7 @@ namespace base;
 		/**
 		 * @method isNew()
 		 */
-		public function isNew(): bool { return !(bool)$this->id; }
+		public function isNew(): bool { return !$this->id; }
 		
 		/**
 		 * @method toArray()
@@ -215,7 +215,7 @@ namespace base;
 			return $result;
         }
 		
-		public function toJSON($options=array()) {
+		public function toJSON(array $options=array()): string {
 			return json_encode($this->toArray($options));
 		}
 		
