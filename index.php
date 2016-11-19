@@ -55,11 +55,6 @@ if(isset($_GET['fields'])) {
     $_GET['fields'] = explode(',', $_GET['fields']);
 }
 
-if($Request->parameters()->has('access_token'))
-    $AuthUser = new User(array(
-        'access_token' => $Request->parameters('access_token')
-    ));
-
 try {
     $points = $Request->parts();
 
@@ -78,14 +73,7 @@ try {
         }
 
         switch($part->type) {
-            case 'self':
-                if(is_null($AuthUser)) {
-                    throw new AppException('AccessTokenRequired');
-                }
-                $part->type = 'object';
-                $part->instance = new $AuthUser;
-                break;
-
+			
             case 'class':
                 $classname = $part->value;
                 $part->type = 'object';
