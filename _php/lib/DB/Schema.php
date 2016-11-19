@@ -111,7 +111,7 @@ class Schema extends \PDO {
     /****/
     public function selectDistinct($columns='*') {
         $this->select($columns)
-            ->_query['distinct'] = true;
+             ->_query['distinct'] = true;
 
         return $this;
     }
@@ -138,7 +138,7 @@ class Schema extends \PDO {
     }
 
     /****/
-    public function where(string $conditions, array $params = array()) {
+    public function where(string $conditions, array $params = array()): self {
         $this->_query['where'] = $conditions;
 
         foreach($params as $name=>$value)
@@ -148,7 +148,7 @@ class Schema extends \PDO {
     }
 
     /****/
-    public function andWhere(string $conditions, array $params = array()) {
+    public function andWhere(string $conditions, array $params = array()): self {
         $this->_query['where'] .= ' AND ' . $conditions;
 
         foreach($params as $name=>$value)
@@ -158,7 +158,7 @@ class Schema extends \PDO {
     }
 
     /****/
-    public function orWhere(string $conditions, array $params = array()) {
+    public function orWhere(string $conditions, array $params = array()): self {
         $this->_query['where'] .= ' OR ' . $conditions;
 
         foreach($params as $name=>$value)
@@ -168,13 +168,13 @@ class Schema extends \PDO {
     }
 
     /****/
-    public function groupBy($sql) {
+    public function groupBy($sql): self {
         $this->_query['group'] =  $sql;
         return $this;
     }
 
     /****/
-    public function order($columns) {
+    public function order($columns): self {
         if(!is_array($columns))
             $columns=preg_split('/\s*,\s*/',trim($columns),-1,PREG_SPLIT_NO_EMPTY);
 
@@ -190,17 +190,35 @@ class Schema extends \PDO {
     }
 
     /****/
-    public function offset($offset) {
+    public function offset($offset): self {
         $this->_query['offset'] = (int)$offset;
         return $this;
     }
 
     /****/
-    public function limit($limit, $offset=NULL) {
+    public function limit($limit, $offset=NULL): self {
         $this->_query['limit'] = $limit;
         if(!is_null($offset))
             $this->offset($offset);
         return $this;
+    }
+
+    /****/
+    public function fetch($fetch_style = \PDO::FETCH_ASSOC) {
+        $sql = $this->_buildQuery();
+        try {
+            if(count($this->_params)) {
+                $sth = $this->prepare($sql);
+				$sth->execute($this->_params);
+            } else {
+                $sth = $this->query($sql);
+            }
+
+        } catch (PDOException $e) {
+            print $e->getMessage();
+        }
+
+        return $sth->fetch($fetch_style);
     }
 
     /****/
@@ -224,6 +242,7 @@ class Schema extends \PDO {
         try {
             if(count($this->_params)) {
                 $sth = $this->prepare($sql);
+				$sth->execute($this->_params);
             } else {
                 $sth = $this->query($sql);
             }
@@ -255,11 +274,11 @@ class Schema extends \PDO {
         }
 
         $sql = 'INSERT INTO ' . $this->quote($table)
-            . ' (' . implode(', ',$names) . ')'
-            . ' VALUES (' . implode(', ', $placeholders) . ')'
-            . ' ON DUPLICATE KEY UPDATE ' . implode(", ",$equalities);
+                . ' (' . implode(', ',$names) . ')'
+                . ' VALUES (' . implode(', ', $placeholders) . ')'
+                . ' ON DUPLICATE KEY UPDATE ' . implode(", ",$equalities);
         $this->prepare($sql)
-            ->execute($params);
+             ->execute($params);
 
         return $this;
     }
@@ -276,10 +295,10 @@ class Schema extends \PDO {
         }
 
         $sql='INSERT INTO ' . $this->quote($table)
-            . ' (' . implode(', ',$names) . ')'
-            . ' VALUES (' . implode(', ', $placeholders) . ')';
+                . ' (' . implode(', ',$names) . ')'
+                . ' VALUES (' . implode(', ', $placeholders) . ')';
         $this->prepare($sql)
-            ->execute($params);
+             ->execute($params);
 
         return $this;
     }
@@ -295,7 +314,7 @@ class Schema extends \PDO {
         if($conditions)
             $sql .= " WHERE " . $conditions;
         $this->prepare($sql)
-            ->execute(array_merge($columns, $params));
+             ->execute(array_merge($columns, $params));
 
         return $this;
     }

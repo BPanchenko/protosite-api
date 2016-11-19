@@ -116,6 +116,12 @@ class Table extends \DB\MySql\Schema {
     /* SQL-Constructor */
 
     /****/
+    public function fetch() {
+        $this->from($this->_name);
+        return parent::fetch();
+    }
+
+    /****/
     public function fetchColumn() {
         $this->from($this->_name);
         return parent::fetchColumn();
