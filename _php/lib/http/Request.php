@@ -100,9 +100,6 @@ class Request {
                 $_part->type = 'int'; // point is a identifier
                 $_part->value = $_value < PHP_INT_MAX ? (int)$_value : $_value;
 
-            } elseif($_value === 'self') {
-                $_part->type = 'self'; // checkpoint 'self' defines the authorized user ID
-
             } else {
                 $_part->type = 'string';
             }
