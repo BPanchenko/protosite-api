@@ -49,4 +49,12 @@ function str2array($data) {
 
     return $result;
 }
+
+function camelize($str) {
+    $str = preg_replace('~[^A-Za-z0-9]+~u', ' ', strtolower($str));
+    $str = ucwords($str);
+    $str = str_replace(' ', '',$str);
+    $str = strtolower($str{0}) . substr($str, 1);
+    return $str;
+}
 ?>
