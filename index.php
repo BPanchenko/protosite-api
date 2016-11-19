@@ -98,11 +98,12 @@ try {
                 break;
 
             case 'string':
-                if($points[$i-1]->type !== 'object' || !method_exists($points[$i-1]->instance, $Request->method . '__' . $part->value)) {
+                $method_name = strtolower($Request->method) . '_' . camelize($part->value);
+                if($points[$i-1]->type !== 'object' || !method_exists($points[$i-1]->instance, $method_name)) {
                     throw new AppException('MethodNotAllowed');
                 }
                 $part->type = 'method';
-                $part->value = $Request->method . '__' . $part->value;
+                $part->value = $method_name;
                 $part->instance = $points[$i-1]->instance;
                 break;
 
@@ -140,9 +141,14 @@ try {
         $Response->get('meta')->code = 200;
 
         // go method
-        $params = $Request->parameters('__uri__');
-        $query = $_GET;
-        $Response->set('data', call_user_func(array(&$endpoint->instance, $endpoint->value), $params, $query));
+		$requestQuery = $Request->parameters()->toArray();
+        $requestBody = $Request->getBody();
+        $Response->set('data',
+			call_user_func(
+				array(&$endpoint->instance, $endpoint->value),
+				$requestBody, $requestQuery
+			)
+		);
     }
 
     if($endpoint->type == 'object') {
