@@ -10,7 +10,7 @@ namespace http;
 		);
 		
 		/****/
-		public function parse(array $data = array()) {
+		public function parse(array $data): array {
 			
 			if(isset($data['fields'])) {
 				$data['fields'] = str2array($data['fields']);

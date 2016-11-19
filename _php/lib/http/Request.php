@@ -22,11 +22,8 @@ class Request {
 
         self::$_instance->_headers = new \base\Model(getallheaders());
         self::$_instance->_uri = $_SERVER['REQUEST_URI'];
-
-        $request_parameters = array_merge($_GET, array(
-            '__uri__' => array()
-        ));
-        self::$_instance->_parameters = new RequestParametersModel($request_parameters);
+		
+        self::$_instance->_parameters = new RequestParametersModel($_GET);
 
         return self::$_instance;
     }
@@ -34,9 +31,7 @@ class Request {
 	public function getBody(): array {
 		$result = array();
 
-		if($this->method == 'GET') {
-			$result = count($_GET) ? $_GET : array();
-		} elseif($this->method == 'POST' && array_search($this->content_type, ['multipart/form-data', 'application/x-www-form-urlencoded']) !== false) {
+		if($this->method == 'POST' && array_search($this->content_type, ['multipart/form-data', 'application/x-www-form-urlencoded']) !== false) {
 			$result = count($_POST) ? $_POST : array();
 		} else {
 			$data = file_get_contents("php://input");

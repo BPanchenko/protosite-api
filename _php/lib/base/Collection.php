@@ -27,14 +27,14 @@ namespace base;
 		
 		
 		/****/
-		public function offsetExists($offset) {
+		public function offsetExists($offset): bool {
 			return isset($this->models[$offset]);
 		}
 		public function offsetGet($offset) {
-			return $this->offsetExists($offset) ? $this->models[$offset] : NULL;
+			return $this->offsetExists($offset) ? $this->models[$offset] : null;
 		}
 
-		public function offsetSet($offset, $model) {
+		public function offsetSet($offset, $model): self {
 			if (is_null($offset)) {
 				$this->models[] = $model;
 			} else {
@@ -43,7 +43,7 @@ namespace base;
 			return $this;
 		}
 
-		public function offsetUnset($offset) {
+		public function offsetUnset($offset): bool {
 			$index = NULL;
 			unset($this->models[$index]);
 			
@@ -54,7 +54,7 @@ namespace base;
 		/**
 		 * Добавление элемента в коллекцию
 		 */
-		public function add($data){
+		public function add($data): self {
 			if($data instanceof static::$classModel) {
 				$model = $data;
 				$model->collection = $this;
@@ -103,7 +103,7 @@ namespace base;
 		 * Для каждого элемента вызывается функция, переданая в параметре метода.
 		 * При каждом вызове функции ей будут переданы 3 аргумента: $model, $index, $collection.
 		 */
-		public function each($fn) {
+		public function each($fn): self {
 			if(!is_callable($fn)) return $this;
 			foreach($this->models as $index=>$model)
 				call_user_func($fn, $model, $index, $this);
@@ -115,7 +115,7 @@ namespace base;
 		 * Выполняет поиск элемента коллекции,
 		 * подходящего под переданый массив атрибутов.
 		 */
-		public function findWhere($attributes, $value=NULL){
+		public function findWhere($attributes, $value){
 			if(!is_array($attributes) && $value) {
 				$attributes = array(
 					$attributes => $value
@@ -134,7 +134,7 @@ namespace base;
 					if($model->id == $id) return $model;
 				}
 			
-			return NULL;
+			return null;
 		}
 		
 		
@@ -182,7 +182,7 @@ namespace base;
 		 * Возвращает индекс модели в коллекции.
 		 * Если модели в коллекции нет результатом будет false.
 		 */
-		public function indexOf($searchValue) {
+		public function indexOf($searchValue): int {
 			$index = false;
 			$id = $searchValue instanceof Model ? $searchValue->id : (int)$searchValue;
 			
@@ -197,7 +197,7 @@ namespace base;
 		
 		
 		/****/
-		public function set($data, $end=0) {
+		public function set($data, $end=0): self {
 			if(is_array($data) && count($data))
 				foreach($data as $item) {
 					$this->add($item);
@@ -220,7 +220,7 @@ namespace base;
 		 * Преобразует коллекцию в простой массив,
 		 * каждый элемент которого является ассоциативным массивом атрибутов модели.
 		 */
-		public function toArray($options=array()) {
+		public function toArray(array $options=array()): array {
 			$array = array();
 			if(!$this->length)
 				return $array;
@@ -246,7 +246,7 @@ namespace base;
 		 * Выполняет поиск элементов коллекции,
 		 * подходящих под переданый массив атрибутов.
 		 */
-		public function where($attributes, $first=false){
+		public function where(array $attributes, bool $first=false): array{
 			$_result = array();
 			
 			foreach($this->models as $model) {
@@ -288,7 +288,7 @@ namespace base;
 		/* Prepare api response
 		 ========================================================================== */
 
-		public function prepareResponse($Response) {
+		public function prepareResponse($Response): self {
 			$meta = $Response->get('meta');
 			$meta->length = $this->length;
 			$meta->paging = $this->paging;

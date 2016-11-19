@@ -30,19 +30,19 @@ namespace base;
 		
 		/** 
 		 ============ */
-		public function offsetExists($attr) {
+		public function offsetExists($attr): bool {
 			return $this->has($attr);
 		}
 		public function offsetGet($attr) {
-			return $this->has($attr) ? $this->get($attr) : NULL;
+			return $this->has($attr) ? $this->get($attr) : null;
 		}
 
-		public function offsetSet($attr, $value) {
+		public function offsetSet($attr, $value): self {
 			return $this->set($attr, $value);
 		}
 
 		public function offsetUnset($offset) {
-			return $this->remove($attr, $value);
+			return;
 		}
 		
 		
@@ -60,7 +60,7 @@ namespace base;
 		/**
 		 * @method get()
 		 */
-		public function get($attr) {
+		public function get(string $attr) {
 			if($attr == 'id')
 				return $this->id;
 			if($this->has($attr))
@@ -72,14 +72,13 @@ namespace base;
 		/**
 		 * @method parse()
 		 */
-		public function parse(array $data) { return $data; }
+		public function parse(array $data): array { return $data; }
 		
 		
 		/**
 		 * @method set()
 		 */
-		public function set($attr, $value=NULL) {
-			if(!$attr || empty($attr)) return $this;
+		public function set($attr, $value = null): self {
 			
 			$attributes = array();
 			is_array($attr) ? $attributes = $attr : $attributes[$attr] = $value;
@@ -163,7 +162,7 @@ namespace base;
 		/**
 		 * @method remove()
 		 */
-		public function remove($attr) {
+		public function remove($attr): self {
 			$attributes = str2array($attr);
 			foreach($attributes as $key)
 				unset($this->_attributes[$key]);
