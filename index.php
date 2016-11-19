@@ -192,7 +192,7 @@ try {
 
 } catch (AppException $e) {
     $Response->setStatusCode($e->code());
-    $Response->get('meta')->error_message = $e->message();
+    $Response->set('meta', $e->toArray());
 
 } catch (SystemException $e) {
     // 500-е ошибки

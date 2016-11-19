@@ -43,7 +43,7 @@
 			)
 		);
 		
-		public function __construct($type = 'ApiUnknownError', $data = null) {
+		public function __construct($type = 'ApiUnknownError', array $data = array()) {
 			parent::__construct($type);
 			
 			$this->_type = $type;
@@ -51,10 +51,12 @@
 			
 			if(array_key_exists($this->_type, $this->_hash))
 				$this->error = $this->_hash[$this->_type];
+			else
+				$this->error = $this->_hash['UnknownError'];
 		}
 
 		public function code(): int {
-			return $this->error ? $this->error['code'] : 400;
+			return $this->_data['code'] ?? $this->error['code'];
 		}
 
 		public function data() {
@@ -67,14 +69,11 @@
 		
 		public function toArray(): array {
 			$result = array();
-			$result['code'] = 400;
-			$result['error_type'] = $this->_type;
-			
-			if($this->_data) $result['error_data'] = $this->_data;
-			
-			if(array_key_exists($this->_type, $this->_hash))
-				$result = array_merge($result, $this->_hash[$this->_type]);
-			
+			$result['code'] = $this->code();
+			$result['error'] = array(
+				'message' => $this->error['message'],
+				'type' => $this->_type
+			);
 			return $result;
 		}
 
