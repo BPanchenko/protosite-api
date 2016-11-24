@@ -228,7 +228,7 @@ abstract class Component {
 			else if(is_string($options['where'])) {
 				$_conditions = explode(',', $options['where']);
 				foreach($_conditions as $_i => $_condition) {
-					preg_match('/([^\s!]+)([!]?:|==)([^:\s]+)/', $_condition, $_temp);
+					preg_match('/([^\s!]+)([!]?:)([^:\s]+)/', $_condition, $_temp);
 
 					if(count($_temp) != 4) {
 						unset($_conditions[$_i]);
@@ -247,7 +247,7 @@ abstract class Component {
 					}
 
 					if(is_numeric($value))
-						$expr = str_replace(array(':', '=='), '=', $expr);
+						$expr = str_replace(array('!:', ':'), array('!=', '='), '=', $expr);
 					else {
 						$expr = str_replace(array('!:', ':'), array('NOT LIKE', 'LIKE'), $expr);
 						$value = '"' . addslashes($value) . '"';
