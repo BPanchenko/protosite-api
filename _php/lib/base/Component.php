@@ -226,7 +226,7 @@ abstract class Component {
 				$_conditions = $options['where'];
 
 			else if(is_string($options['where'])) {
-				$_conditions = explode(',', $options['where']);
+				$_conditions = explode(';', $options['where']);
 				foreach($_conditions as $_i => $_condition) {
 					preg_match('/([^\s!]+)([!]?:)([^:\s]+)/', $_condition, $_temp);
 
@@ -237,18 +237,24 @@ abstract class Component {
 
 					$column = $_temp[1];
 					$expr = $_temp[2];
-					$value = $_temp[3];
+					$value = strpos($_temp[3], ',') === false ? $_temp[3] : explode(',', $_temp[3]);
 
-					if($this->_table->hasColumn($column))
+					if($this->_table->hasColumn($column)) {
 						$column = '`' . $this->_table->name() . '`.`' . $column . '`';
-					else {
+					} else {
 						unset($_conditions[$_i]);
 						continue;
 					}
 
-					if(is_numeric($value))
-						$expr = str_replace(array('!:', ':'), array('!=', '='), '=', $expr);
-					else {
+					if(is_array($value)) {
+						$expr = str_replace(array('!:', ':'), array(' NOT IN ', 'IN'), $expr);
+						$value = array_map(function($val) {
+							return is_numeric($val) ? $val : "\"$val\"";
+						}, $value);
+						$value = '(' . join(',', $value) . ')';
+					} else if(is_numeric($value)) {
+						$expr = str_replace(array('!:', ':'), array('!=', '='), $expr);
+					} else {
 						$expr = str_replace(array('!:', ':'), array('NOT LIKE', 'LIKE'), $expr);
 						$value = '"' . addslashes($value) . '"';
 					}
