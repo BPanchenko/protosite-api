@@ -290,7 +290,7 @@ class Schema extends \PDO {
   }
 
   /****/
-  public function update(string $table, array $columns, $conditions='', array $params=array()): bool {
+  public function update(string $table, array $columns, $conditions='', array $params=array()) {
     $keys = array_keys($columns);
     $update_parts = array();
 
