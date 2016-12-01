@@ -5,6 +5,7 @@ abstract class Component {
   const EVENT_CHANGE = 'change';
 
   public $tb = null;
+  public $tbs = null;
 
   protected $_children = array();
   protected $_default_fetch_options = array(
@@ -17,22 +18,16 @@ abstract class Component {
   );
   protected $_fetch_options = array();
   protected $_parent;
-  protected $_table = null;
-  protected $_tables = array();
 
   private $_events = array();
 
 
-  function __construct($data = array(), $parent = null) {
-    if($parent instanceof \base\Component){
-      $this->attachTo($parent);
-    }
+  function __construct(array $data = array(), \base\Component $parent = null) {
 
-    if(is_string($this->tb)){
-      $this->tb = self::initTable($this->tb);
-    }
+    if(!is_null($parent)) $this->attachTo($parent);
+    if(is_string($this->tb)) $this->tb = self::initTable($this->tb);
 
-    if(is_array($this->tbs) && count($this->tbs))
+    if(is_array($this->tbs))
       foreach($this->tbs as $_tb_name=>$_tb_dns) {
         if($_tb_dns instanceof \PDO) continue;
 
@@ -59,8 +54,8 @@ abstract class Component {
 
     if($this instanceof \base\Model && $parent_object instanceof \base\Collection) {
       $this->collection = $parent_object;
-      if($this->collection->_table instanceof \PDO && $this->tb == $this->collection->_table->dns)
-        $this->tb = $this->collection->_table;
+      if($this->collection->tb instanceof \PDO && $this->tb == $this->collection->tb->dns)
+        $this->tb = $this->collection->tb;
     }
 
     return $this;
@@ -341,6 +336,7 @@ abstract class Component {
   /* Helpers
    ========================================================================== */
 
+  public function isAccessible(): bool { return true; }
   public function isValid(): bool { return true; }
 
 

@@ -73,7 +73,7 @@ try {
         }
 
         switch($part->type) {
-			
+
             case 'class':
                 $classname = $part->value;
                 $part->type = 'object';
@@ -110,7 +110,7 @@ try {
                 if(isset($_GET['debug']))
                     var_dump(get_class($_prev->instance) . ' -> create()');
 
-                $part->instance = $_prev->instance->create($part->value);
+                $part->instance = $_prev->instance->create([ 'id' => $part->value ]);
                 break;
         }
     }

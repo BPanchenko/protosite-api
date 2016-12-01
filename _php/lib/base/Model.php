@@ -13,15 +13,8 @@ class Model extends Component {
   public $collection;
 
 
-  function __construct($data=array(), $parent=NULL) {
-
-    $this->_attributes = $this->_defaults;
-
-    if($data instanceof \stdClass) $data = json_decode(json_encode($data), true);
-
-    if(is_array($data) && count($data)) $this->set($this->parse($data));
-    elseif(is_numeric($data)) $this->set(array('id'=>$data));
-
+  function __construct(array $data = array(), \base\Component $parent = null) {
+    $this->set($this->parse($this->_defaults + $data));
     parent::__construct($data, $parent);
   }
 
