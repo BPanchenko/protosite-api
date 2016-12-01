@@ -1,5 +1,7 @@
 <?php
 
+array_walk($_COOKIE, function(&$cookie){ $cookie = trim($cookie, '"'); });
+
 function getQueryWithoutParameter($param='') {
     $query = trim($_SERVER{'QUERY_STRING'}, '?');
     $params = array();

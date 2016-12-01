@@ -4,6 +4,7 @@ namespace base;
 abstract class Component {
   const EVENT_CHANGE = 'change';
 
+  public $tb = null;
 
   protected $_children = array();
   protected $_default_fetch_options = array(
@@ -23,21 +24,23 @@ abstract class Component {
 
 
   function __construct($data = array(), $parent = null) {
-    if($parent instanceof \base\Component)
+    if($parent instanceof \base\Component){
       $this->attachTo($parent);
+    }
 
-    if(is_string($this->_table))
-      $this->_table = self::initTable($this->_table);
+    if(is_string($this->tb)){
+      $this->tb = self::initTable($this->tb);
+    }
 
-    if(is_array($this->_tables) && count($this->_tables))
-      foreach($this->_tables as $_tb_name=>$_tb_dns) {
+    if(is_array($this->tbs) && count($this->tbs))
+      foreach($this->tbs as $_tb_name=>$_tb_dns) {
         if($_tb_dns instanceof \PDO) continue;
 
         if(strpos($_tb_dns, '{model_id}') !== false && !$this->isNew()) {
           $_tb_dns = str_replace('{model_id}', $this->id, $_tb_dns);
-          $this->_tables[$_tb_name] = self::initTable($_tb_dns);
+          $this->tbs[$_tb_name] = self::initTable($_tb_dns);
         } else
-          $this->_tables[$_tb_name] = self::initTable($_tb_dns);
+          $this->tbs[$_tb_name] = self::initTable($_tb_dns);
       }
   }
 
@@ -56,8 +59,8 @@ abstract class Component {
 
     if($this instanceof \base\Model && $parent_object instanceof \base\Collection) {
       $this->collection = $parent_object;
-      if($this->collection->_table instanceof \PDO && $this->_table == $this->collection->_table->dns)
-        $this->_table = $this->collection->_table;
+      if($this->collection->_table instanceof \PDO && $this->tb == $this->collection->_table->dns)
+        $this->tb = $this->collection->_table;
     }
 
     return $this;
@@ -124,31 +127,31 @@ abstract class Component {
 
     // fetch Model
     if($this instanceof \base\Model) {
-      $this->_table->reset()
+      $this->tb->reset()
         ->select($options['fields'])
         ->where($options['where'])
         ->limit(1);
 
-      $res = $this->parse($this->_table->fetch(\PDO::FETCH_ASSOC));
+      $res = $this->parse($this->tb->fetch(\PDO::FETCH_ASSOC));
     }
 
     // fetch Collection
     if($this instanceof \base\Collection) {
       //
-      $this->_table->reset()
+      $this->tb->reset()
         ->select($options['fields'])
         ->where($options['where'])
         ->order($options['order'])
         ->limit($options['count'])
         ->offset($options['offset']);
       //
-      $res = $this->_table->fetchAll(\PDO::FETCH_ASSOC);
+      $res = $this->tb->fetchAll(\PDO::FETCH_ASSOC);
 
       // set total
-      $this->_table->reset()
+      $this->tb->reset()
         ->select("count(*)")
         ->where($options['where']);
-      $this->total = (int)$this->_table->fetchColumn();
+      $this->total = (int)$this->tb->fetchColumn();
 
       //
       $this->paging = $this->buildPaging($options['offset'], $options['count'], $this->total);
@@ -188,7 +191,7 @@ abstract class Component {
     if(!empty($options['fields']))
       $options['fields'] = str2array($options['fields']);
     else
-      $options['fields'] = $this->_table->fields();
+      $options['fields'] = $this->tb->fields();
 
     if(is_string($options['order'])) {
       $_orders = explode(',', $options['order']);
@@ -202,8 +205,8 @@ abstract class Component {
       }
       $options['order'] = join(', ', $_orders);
 
-    } elseif(is_string($this->_table->primaryKey()))
-      $options['order'] = '`' . $this->_table->primaryKey() . '` DESC';
+    } elseif(is_string($this->tb->primaryKey()))
+      $options['order'] = '`' . $this->tb->primaryKey() . '` DESC';
 
     //
     if(isset($options['excluded_fields'])) {
@@ -241,8 +244,8 @@ abstract class Component {
           $expr = $_temp[2];
           $value = strpos($_temp[3], ',') === false ? $_temp[3] : explode(',', $_temp[3]);
 
-          if($this->_table->hasColumn($column)) {
-            $column = '`' . $this->_table->name() . '`.`' . $column . '`';
+          if($this->tb->hasColumn($column)) {
+            $column = '`' . $this->tb->name() . '`.`' . $column . '`';
           } else {
             unset($_conditions[$_i]);
             continue;
@@ -266,10 +269,10 @@ abstract class Component {
       }
 
     } else if($this instanceof \base\Model) {
-      if($this->_table->hasColumn(static::$idAttribute))
+      if($this->tb->hasColumn(static::$idAttribute))
         array_push($_conditions, "`" . static::$idAttribute . "` = '" . $this->id . "'");
       else
-        array_push($_conditions, "`" . $this->_table->primaryKey() . "` = '" . $this->id . "'");
+        array_push($_conditions, "`" . $this->tb->primaryKey() . "` = '" . $this->id . "'");
     }
 
     $options['where'] = join(' AND ', $_conditions);
@@ -319,8 +322,8 @@ abstract class Component {
     }
 
     // save model
-    $this->_table->save($this->toArray());
-    $this->set(static::$idAttribute, $this->_table->lastInsertId());
+    $this->tb->save($this->toArray());
+    $this->set(static::$idAttribute, $this->tb->lastInsertId());
 
     return $this;
   }
