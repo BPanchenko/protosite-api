@@ -9,12 +9,12 @@ abstract class Component {
 
   protected $_children = array();
   protected $_default_fetch_options = array(
-      'fields' => array(),
-      'excluded_fields' => array('is_del'),
-      'where' => 'is_del:0',
-      'order' => null,
-      'count' => FETCH_DEFAULT_COUNT,
-      'offset' => FETCH_DEFAULT_OFFSET
+    'fields' => array(),
+    'excluded_fields' => array('is_del'),
+    'where' => 'is_del:0',
+    'order' => null,
+    'count' => FETCH_DEFAULT_COUNT,
+    'offset' => FETCH_DEFAULT_OFFSET
   );
   protected $_fetch_options = array();
   protected $_parent;
@@ -24,6 +24,7 @@ abstract class Component {
 
   function __construct(array $data = array(), \base\Component $parent = null) {
 
+    if(!$this->isAccessible()) throw new \AppException('AccessDenied');
     if(!is_null($parent)) $this->attachTo($parent);
     if(is_string($this->tb)) $this->tb = self::initTable($this->tb);
 
