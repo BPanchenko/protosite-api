@@ -1,6 +1,6 @@
 <?php
 
-$Log = new system\Log;
+$Log = new Log;
 $Request = http\Request::init();
 $Response = http\Response::init();
 $start_ts = microtime(true);

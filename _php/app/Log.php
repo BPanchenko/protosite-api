@@ -1,5 +1,4 @@
 <?php
-namespace system;
 
 class Log {
 
