@@ -29,14 +29,9 @@ abstract class Component {
     if(is_string($this->tb)) $this->tb = self::initTable($this->tb);
 
     if(is_array($this->tbs))
-      foreach($this->tbs as $_tb_name=>$_tb_dns) {
+      foreach($this->tbs as &$_tb_dns) {
         if($_tb_dns instanceof \PDO) continue;
-
-        if(strpos($_tb_dns, '{model_id}') !== false && !$this->isNew()) {
-          $_tb_dns = str_replace('{model_id}', $this->id, $_tb_dns);
-          $this->tbs[$_tb_name] = self::initTable($_tb_dns);
-        } else
-          $this->tbs[$_tb_name] = self::initTable($_tb_dns);
+        $_tb_dns = self::initTable($_tb_dns);
       }
   }
 
@@ -117,7 +112,7 @@ abstract class Component {
   /* Synchronization of the component with database support
    ========================================================================== */
 
-  public function fetch($options = array())
+  public function fetch(array $options = array())
   {
     $options = $this->_prepareFetchOptions($options);
 
@@ -128,7 +123,10 @@ abstract class Component {
         ->where($options['where'])
         ->limit(1);
 
-      $res = $this->parse($this->tb->fetch(\PDO::FETCH_ASSOC));
+      $data = $this->tb->fetch(\PDO::FETCH_ASSOC);
+      if(!$data) throw new \AppException("FailedModelFetch", $options);
+
+      $res = $this->parse($data);
     }
 
     // fetch Collection
@@ -156,7 +154,7 @@ abstract class Component {
     return $this->set($res);
   }
 
-  public function buildPaging($offset = 0, $count = 20, $total = 0)
+  public function buildPaging(int $offset = 0, int $count = 20, int $total = 0): array
   {
     $current = floor($offset / $count);
     $prev = $current - 1;
@@ -265,6 +263,7 @@ abstract class Component {
       }
 
     } else if($this instanceof \base\Model) {
+      if($this->isNew()) throw new \AppException("Model can not be fetched");
       if($this->tb->hasColumn(static::$idAttribute))
         array_push($_conditions, "`" . static::$idAttribute . "` = '" . $this->id . "'");
       else
@@ -282,20 +281,23 @@ abstract class Component {
    * @param $table -
    */
   public static function initTable($table) {
-    if($table instanceof \DB\Schema)
-      return $table;
+    if($table instanceof \DB\Schema) return $table;
 
-    if(empty($table))
+    if(empty($table)) {
       throw new \SystemException('EmptyTableName');
+    }
 
-    if(strpos($table, 'sqlite:') === 0)
+    if(strpos($table, 'sqlite:') === 0) {
       $table = new \DB\SQLite\Table($table);
+    }
 
-    if(strpos($table, 'mysql:') === 0)
+    if(strpos($table, 'mysql:') === 0) {
       $table = new \DB\MySql\Table($table);
+    }
 
-    if(!($table instanceof \DB\Schema))
+    if(!($table instanceof \DB\Schema)) {
       throw new \SystemException('FailInitTable');
+    }
 
     return $table;
   }
@@ -304,12 +306,7 @@ abstract class Component {
   /* Insert or update a component in the database
    ========================================================================== */
 
-  public function save($data): self {
-    if($data instanceof \stdClass)
-      $data = json_decode(json_encode($data), true);
-
-    if(is_array($data) && count($data))
-      $this->set($this->parse($data));
+  public function save(array $data = []): self {
 
     // save models of collection
     if($this instanceof \base\Collection) {
@@ -318,8 +315,9 @@ abstract class Component {
     }
 
     // save model
+    if(count($data)) $this->set($this->parse($data));
     $this->tb->save($this->toArray());
-    $this->set(static::$idAttribute, $this->tb->lastInsertId());
+    if($this->isNew()) $this->set(static::$idAttribute, $this->tb->lastInsertId());
 
     return $this;
   }

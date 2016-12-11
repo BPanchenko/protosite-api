@@ -245,15 +245,15 @@ class Schema extends \PDO {
     $placeholders=array();
     $equalities=array();
 
-    if(!$columns['created']) $columns['created'] = date("Y-m-d H:i:s");
-
     foreach($columns as $name=>$value) {
       $names[] = $this->quote($name);
       $placeholders[] = ':' . $name;
       $params[':' . $name] = $value;
 
-      if(!in_array($name, array('updated', 'created')))
-          $equalities[] = end($names) . '=' . end($placeholders);
+      // don't change the system columns
+      if(!in_array($name, array('updated', 'created'))) {
+        $equalities[] = end($names) . '=' . end($placeholders);
+      }
     }
 
     $sql = 'INSERT INTO ' . $this->quote($table)
@@ -368,6 +368,12 @@ class Schema extends \PDO {
 
     if(!empty($this->_query['offset']))
         $sql.="\nOFFSET ".$this->_query['offset'];
+
+    if(isset($_GET['debug'])) {
+      print_r("\n# SQL -------------\n");
+      print_r($sql);
+      print_r("\n# -------------\n");
+    }
 
     return $sql;
   }

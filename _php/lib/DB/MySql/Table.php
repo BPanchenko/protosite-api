@@ -3,6 +3,7 @@ namespace DB\MySql;
 require_once dirname(__FILE__) . '/Schema.php';
 
 class Table extends \DB\MySql\Schema {
+  use \DB\traitTable;
 
   protected $_name;
   protected $_schema;
@@ -90,12 +91,6 @@ class Table extends \DB\MySql\Schema {
   }
 
   /****/
-  public function hasColumn($column_name) {
-    if(!$this->_columns) $this->columns();
-    return array_key_exists($column_name, $this->_columns);
-  }
-
-  /****/
   public function primaryKey() {
     return $this->_primary_key;
   }
@@ -131,16 +126,6 @@ class Table extends \DB\MySql\Schema {
   public function fetchAll($fetch_style = \PDO::FETCH_OBJ): array {
     $this->from($this->_name);
     return parent::fetchAll($fetch_style);
-  }
-
-  /****/
-  public function save(array $columns) {
-    // check columns among the fields of database table
-    foreach($columns as $column=>$value)
-      if(!$this->hasColumn($column))
-          unset($columns[$column]);
-
-    return parent::save($this->_name, $columns);
   }
 
   /****/
