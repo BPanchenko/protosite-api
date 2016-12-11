@@ -112,7 +112,7 @@ abstract class Component {
   /* Synchronization of the component with database support
    ========================================================================== */
 
-  public function fetch(array $options = array())
+  public function fetch(array $options = [])
   {
     $options = $this->_prepareFetchOptions($options);
 

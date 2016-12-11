@@ -9,8 +9,8 @@ require_once PHP_LIB_DIR . "/traits.php";
 
 require_once PHP_LIB_DIR . "/base/CaseInsensitiveArray.php";
 require_once PHP_LIB_DIR . "/base/Component.php";
-require_once PHP_LIB_DIR . "/base/Collection.php";
 require_once PHP_LIB_DIR . "/base/Model.php";
+require_once PHP_LIB_DIR . "/base/Collection.php";
 
 require_once PHP_LIB_DIR . "/DB/Schema.php";
 require_once PHP_LIB_DIR . "/DB/MySql/Schema.php";

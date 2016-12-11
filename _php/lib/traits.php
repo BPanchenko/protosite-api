@@ -24,11 +24,22 @@ trait initByToken
   public function initByToken(string $token): self
   {
     $data = $this->_fetchDataByToken($token);
-    if(!$data[self::$idAttribute]) throw new AppException('Unauthorized', [
-        'class' => get_called_class(),
-        'token' => $token
-    ]);
-    else $this->set($this->parse($data));
+
+    if(!$data[self::$idAttribute]) {
+      throw new AppException('Unauthorized', [
+          'class' => get_called_class(),
+          'token' => $token
+      ]);
+    } elseif(!$this->isNew() && $this->id != $data[self::$idAttribute]) {
+      throw new AppException('Unauthorized', [
+          'class' => get_called_class(),
+          'token' => $token
+      ]);
+    }
+    else {
+      $this->set($this->parse($data));
+    }
+
     return $this;
   }
 
@@ -42,7 +53,8 @@ trait initByToken
       throw new Error("Table of the tokens is undefined");
     }
 
-    $data = $this->toArray() + [ 'token' => $token ];
+    $this->set('token', $token);
+    $data = $this->toArray();
     unset($data['id']);
     $this->tbTokens->save($data);
     return $this;

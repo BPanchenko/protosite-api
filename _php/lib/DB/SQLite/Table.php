@@ -23,7 +23,7 @@ class Table extends \DB\SQLite\Schema {
       $this->_default_query = [
           'from' => $this->_name
       ];
-      $this->_columns();
+      $this->columns();
     }
 
     /****/
