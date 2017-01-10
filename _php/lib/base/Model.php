@@ -3,10 +3,10 @@ namespace base;
 
 class Model extends Component {
 
-  protected $_attributes = array();
-  protected $_changed = array();
-  protected $_defaults = array();
-  protected $_previous = array();
+  protected $_attributes = [];
+  protected $_changed = [];
+  protected $_defaults = [];
+  protected $_previous = [];
 
   public static $idAttribute = 'id';
   public $id;
@@ -98,10 +98,10 @@ class Model extends Component {
         $this->id = $this->_attributes[static::$idAttribute] = $val;
       }
 
-      $this->trigger(self::EVENT_CHANGE . ":$key", array(
-        "value" => $val,
-        "previous" => $_previous[$key]
-      ));
+      $this->trigger(self::EVENT_CHANGE . ":$key", [
+          "value" => $val,
+          "previous" => $_previous[$key]
+      ]);
     }
 
     $this->_changed = $_changed;

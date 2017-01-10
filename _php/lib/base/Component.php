@@ -7,19 +7,19 @@ abstract class Component {
   public $tb = null;
   public $tbs = null;
 
-  protected $_children = array();
-  protected $_default_fetch_options = array(
-    'fields' => array(),
-    'excluded_fields' => array('is_del'),
+  protected $_children = [];
+  protected $_default_fetch_options = [
+    'fields' => [],
+    'excluded_fields' => ['is_del'],
     'where' => 'is_del:0',
     'order' => null,
     'count' => FETCH_DEFAULT_COUNT,
     'offset' => FETCH_DEFAULT_OFFSET
-  );
-  protected $_fetch_options = array();
+  ];
+  protected $_fetch_options = [];
   protected $_parent;
 
-  private $_events = array();
+  private $_events = [];
 
 
   function __construct(array $data = array(), \base\Component $parent = null) {
@@ -306,7 +306,7 @@ abstract class Component {
   /* Insert or update a component in the database
    ========================================================================== */
 
-  public function save(array $data = []): self {
+  public function save(array $data = []) {
 
     // save models of collection
     if($this instanceof \base\Collection) {
