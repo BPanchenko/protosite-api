@@ -2,6 +2,12 @@
 
 array_walk($_COOKIE, function(&$cookie){ $cookie = trim($cookie, '"'); });
 
+function array_parse_int(array $arr = []) {
+  return array_combine(array_keys($arr), array_map(function($val){
+    return is_numeric($val) ? (int)$val : $val;
+  }, $arr));
+}
+
 function getQueryWithoutParameter($param='') {
     $query = trim($_SERVER{'QUERY_STRING'}, '?');
     $params = array();
