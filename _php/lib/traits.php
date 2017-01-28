@@ -4,17 +4,17 @@
 trait getSelf
 {
   use initByToken;
-  public function get_self(): array {
-    $token = $_COOKIE[$this->_tokenName];
+  public function get_self(): \base\Component {
+    $token = $_COOKIE[$this->_cookieTokenName] ?? $_GET[$this->_cookieTokenName];
     if(empty($token)) throw new AppException('Unauthorized');
 
     $data = $this->_fetchDataByToken($token);
     if(!$data[self::$classModel::$idAttribute]) throw new AppException('Unauthorized', [
         'class' => get_called_class(),
-        'token' => $token
+        'access_token' => $token
     ]);
 
-    return $this->create($data)->fetch()->toArray();
+    return $this->create($data)->fetch();
   }
 }
 
@@ -28,12 +28,12 @@ trait initByToken
     if(!$data[self::$idAttribute]) {
       throw new AppException('Unauthorized', [
           'class' => get_called_class(),
-          'token' => $token
+          'access_token' => $token
       ]);
     } elseif(!$this->isNew() && $this->id != $data[self::$idAttribute]) {
       throw new AppException('Unauthorized', [
           'class' => get_called_class(),
-          'token' => $token
+          'access_token' => $token
       ]);
     }
     else {
@@ -53,7 +53,7 @@ trait initByToken
       throw new Error("Table of the tokens is undefined");
     }
 
-    $this->set('token', $token);
+    $this->set('access_token', $token);
     $data = $this->toArray();
     unset($data['id']);
     $this->tbTokens->save($data);
@@ -68,7 +68,7 @@ trait initByToken
 
     $data = $this->tbTokens
         ->select("*")
-        ->where("`token`=:token", [ 'token' => $token ])
+        ->where("`access_token`=:token", [ 'token' => $token ])
         ->limit(1)
         ->fetch(\PDO::FETCH_ASSOC);
 
