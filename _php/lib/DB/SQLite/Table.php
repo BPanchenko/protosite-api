@@ -73,15 +73,13 @@ class Table extends \DB\SQLite\Schema {
     /****/
     public function fields(): array {
         if(!$this->_columns) $this->columns();
-        return
-            array_keys($this->columns);
+        return array_keys($this->_columns);
     }
 
     /****/
     public function columnType($column_name) {
         if(!$this->_columns) $this->columns();
-        return
-            $this->hasColumn($column_name) ? $this->_columns[$column_name]['type'] : NULL;
+        return $this->hasColumn($column_name) ? $this->_columns[$column_name]['type'] : NULL;
     }
 
     /****/
