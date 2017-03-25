@@ -266,22 +266,13 @@ class Collection extends Component implements \ArrayAccess {
 
     return $_result;
   }
-		
-		
+
+
   /**
    * Вернет массив значений свойства каждого элемента коллекции.
    */
-  public function pluck(string $attr): array{
-    $_result = array();
-
-    foreach($this->models as $model) {
-      if(!$model->has($attr))
-        continue;
-      if(!in_array($model->get($attr), $_result))
-        array_push($_result, $model->get($attr));
-    }
-
-    return $_result;
+  public function pluck(string $attr): array {
+    return array_column($this->models, $attr);
   }
 
 
