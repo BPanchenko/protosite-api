@@ -9,12 +9,12 @@ abstract class Component {
 
   protected $_children = [];
   protected $_default_fetch_options = [
-    'fields' => [],
-    'excluded_fields' => ['is_del'],
-    'where' => 'is_del:0',
-    'order' => null,
-    'count' => FETCH_DEFAULT_COUNT,
-    'offset' => FETCH_DEFAULT_OFFSET
+      'fields' => [],
+      'excluded_fields' => ['is_del'],
+      'where' => 'is_del:0',
+      'order' => null,
+      'count' => FETCH_DEFAULT_COUNT,
+      'offset' => FETCH_DEFAULT_OFFSET
   ];
   protected $_fetch_options = [];
   protected $_parent;
@@ -119,9 +119,9 @@ abstract class Component {
     // fetch Model
     if($this instanceof \base\Model) {
       $this->tb->reset()
-        ->select($options['fields'])
-        ->where($options['where'])
-        ->limit(1);
+          ->select($options['fields'])
+          ->where($options['where'])
+          ->limit(1);
 
       $data = $this->tb->fetch(\PDO::FETCH_ASSOC);
       if(!$data) throw new \AppException("FailedModelFetch", $options);
@@ -133,18 +133,19 @@ abstract class Component {
     if($this instanceof \base\Collection) {
       //
       $this->tb->reset()
-        ->select($options['fields'])
-        ->where($options['where'])
-        ->order($options['order'])
-        ->limit($options['count'])
-        ->offset($options['offset']);
+          ->select($options['fields'])
+          ->where($options['where'])
+          ->order($options['order'])
+          ->limit($options['count'])
+          ->offset($options['offset']);
+
       //
       $res = $this->tb->fetchAll(\PDO::FETCH_ASSOC);
 
       // set total
       $this->tb->reset()
-        ->select("count(*)")
-        ->where($options['where']);
+          ->select("count(*)")
+          ->where($options['where']);
       $this->total = (int)$this->tb->fetchColumn();
 
       //
@@ -227,7 +228,7 @@ abstract class Component {
       else if(is_string($options['where'])) {
         $_conditions = explode(';', $options['where']);
         foreach($_conditions as $_i => $_condition) {
-          preg_match('/([^\s!]+)([!]?:)([^:\s]+)/', $_condition, $_temp);
+          preg_match('/([^\s!:]+)([!:]?:)([^:\s]+)/', $_condition, $_temp);
 
           if(count($_temp) != 4) {
             unset($_conditions[$_i]);
@@ -246,16 +247,17 @@ abstract class Component {
           }
 
           if(is_array($value)) {
-            $expr = str_replace(array('!:', ':'), array(' NOT IN ', 'IN'), $expr);
+            $expr = str_replace(array('!:', '::', ':'), array(' NOT IN ', 'IN', 'IN'), $expr);
             $value = array_map(function($val) {
-                return is_numeric($val) ? $val : "\"$val\"";
+              return is_numeric($val) ? $val : '"' . strtolower($val) . '"';
             }, $value);
             $value = '(' . join(',', $value) . ')';
           } else if(is_numeric($value)) {
-            $expr = str_replace(array('!:', ':'), array('!=', '='), $expr);
+            $expr = str_replace(array('!:', '::', ':'), array('!=', '=', '='), $expr);
           } else {
-            $expr = str_replace(array('!:', ':'), array('NOT LIKE', 'LIKE'), $expr);
-            $value = '"' . addslashes($value) . '"';
+            if ($expr == '::') $value = '"' . addslashes(strtolower($value)) . '"';
+            else $value = '"%' . addslashes(strtolower($value)) . '%"';
+            $expr = str_replace(array('!:', '::', ':'), array('NOT LIKE', 'LIKE', 'LIKE'), $expr);
           }
 
           $_conditions[$_i] = $column . ' ' . $expr . ' ' . $value;
