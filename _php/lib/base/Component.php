@@ -41,16 +41,16 @@ abstract class Component {
     return $this;
   }
 
-  public function attachTo($parent_object): self
+  public function attachTo($parent): self
   {
-    if($parent_object instanceof \base\Component) {
-      $this->_parent = $parent_object;
-      $parent_object->attach($this);
+    if($parent instanceof \base\Component) {
+      $this->_parent = $parent;
+      $parent->attach($this);
     }
 
-    if($this instanceof \base\Model && $parent_object instanceof \base\Collection) {
-      $this->collection = $parent_object;
-      if($this->collection->tb instanceof \PDO && $this->tb == $this->collection->tb->dns)
+    if($this instanceof \base\Model && $parent instanceof \base\Collection) {
+      $this->collection = $parent;
+      if($this->collection->tb instanceof \PDO && $this->tb == $this->collection->tb->dns())
         $this->tb = $this->collection->tb;
     }
 
