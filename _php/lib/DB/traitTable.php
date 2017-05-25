@@ -23,5 +23,9 @@ trait traitTable
 
     return parent::save($this->name(), $data);
   }
+
+  public function dns() { return $this->_dns; }
+  public function drop() { return $this->dropTable($this->_name); }
+  public function name() { return $this->_name; }
 }
 ?>

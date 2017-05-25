@@ -5,6 +5,7 @@ require_once dirname(__FILE__) . '/Schema.php';
 class Table extends \DB\MySql\Schema {
   use \DB\traitTable;
 
+  protected $_dns;
   protected $_name;
   protected $_schema;
   protected $_fullname;
@@ -14,10 +15,10 @@ class Table extends \DB\MySql\Schema {
   protected $_primary_key;
 
   function __construct($table, $user, $pass) {
-    $table = str_replace('`', '', $table);
-    $temp = explode('.', str_replace('mysql:', '', $table));
+    $this->_dns = str_replace('`', '', $table);
+    $temp = explode('.', str_replace('mysql:', '', $this->_dns));
 
-    if(strpos($table, 'mysql:') !== 0 || !count($temp)) {
+    if(strpos($this->_dns, 'mysql:') !== 0 || !count($temp)) {
       throw new SystemException('WrongMySqlTableName');
     }
 
@@ -140,8 +141,6 @@ class Table extends \DB\MySql\Schema {
   }
 
   public function drop() { return $this->dropTable($this->_name); }
-  public function name() { return $this->_name; }
-  public function fullname() { return $this->_fullname; }
 
   /* </ use php trait ... */
 }
