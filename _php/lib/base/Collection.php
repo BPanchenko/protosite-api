@@ -288,6 +288,10 @@ class Collection extends Component implements \ArrayAccess {
     $meta->length = $this->length;
     $meta->paging = $this->paging;
     $meta->total = $this->total;
+    
+    if($this->tb instanceof \DB\MySql\Table) {
+      $meta->fields = $this->tb->columns();
+    }
 
     $Response->set('meta', $meta);
     $Response->set('data', $this->toArray());
