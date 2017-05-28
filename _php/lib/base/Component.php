@@ -12,7 +12,7 @@ abstract class Component {
       'fields' => [],
       'excluded_fields' => ['is_del'],
       'where' => 'is_del:0',
-      'order' => null,
+      'sort' => null,
       'count' => FETCH_DEFAULT_COUNT,
       'offset' => FETCH_DEFAULT_OFFSET
   ];
@@ -173,25 +173,33 @@ abstract class Component {
     );
   }
 
-  protected function _prepareFetchOptions($options)
+  protected function _prepareFetchOptions(array $options = []): array
   {
-    $_opt = $this->_fetch_options + $this->_default_fetch_options;
+    $options = $options + $this->_fetch_options + $this->_default_fetch_options;
 
-    if(is_array($options))
-      $options = $options + $_opt;
-    else
-      $options = $_opt;
-
+    // fields
 
     if(!empty($options['fields']))
       $options['fields'] = str2array($options['fields']);
     else
       $options['fields'] = $this->tb->fields();
 
-    if(is_string($options['order'])) {
-      $_orders = explode(',', $options['order']);
+    // exclude fields
+
+    if(isset($options['excluded_fields'])) {
+      $options['excluded_fields'] = str2array($options['excluded_fields']);
+      foreach($options['excluded_fields'] as $_field) {
+        $i = array_search($_field, $options['fields']);
+        if($i) unset($options['fields'][$i]);
+      }
+    }
+
+    // order
+
+    if(is_string($options['sort'])) {
+      $_orders = explode(',', $options['sort']);
       foreach($_orders as $_i=>$_order) {
-        if($options['order'] == 'random')
+        if($_order == 'random')
           $_orders[$_i] = 'RAND()';
         elseif(strpos($_order, '-') === 0)
           $_orders[$_i] = '`' . substr($_order, 1) . '` DESC';
@@ -203,22 +211,13 @@ abstract class Component {
     } elseif(is_string($this->tb->primaryKey()))
       $options['order'] = '`' . $this->tb->primaryKey() . '` DESC';
 
-    //
-    if(isset($options['excluded_fields'])) {
-      $options['excluded_fields'] = str2array($options['excluded_fields']);
-      foreach($options['excluded_fields'] as $_field) {
-        $i = array_search($_field, $options['fields']);
-        if($i) unset($options['fields'][$i]);
-      }
-    }
-
     if(isset($_GET['debug'])) {
       var_dump("// Fetch options");
       var_dump($options);
     }
 
-
     // build where expression
+
     $_conditions = array();
 
     if($this instanceof \base\Collection) {
