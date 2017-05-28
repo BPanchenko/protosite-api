@@ -27,5 +27,21 @@ trait traitTable
   public function dns() { return $this->_dns; }
   public function drop() { return $this->dropTable($this->_name); }
   public function name() { return $this->_name; }
+
+  private function _getShortFieldType(string $origin):string {
+    $origin = strtolower($origin);
+    $type = '';
+    $reg_numeric = '/^(?:int|tinyint|smallint|mediumint|bigint|float|decimal|double|real).*/';
+    $reg_string = '/^(?:binary|char|enum|tinytext|text|mediumtext|longtext|varchar|varbinary).*/';
+
+    if($origin == 'tinyint(1)') $type = 'boolean';
+    elseif(in_array($origin, ['boolean', 'date', 'time', 'datetime', 'timestamp'])) {
+      $type = $origin;
+    }
+    elseif(preg_match($reg_numeric, $origin)) $type = 'numeric';
+    elseif(preg_match($reg_string, $origin)) $type = 'string';
+
+    return $type;
+  }
 }
 ?>

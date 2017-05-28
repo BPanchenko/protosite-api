@@ -100,15 +100,17 @@
 		В качестве примера рассматривается API блога.
 	</p>
 	<p>
-		<h4><code>GET: /list/</code></h4>
-		<p>Массив статей.</p>
-		<h4><code>POST: /list/</code></h4>
+		<h4><code>GET: /{list}/</code></h4>
+		<p>Массив элементов коллекции.</p>
+		<h4><code>POST: /{list}/</code></h4>
 		<p>Создание нового элемента коллекции. Возвращает созданную модель.</p>
-		<h4><code>GET: /list/{item_id}</code></h4>
+		<h4><code>POST: /{list}/fields</code></h4>
+		<p>Описание полей таблицы данных списка.</p>
+		<h4><code>GET: /{list}/{item_id}</code></h4>
 		<p>Подробные данные.</p>
-		<h4><code>GET: /list/{item_id}/lastmodify</code></h4>
+		<h4><code>GET: /{list}/{item_id}/lastmodify</code></h4>
 		<p>Дата последнего обновления модели.</p>
-		<h4><code>PUT: /list/{item_id}</code></h4>
+		<h4><code>PUT: /{list}/{item_id}</code></h4>
 		<p>
 			Редактирование.<br>
 			Данные на сохранение передаются в теле запроса.<br>

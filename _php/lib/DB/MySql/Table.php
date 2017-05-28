@@ -40,25 +40,21 @@ class Table extends \DB\MySql\Schema {
     if($this->_columns) return $this->_columns;
 
     // fetch the table structure
-    $_sql = "SHOW COLUMNS FROM `".$this->name()."` \n";
+    $_sql = "SHOW FULL COLUMNS FROM `".$this->name()."` \n";
     $_sth = $this->query($_sql);
     $_sth->bindParam(":tbl_name", $this->name());
     $_sth->execute();
 
     while($_row = $_sth->fetch(\PDO::FETCH_OBJ)) {
       $_name = $_row->Field;
-      $_type = strtolower($_row->Key) == 'pri' ? 'pk' : NULL;
+      $_is_primary_key = strtolower($_row->Key) == 'pri';
+      
+      $this->_columns[$_name]['comment'] = $_row->Comment;
+      $this->_columns[$_name]['is_primary'] = $_is_primary_key;
+      $this->_columns[$_name]['type'] = $_row->Type;
+      $this->_columns[$_name]['short_type'] = $this->_getShortFieldType($_row->Type);
 
-      if(!$_type)
-        foreach ($this->columnTypes as $columnType=>$needle) {
-          $_type = $_row->Type == $needle ? $columnType : NULL;
-          if($_type) break;
-        }
-
-      $this->_columns[$_name]['_inst'] = $_row;
-      $this->_columns[$_name]['type'] = $_type;
-
-      if($_type == 'pk') $this->_setPrimaryKey($_name);
+      if($_is_primary_key) $this->_setPrimaryKey($_name);
     }
 
     return $this->_columns;
