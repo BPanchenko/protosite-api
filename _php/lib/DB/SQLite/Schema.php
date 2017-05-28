@@ -4,7 +4,7 @@ require_once dirname(__FILE__) . '/../Schema.php';
 
 class Schema extends \DB\Schema {
 
-  public $columnTypes = array(
+  public $columnTypes = [
     'pk' => 'integer PRIMARY KEY AUTOINCREMENT NOT NULL',
     'bigpk' => 'integer PRIMARY KEY AUTOINCREMENT NOT NULL',
     'string' => 'varchar(255)',
@@ -20,7 +20,7 @@ class Schema extends \DB\Schema {
     'binary' => 'blob',
     'boolean' => 'tinyint(1)',
     'money' => 'decimal(19,4)'
-  );
+  ];
 
   function __construct($schema = 'memory', $dir='/') {
     $this->_schema = $schema;
