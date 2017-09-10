@@ -189,10 +189,10 @@ $Response->send();
 if(isset($_GET['debug'])) {
   echo "\n\n//*********************************";
   echo "\n// MEMORY USAGE\n";
-  echo memory_get_usage();
+  echo round(memory_get_usage() / (1024 * 1024), 2) . "Mb";
 
   echo "\n\n//*********************************";
   echo "\n// EXECUTION TIME\n";
-  echo (microtime(true) - $start_ts).'s';
+  echo round((microtime(true) - $start_ts), 2) . 's';
 }
 ?>
