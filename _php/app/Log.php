@@ -10,8 +10,8 @@ class Log {
         $this->_dir = LOG_DIR;
 
         if(!$this->filename($filename)) {
-			$this->filename($_SERVER['HTTP_HOST'] . '--' . date('Ymd') . '.log');
-		}
+            $this->filename($_SERVER['HTTP_HOST'] . '--' . date('Ymd') . '.log');
+        }
     }
 
     public function dir($string) {
@@ -47,7 +47,7 @@ class Log {
         else {
             $damp = array_reverse(file($this->_path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES));
 
-            $result = new \base\CaseInsensitiveArray;
+            $result = [];
             foreach($damp as $index => $line) {
                 if($index >= $length) break;
                 $line = explode("\t", $line);

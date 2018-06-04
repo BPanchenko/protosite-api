@@ -105,7 +105,7 @@ namespace http;
 		/**
 		 * Initializes this component.
 		 */
-		public function init() {
+		public static function init() {
 			if (is_object(self::$_instance))
 				return self::$_instance;
 				

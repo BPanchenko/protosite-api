@@ -1,53 +1,55 @@
 <?php
+
 class AppException extends Exception {
   private $_type;
   private $_data;
   private $error;
 
-  private $_hash = array(
-    'AccessDenied' => array(
+  private $_hash = [
+    'AccessDenied' => [
       'code' => 401,
       'message' => "Access denied"
-    ),
-    'EmailExists' => array(
+    ],
+    'EmailExists' => [
       'code' => 409,
       'message' => "Email is already registered"
-    ),
-    'MethodNotAllowed' => array(
+    ],
+    'MethodNotAllowed' => [
       'code' => 405,
       'message' => "Method is not supported"
-    ),
-    'ManyRequestCheckpoints' => array(
+    ],
+    'ManyRequestCheckpoints' => [
       'code' => 405,
       'message' => "Many checkpoints in the request"
-    ),
-    'WrongEmail' => array(
+    ],
+    'WrongEmail' => [
       'code' => 400,
       'message' => "Invalid email"
-    ),
-    'WrongFileType' => array(
+    ],
+    'WrongFileType' => [
       'code' => 400,
       'message' => "Not registered file type"
-    ),
-    'WrongPassword' => array(
+    ],
+    'WrongPassword' => [
       'code' => 400,
       'message' => "Invalid password"
-    ),
-    'Unauthorized' => array(
+    ],
+    'Unauthorized' => [
       'code' => 401,
       'message' => "Access denied"
-    ),
-    'UnknownError' => array(
+    ],
+    'UnknownError' => [
       'code' => 400,
       'message' => "Unknown Error"
-    ),
-    'UnprocessableEntity' => array(
+    ],
+    'UnprocessableEntity' => [
       'code' => 422,
       'message' => "Unprocessable Entity"
-    )
-  );
+    ]
+  ];
 
-  public function __construct($type = 'ApiUnknownError', array $data = array()) {
+  public function __construct(string $type = 'UnknownError', $data = null)
+  {
     parent::__construct($type);
 
     $this->_type = $type;
@@ -59,7 +61,8 @@ class AppException extends Exception {
       $this->error = $this->_hash['UnknownError'];
   }
 
-  public function code(): int {
+  public function code(): int
+  {
     return $this->_data['code'] ?? $this->error['code'];
   }
 
@@ -67,26 +70,32 @@ class AppException extends Exception {
     return $this->_data;
   }
 
-  public function message(): string {
-    return $this->error ? $this->error['message'] : $this->_hash['UnknownError']['message'];
+  public function message(): string
+  {
+    return $this->error['message'];
   }
 
-  public function toArray(): array {
-    $result = array();
+  public function toArray(): array
+  {
+    $result = [];
     $result['code'] = $this->code();
-    $result['error'] = array(
+    $result['error'] = [
       'message' => $this->error['message'],
       'type' => $this->_type
-    );
+    ];
     return $result;
   }
 
-  public function type(): string {
+  public function type(): string
+  {
     return $this->_type;
   }
 
-  public function __toString(): string {
-    return $this->_type;
+  public function __toString(): string
+  {
+    $string = $this->_type;
+    if(count($this->_data)) $string .= ': ' . json_encode($this->_data);
+    return $string;
   }
 }
 ?>

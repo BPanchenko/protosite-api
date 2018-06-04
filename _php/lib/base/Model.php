@@ -13,7 +13,7 @@ class Model extends Component {
   public $collection;
 
 
-  function __construct($data = array(), $parent = null) {
+  function __construct($data = [], $parent = null) {
     $data = $data ? $data + $this->_defaults : $this->_defaults;
     if($parent instanceof Model) {
       $data[$parent::$idAttribute] = $parent->id;
