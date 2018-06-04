@@ -6,11 +6,12 @@ class Log {
     private  $_filename;
     private  $_path;
 
-    function __construct($filename) {
+    function __construct(string $filename = '') {
         $this->_dir = LOG_DIR;
 
-        if(!$this->filename($filename))
-            $this->filename($_SERVER['HTTP_HOST'] . '--' . date('Ymd') . '.log');
+        if(!$this->filename($filename)) {
+			$this->filename($_SERVER['HTTP_HOST'] . '--' . date('Ymd') . '.log');
+		}
     }
 
     public function dir($string) {
@@ -21,7 +22,7 @@ class Log {
         return $this->_dir;
     }
 
-    public function filename($string) {
+    public function filename(string $string) {
         if($string) {
             $this->_filename = $string;
             $this->_path = $this->_dir . '/' . $this->_filename;

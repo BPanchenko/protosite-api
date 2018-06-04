@@ -287,7 +287,7 @@ class Collection extends Component implements \ArrayAccess {
    * Обработка ответа на запрос к API
    */
 
-  public function prepareResponse($Response): self {
+  public function prepareResponse($Response) {
     $meta = $Response->get('meta');
     $meta->length = $this->length;
     $meta->paging = $this->paging;

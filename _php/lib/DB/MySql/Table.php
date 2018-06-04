@@ -14,7 +14,7 @@ class Table extends \DB\MySql\Schema {
   protected $_default_query;
   protected $_primary_key;
 
-  function __construct($table, $user, $pass) {
+  function __construct(string $table, string $user = '', string $pass = '') {
     $this->_dns = str_replace('`', '', $table);
     $temp = explode('.', str_replace('mysql:', '', $this->_dns));
 
