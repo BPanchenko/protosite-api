@@ -97,7 +97,7 @@ namespace http;
 		/**
 		* @var HeaderCollection
 		*/
-		private $_headers = array();
+		private $_headers = [];
 		
 		private $_body;
 		protected static $_instance;
@@ -163,7 +163,9 @@ namespace http;
 		 * @param string $text the status text. If not set, it will be set automatically based on the status code.
 		 */
 		public function setStatusCode(int $value = 200, string $text = '') {
-			$this->_statusCode = $this->content->meta->code = $value;
+			$this->_statusCode = $value;
+			if (is_array($this->content->meta)) $this->content->meta['code'] = $this->_statusCode;
+			if (is_object($this->content->meta)) $this->content->meta->code = $this->_statusCode;
 			
 			if (!$text)
 				$this->statusText = isset(static::$httpStatuses[$this->_statusCode]) ? static::$httpStatuses[$this->_statusCode] : '';
@@ -196,7 +198,7 @@ namespace http;
 		 * Clears the headers, cookies, content, status code of the response.
 		 */
 		public function clear() {
-			$this->_headers = NULL;
+			$this->_headers = [];
 			$this->_cookies = NULL;
 			$this->_statusCode = 200;
 			$this->statusText = 'OK';
