@@ -2,7 +2,7 @@
 namespace DB\MySql;
 require_once dirname(__FILE__) . '/Schema.php';
 
-class Table extends \DB\MySql\Schema {
+class Table {
   use \DB\traitTable;
 
   protected $_dns;
@@ -13,6 +13,8 @@ class Table extends \DB\MySql\Schema {
   protected $_columns;
   protected $_default_query;
   protected $_primary_key;
+
+  private $_dbh;
 
   function __construct(string $table, string $user = '', string $pass = '') {
     $this->_dns = str_replace('`', '', $table);
@@ -26,7 +28,7 @@ class Table extends \DB\MySql\Schema {
     $this->_name = count($temp) == 2 ? $temp[1] : $temp[0];
     $this->_fullname = '`' . $this->_schema . '`.`' . $this->_name . '`';
 
-    parent::__construct($this->_schema, $user, $pass);
+    $this->_dbh = new \DB\MySql\Schema($this->_schema, $user, $pass);
 
     $this->_default_query = array(
       'from' => $this->_name
@@ -41,7 +43,7 @@ class Table extends \DB\MySql\Schema {
 
     // fetch the table structure
     $_sql = "SHOW FULL COLUMNS FROM `".$this->name()."` \n";
-    $_sth = $this->query($_sql);
+    $_sth = $this->_dbh->query($_sql);
     $_sth->bindParam(":tbl_name", $this->name());
     $_sth->execute();
 
@@ -68,7 +70,7 @@ class Table extends \DB\MySql\Schema {
     if(preg_match("/\((\d+)\)$/", $value, $matches)) $a = $matches[1];
     else $a = 0;
     // calc the new value
-    while($a<10000 && $this->query("select COUNT(*) as `count` from ".$this->_name." where ".$column."='".$value."'")->fetchColumn()) {
+    while($a<10000 && $this->_dbh->query("select COUNT(*) as `count` from ".$this->_name." where ".$column."='".$value."'")->fetchColumn()) {
       $a++;
       $a==2 ? $value .= "(".$a.")" : $value = str_replace("(".($a-1).")", "(".$a.")", $value);
     }
@@ -109,35 +111,36 @@ class Table extends \DB\MySql\Schema {
 
   /****/
   public function fetch() {
-    $this->from($this->_name);
-    return parent::fetch();
+    $this->_dbh->from($this->_name);
+    return $this->_dbh->fetch();
   }
 
   /****/
   public function fetchColumn() {
-    $this->from($this->_name);
-    return parent::fetchColumn();
+    $this->_dbh->from($this->_name);
+    return $this->_dbh->fetchColumn();
   }
 
   /****/
   public function fetchAll($fetch_style = \PDO::FETCH_OBJ): array {
-    $this->from($this->_name);
-    return parent::fetchAll($fetch_style);
+    $this->_dbh->from($this->_name);
+    return $this->_dbh->fetchAll($fetch_style);
   }
 
   /****/
   public function truncate() {
-    $this->exec("truncate table ".$this->_name);
+    $this->_dbh->exec("truncate table ".$this->_name);
     return true;
   }
 
   /****/
   public function update(array $columns = array(), $conditions='', array $params=array()): bool {
-    return parent::update($this->_name, $columns, $conditions='', $params);
+    return $this->_dbh->update($this->_name, $columns, $conditions, $params);
   }
 
-  public function drop() { return $this->dropTable($this->_name); }
+  public function drop() {
+    return $this->_dbh->dropTable($this->_name);
+  }
 
-  /* </ use php trait ... */
 }
 ?>
