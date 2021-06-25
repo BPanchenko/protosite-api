@@ -15,10 +15,10 @@ class Request {
     static public function init() {
         if (is_object(self::$_instance))
             return self::$_instance;
-
+        
         self::$_instance = new self;
         self::$_instance->method = strtoupper($_SERVER['REQUEST_METHOD']);
-        self::$_instance->content_type = strtolower($_SERVER['CONTENT_TYPE']);
+        self::$_instance->content_type = strtolower($_SERVER['CONTENT_TYPE'] ?? '');
 
         self::$_instance->_headers = new \base\Model(getallheaders());
         self::$_instance->_uri = $_SERVER['REQUEST_URI'];
@@ -135,6 +135,6 @@ class Request {
 
     private function __construct() {}
     private function __clone() {}
-    private function __wakeup() {}
+    public function __wakeup() {}
 }
 ?>
