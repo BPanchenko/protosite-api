@@ -83,11 +83,11 @@ class Model extends Component {
       if(isset($this->_attributes[$key]) && $this->_attributes[$key] !== $val) {
         $_previous[$key] = $this->_attributes[$key];
         $_changed[$key] = $val;
-      } elseif ($this->_attributes[$key] === $val) {
+      } elseif (isset($this->_attributes[$key]) && $this->_attributes[$key] === $val) {
         continue;
       }
 
-      if(is_array($this->_attributes[$key]) && is_array($val)) {
+      if(isset($this->_attributes[$key]) && is_array($this->_attributes[$key]) && is_array($val)) {
         // для сохранения массива данных используется слияние старых и новых данных
         $this->_attributes[$key] = $val + $this->_attributes[$key];
       } else {
@@ -100,7 +100,7 @@ class Model extends Component {
 
       $this->trigger(self::EVENT_CHANGE . ":$key", [
           "value" => $val,
-          "previous" => $_previous[$key]
+          "previous" => isset($_previous[$key]) ? $_previous[$key] : null
       ]);
     }
 
