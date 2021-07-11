@@ -19,10 +19,7 @@ class Request {
         self::$_instance = new self;
         self::$_instance->method = strtoupper($_SERVER['REQUEST_METHOD']);
         self::$_instance->content_type = strtolower($_SERVER['CONTENT_TYPE'] ?? '');
-
         self::$_instance->_headers = new \base\Model(getallheaders());
-        self::$_instance->_uri = $_SERVER['REQUEST_URI'];
-		
         self::$_instance->_parameters = new RequestParametersModel($_GET);
 
         return self::$_instance;
@@ -74,13 +71,8 @@ class Request {
             return $this->_parts;
 
         $_res = array();
-        if(strrpos($_SERVER['REQUEST_URI'],'?'))
-            $_uri = substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'],'?'));
-        else
-            $_uri = $_SERVER['REQUEST_URI'];
 
-        $_uri = trim($_uri, '/');
-        $_parts = explode('/', $_uri);
+        $_parts = explode('/', $this->uri());
 
         foreach ($_parts as $i=>$_part) {
             $_value = $_part;
@@ -88,7 +80,7 @@ class Request {
             $_part->value = $_value;
 
             $_tmp = explode('-', $_value);
-            $_tmp = array_map(ucfirst, $_tmp);
+            $_tmp = array_map('ucfirst', $_tmp);
             $classname = implode('', $_tmp);
 
             if(class_exists($classname, true)) {
@@ -111,6 +103,14 @@ class Request {
     }
 
     public function uri(){
+        if (!isset($this->_uri)) {
+            $_root = trim(API_ROOT, '/');
+            $_uri = $_SERVER['REQUEST_URI'];
+            if (strpos($_uri, '?') !== false) $_uri = substr($_uri, 0, strrpos($_uri, '?'));
+            if (strpos($_uri, $_root) !== false) $_uri = substr($_uri, strpos($_uri, $_root) + strlen($_root));
+            $_uri = trim($_uri, '/');
+            $this->_uri = $_uri;
+        }
         return $this->_uri;
     }
 
