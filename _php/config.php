@@ -11,7 +11,7 @@ define('API_ROOT', '/');
 define('LOG_DIR', '/home/bp/api.protosite.rocks/docs/_php/logs');
 define('PHOTOS_UPLOAD_DIR', '/home/bp/api.protosite.rocks/docs/upload/photos/temp');
 define('PHOTOS_PATH', 'http://api.protosite.rocks/upload/photos');
-define('STATIC_JSON_DIR', '/home/bp/api.protosite.rocks/docs/static');
+define('STATIC_DIR', '/home/bp/api.protosite.rocks/docs/static');
 
 define('FETCH_DEFAULT_COUNT', 200);
 define('FETCH_DEFAULT_OFFSET', 0);

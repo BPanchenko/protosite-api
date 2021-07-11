@@ -55,16 +55,49 @@ if(isset($_GET['fields'])) {
   $_GET['fields'] = explode(',', $_GET['fields']);
 }
 
-try {
-  $points = $Request->parts();
+/**
+ * Endpoint based on parts of Request URI
+ */
 
-  if(isset($_GET['debug'])) {
-    echo "\n\n//*********************************";
-    echo "\n// POINTS OF THE REQUEST\n";
-    var_dump($points);
+$points = $Request->parts();
+
+if(isset($_GET['debug'])) {
+  echo "\n\n//*********************************";
+  echo "\n// POINTS OF THE REQUEST\n";
+  var_dump($points);
+}
+
+/**
+ * Make a response based on the static json files.
+ * Json files from a static directory are used.
+ */
+
+if (isset($_GET['fallback'])) {
+  $getValue = function ($inst) { return $inst->value; };
+  $filename = STATIC_JSON_DIR . '/' . implode('-', array_map($getValue, $points)) . '.json';
+
+  if (is_file($filename)) {
+    $Response->get('meta')->code = 200;
+    $Response->setStatusCode(200, 'OK');
+    $Response->set('data', json_decode(file_get_contents($filename)));
+  } else {
+    $Response->get('meta')->code = 404;
+    $Response->setStatusCode(404, 'Not Found');
+    $Response->get('meta')->error_message = 'File not found';
   }
 
+  $Response->send();
+  exit();
+}
+
+/**
+ * Make a response based on data from the database.
+ * The response data makes from a collection or model, depending on the endpoint datum.
+ */
+
+try {
   $prev = new stdClass();
+
   foreach($points as &$part) {
 
     switch($part->type) {
