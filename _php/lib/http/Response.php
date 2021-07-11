@@ -264,7 +264,7 @@ namespace http;
 		 * Sends the response content to the client
 		 */
 		protected function sendContent() {
-			if ($this->stream === NULL) {
+			if (!isset($this->stream)) {
 				echo $this->content;
 				return;
 			}
