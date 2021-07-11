@@ -50,9 +50,9 @@ class Request {
     }
 
     public function ip($check_proxy = true) {
-        if ($check_proxy && $_SERVER['HTTP_CLIENT_IP']) {
+        if ($check_proxy && isset($_SERVER['HTTP_CLIENT_IP'])) {
             $ip = $_SERVER['HTTP_CLIENT_IP'];
-        } else if ($check_proxy && $_SERVER['HTTP_X_FORWARDED_FOR']) {
+        } else if ($check_proxy && isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
         } else {
             $ip = $_SERVER['REMOTE_ADDR'];
