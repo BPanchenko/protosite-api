@@ -111,14 +111,14 @@ namespace http;
 				
 			self::$_instance = new self;
 			
-			if (self::$_instance->version === NULL)
+			if (!isset(self::$_instance->version))
 				if (isset($_SERVER['SERVER_PROTOCOL']) && $_SERVER['SERVER_PROTOCOL'] === 'HTTP/1.0') {
 					self::$_instance->version = '1.0';
 				} else {
 					self::$_instance->version = '1.1';
 				}
 			
-			if (self::$_instance->charset === NULL)
+			if (!isset(self::$_instance->charset))
 				self::$_instance->charset = 'UTF-8';
 			
 			self::$_instance->clear();
