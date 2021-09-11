@@ -72,7 +72,7 @@ if(isset($_GET['debug'])) {
  * Json files from a static directory are used.
  */
 
-if (isset($_GET['fallback'])) {
+if (isset($_GET['fallback']) && $_GET['fallback']) {
   $getValue = function ($inst) { return $inst->value; };
   $filename = STATIC_JSON_DIR . '/' . implode('-', array_map($getValue, $points)) . '.json';
 
