@@ -1,13 +1,13 @@
 ﻿<h1>REST API</h1>
 <p>
-	Шаблон строки запроса к API: <code>/api/{collection_name}/[{item_id|collection_method}/[{item_method|model_method|method_parametr}/][{method_parametr}/]]</code>.<br>
-	<br><br>
+	Шаблон строки запроса к API: <code>/api/{collection_name}/[{item_id|collection_method}/[{item_method|model_method|method_parametr}/][{method_parametr}/]]</code>.
+</p>
 	<h5>Общие GET-параметры запросов к API:</h5>
 	<dl>
-		<dt class="request__param_name"><q>debug</q></dt>
-			<dd class="request__param_description">При указании данного параметра, в вывод результатов запросов будут добавлены тестовые данные фреймворка.</dd>
-		<dt class="request__param_name"><q>bulk</q></dt>
-			<dd class="request__param_description">
+		<dt><q>debug</q></dt>
+			<dd>При указании данного параметра, в вывод результатов запросов будут добавлены тестовые данные фреймворка.</dd>
+		<dt><q>bulk</q></dt>
+			<dd>
 				Параметр указывает API в каком объеме должны быть возвращены данные результата запроса.
 				<br><br>
 				Возможные значения:<br>
@@ -48,12 +48,12 @@
 					Для поиска по точному совпадению значения поля с запросом необходимо использовать знак <q>::</q>.
 				</blockquote>
 			</dd>
-		<dt class="request__param_name"><q>count</q></dt>
-			<dd class="request__param_description">Количество элементов в ответе.</dd>
-		<dt class="request__param_name"><q>offset</q></dt>
-			<dd class="request__param_description">Смещение результатов запроса.</dd>
-		<dt class="request__param_name"><q>order</q></dt>
-			<dd class="request__param_description">Атрибут, по которому выполняется сортировка результатов запроса. Для сортировки по возрастанию(ASC) перед названием атрибута добавляется знак <q>-</q>. Для уточнения сортировки можно передать несколько атрибутов через запятую.</dd>
+		<dt><q>count</q></dt>
+			<dd>Количество элементов в ответе.</dd>
+		<dt><q>offset</q></dt>
+			<dd>Смещение результатов запроса.</dd>
+		<dt><q>order</q></dt>
+			<dd>Атрибут, по которому выполняется сортировка результатов запроса. Для сортировки по возрастанию(ASC) перед названием атрибута добавляется знак <q>-</q>. Для уточнения сортировки можно передать несколько атрибутов через запятую.</dd>
 	</dl>
 	<h3>Формат ответа</h3>
 	<p>
@@ -158,13 +158,11 @@
 		<h4><code>POST: /upload/</code></h4>
 		<p>Загрузка файлов на сервер.</p>
 	</p>
-	<br><br>
 	<h2>Backbone.php</h2>
 	<p>
-		Программная среда API реализована по образу и подобию <a href="" target="_blank">Backbone.js</a>.
+		Программная среда API реализована по образу и подобию <a href="https://backbonejs.org/">Backbone.js</a>.
 		Модели и Коллекции являются компонентами фреймворка, наследниками от абстрактного класса <q>Component</q>.
 	</p>
-	<br><br>
 	<h2>Конечные точки API как публичные методы объектов.</h2>
 	<pre>
 class Items extends Collection {
@@ -234,4 +232,3 @@ class Item extends Model {
 	<p>
 		Спасибо <a href="http://backbonejs.org/" target="_blank">Backbone.js</a>, <a href="https://github.com/interagent/http-api-design/blob/master/README.md">HTTP API Design Guide</a> и заочно <a href="https://ru.wikipedia.org/wiki/WebDAV">WebDAV</a>!
 	</p>
-</p>
