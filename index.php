@@ -74,7 +74,7 @@ if(isset($_GET['debug'])) {
 
 if (isset($_GET['fallback']) && $_GET['fallback'] === 'true') {
   $getValue = function ($inst) { return $inst->value; };
-  $filename = STATIC_JSON_DIR . '/' . implode('-', array_map($getValue, $points)) . '.json';
+  $filename = STATIC_DIR . '/' . implode('-', array_map($getValue, $points)) . '.json';
 
   if (is_file($filename)) {
     $Response->get('meta')->code = 200;
@@ -110,7 +110,12 @@ try {
 
       case 'string':
         $method_name = strtolower($Request->method) . '_' . camelize($part->value);
-        if($prev->type !== 'object' || !method_exists($prev->instance, $method_name)) {
+        
+        if(
+          !property_exists($prev, 'type')
+          || $prev->type !== 'object'
+          || !method_exists($prev->instance, $method_name)
+        ) {
           throw new AppException('MethodNotAllowed');
         }
 
