@@ -73,7 +73,7 @@ if(isset($_GET['debug'])) {
  */
 
 if (isset($_GET['fallback']) && $_GET['fallback'] === 'true') {
-  $getValue = function ($inst) { return $inst->value; };
+  $getValue = function ($inst) { return strtolower($inst->value); };
   $filename = STATIC_DIR . '/' . implode('-', array_map($getValue, $points)) . '.json';
 
   if (is_file($filename)) {
@@ -105,7 +105,7 @@ try {
       case 'class':
         $classname = $part->value;
         $part->type = 'object';
-        $part->instance = new $classname(null, $prev->instance);
+        $part->instance = new $classname(null, $prev->instance ?? NULL);
         break;
 
       case 'string':

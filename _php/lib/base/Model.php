@@ -165,10 +165,11 @@ class Model extends Component {
    * @method toArray()
    */
   public function toArray(array $options=array()): array {
+    $result = [];
+
     if(!empty($options['fields'])) $fields = str2array($options['fields']);
 
-    $result = array();
-    if(count($fields)) {
+    if(!empty($fields)) {
       if(!in_array(static::$idAttribute, $fields)) {
         array_unshift($fields, static::$idAttribute);
       }
@@ -182,7 +183,6 @@ class Model extends Component {
         }
       }
     } else {
-      $result = array();
       foreach($this->_attributes as $attr=>$value)
         if(is_object($value) && method_exists($value, 'toArray'))
           $result[$attr] = call_user_func(array($value, 'toArray'));
@@ -191,6 +191,7 @@ class Model extends Component {
     }
 
     if (!$this->isNew()) $result['id'] = $this->id;
+    
     return $result;
   }
 

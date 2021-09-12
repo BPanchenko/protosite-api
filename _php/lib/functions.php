@@ -20,7 +20,8 @@ function deleteAllCookies() {
 }
 
 function getQueryWithoutParameter($param='') {
-  $query = trim($_SERVER{'QUERY_STRING'}, '?');
+
+  $query = trim($_SERVER['QUERY_STRING'], '?');
   $params = array();
 
   $temp = explode('&', $query);
@@ -73,7 +74,7 @@ function camelize($str) {
   $str = preg_replace('~[^A-Za-z0-9]+~u', ' ', strtolower($str));
   $str = ucwords($str);
   $str = str_replace(' ', '',$str);
-  $str = strtolower($str{0}) . substr($str, 1);
+  $str = strtolower($str[0]) . substr($str, 1);
   return $str;
 }
 ?>
