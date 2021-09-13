@@ -1,16 +1,15 @@
 <?php
 namespace base;
-	
+
 class Collection extends Component implements \ArrayAccess {
-  public static $classModel = Model;
-  public $models = array();
+  public $models = [];
   public $length = 0;
   public $pagination;
   public $total = 0;
-  protected $_columns = array();
+  protected $_columns = [];
 		
 		
-  function __construct($data = array(), $parent = NULL) {
+  function __construct($data = [], $parent = NULL) {
     if(is_array($data) && count($data)) {
       foreach($data as $item) {
         $this->add($item);
@@ -56,11 +55,11 @@ class Collection extends Component implements \ArrayAccess {
    * Добавление элемента в коллекцию
    */
   public function add($data): self {
-    if($data instanceof static::$classModel) {
+    if($this->isModel($data)) {
       $model = $data;
       $model->collection = $this;
     } elseif(is_numeric($data) || is_array($data) || is_object($data)) {
-      $model = new static::$classModel($data, $this);
+      $model = $this->initModel($data);
     }
 
     if(!$model->isValid()) return $this;
@@ -90,8 +89,7 @@ class Collection extends Component implements \ArrayAccess {
    */
   public function create($data){
     try {
-      $model = new static::$classModel($data, $this);
-      $this->add($model);
+      $this->add($this->initModel($data));
     } catch(ErrorException $e) {
       if($e->getMessage() == 'WrongModelID') return NULL;
     }
@@ -222,8 +220,8 @@ class Collection extends Component implements \ArrayAccess {
    * Преобразует коллекцию в простой массив,
    * каждый элемент которого является ассоциативным массивом атрибутов модели.
    */
-  public function toArray(array $options=array()): array {
-    $array = array();
+  public function toArray(array $options=[]): array {
+    $array = [];
     if(!$this->length) return $array;
 
     if($options['bulk'] == 'ids') {
@@ -238,7 +236,7 @@ class Collection extends Component implements \ArrayAccess {
     return $array;
   }
 		
-  public function toJSON($options=array()) {
+  public function toJSON($options=[]) {
     return json_encode($this->toArray($options));
   }
 		
@@ -248,7 +246,7 @@ class Collection extends Component implements \ArrayAccess {
    * подходящих под переданый массив атрибутов.
    */
   public function where(array $attributes, bool $first=false): array{
-    $_result = array();
+    $_result = [];
 
     foreach($this->models as $model) {
       $apt = true;
@@ -273,6 +271,25 @@ class Collection extends Component implements \ArrayAccess {
    */
   public function pluck(string $attr): array {
     return array_column($this->models, $attr);
+  }
+
+
+  /* Методы для работы с моделями коллекции требуют переопределения в
+   * конкретных коллекциях для переопределения класса элементов коллекции.
+   ========================================================================== */
+
+  /**
+   * Проверит является ли параметр моделью
+   */
+  protected function isModel($data): bool {
+    return ($data instanceof Model);
+  }
+
+  /**
+   * Вернёт инициализированный элемент коллекции
+   */
+  protected function initModel($data): Model {
+    return $this->isModel($data) ? $data : new Model($data, $this);
   }
 
 
