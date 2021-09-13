@@ -105,7 +105,7 @@ try {
       case 'class':
         $classname = $part->value;
         $part->type = 'object';
-        $part->instance = new $classname(null, $prev->instance ?? NULL);
+        $part->instance = new $classname(NULL, $prev->instance ?? NULL);
         break;
 
       case 'string':
