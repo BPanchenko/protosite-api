@@ -1,6 +1,7 @@
 AddDefaultCharset UTF-8
 ServerSignature Off
 Options -Indexes
+DirectoryIndex underconstruction.html index.php
 
 <ifModule mod_rewrite.c>
 	RewriteEngine On
