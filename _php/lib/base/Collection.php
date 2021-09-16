@@ -126,13 +126,12 @@ class Collection extends Component implements \ArrayAccess {
   /**
    * Возвращает модель из коллекции по ее идентификатору.
    */
-  public function get($id) {
+  public function get(int $id) {
     if($id && is_numeric($id)) {
       foreach($this->models as $model) {
         if($model->id == $id) return $model;
       }
     }
-
     return null;
   }
 		
@@ -196,12 +195,8 @@ class Collection extends Component implements \ArrayAccess {
 		
 		
   /****/
-  public function set($data, $end=0): self {
-    if(is_array($data) && count($data)) {
-      foreach($data as $item) {
-        $this->add($item);
-      }
-    }
+  public function set(array $data, int $end=0): self {
+    foreach($data as $item) $this->add($item);
     return $this;
   }
 		
@@ -209,10 +204,10 @@ class Collection extends Component implements \ArrayAccess {
   /**
    * Выбирает срез коллекции начиная с идекса $start и заканчивая индексом $end.
    */
-  public function slice($start, $end=0) {
+  public function slice(int $start, int $end=0) {
     $offset = $start;
     $length = $end ? ($end - $start) : NULL;
-    return  array_slice ($this->models, $offset, $length);
+    return  array_slice($this->models, $offset, $length);
   }
 		
 		
@@ -221,19 +216,21 @@ class Collection extends Component implements \ArrayAccess {
    * каждый элемент которого является ассоциативным массивом атрибутов модели.
    */
   public function toArray(array $options=[]): array {
-    $array = [];
-    if(!$this->length) return $array;
+    $result = [];
 
-    if($options['bulk'] == 'ids') {
+    if(!$this->length) return $result;
+
+    if(isset($options['bulk']) && $options['bulk'] == 'ids') {
       foreach($this->models as $model) {
-        array_push($array,$model->id);
+        array_push($result, $model->id);
       }
     } else {
       foreach($this->models as $model) {
-          array_push($array,$model->toArray($options));
+          array_push($result, $model->toArray($options));
       }
     }
-    return $array;
+
+    return $result;
   }
 		
   public function toJSON($options=[]) {
@@ -304,7 +301,7 @@ class Collection extends Component implements \ArrayAccess {
    * Обработка ответа на запрос к API
    */
 
-  public function prepareResponse($Response) {
+  public function prepareResponse(\http\Response $Response) {
     $meta = $Response->get('meta');
     $meta->length = $this->length;
     $meta->paging = $this->paging;

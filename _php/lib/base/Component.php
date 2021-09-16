@@ -24,9 +24,9 @@ abstract class Component {
 
   function __construct($data = [], $parent = null) {
 
-    if($parent instanceof \base\Component) $this->attachTo($parent);
-    if(!$this->isAccessible()) throw new \AppException('AccessDenied');
-    if(is_string($this->tb)) $this->tb = self::initTable($this->tb);
+    if (!is_null($parent)) $this->attachTo($parent);
+    if (!$this->isAccessible()) throw new \AppException('AccessDenied');
+    if (is_string($this->tb)) $this->tb = self::initTable($this->tb);
 
     if(is_array($this->tbs))
       foreach($this->tbs as &$_tb_dns) {
@@ -35,9 +35,9 @@ abstract class Component {
       }
   }
 
-  public function attach($child)
+  public function attach($child): self
   {
-    if($child instanceof \base\Component) array_push($this->_children, $parent_object);
+    if($child instanceof \base\Component) array_push($this->_children, $child);
     return $this;
   }
 
@@ -61,7 +61,7 @@ abstract class Component {
   /* Events bus
    ========================================================================== */
 
-  public function trigger($name, $event = null)
+  public function trigger($name, $event = null): self
   {
     if(empty($this->_events[$name])) return $this;
 
@@ -76,7 +76,7 @@ abstract class Component {
     return $this;
   }
 
-  public function on(string $name, callable $handler, $data = null, bool $append = true)
+  public function on(string $name, callable $handler, $data = null, bool $append = true): self
   {
     if ($append || empty($this->_events[$name])) {
       $this->_events[$name][] = array($handler, $data);
@@ -86,7 +86,7 @@ abstract class Component {
     return $this;
   }
 
-  public function off($name, $handler = null)
+  public function off($name, $handler = null): bool
   {
     if (empty($this->_events[$name])) return false;
 
@@ -282,21 +282,18 @@ abstract class Component {
    * @param $table -
    */
   public static function initTable($table) {
-    if($table instanceof \DB\Schema) return $table;
+    if($table instanceof \DB\Table) return $table;
 
     if(empty($table)) {
       throw new \SystemException('EmptyTableName');
     }
-
-    if(strpos($table, 'sqlite:') === 0) {
+    elseif (strpos($table, 'sqlite:') === 0) {
       $table = new \DB\SQLite\Table($table);
     }
-
-    if(strpos($table, 'mysql:') === 0) {
+    elseif (strpos($table, 'mysql:') === 0) {
       $table = new \DB\MySql\Table($table);
     }
-
-    if(!($table instanceof \DB\Schema)) {
+    else {
       throw new \SystemException('FailInitTable');
     }
 
@@ -327,7 +324,7 @@ abstract class Component {
   /* Prepare api response
    ========================================================================== */
 
-  public function prepareResponse($Response) {
+  public function prepareResponse(\http\Response $Response) {
     $Response->set('data', $this->toArray());
     return $this;
   }

@@ -42,10 +42,8 @@ class Table {
     if($this->_columns) return $this->_columns;
 
     // fetch the table structure
-    $_sql = "SHOW FULL COLUMNS FROM `".$this->name()."` \n";
+    $_sql = "SHOW FULL COLUMNS FROM `".$this->name()."`;";
     $_sth = $this->_dbh->query($_sql);
-    $_sth->bindParam(":tbl_name", $this->name());
-    $_sth->execute();
 
     while($_row = $_sth->fetch(\PDO::FETCH_OBJ)) {
       $_name = $_row->Field;
@@ -109,31 +107,30 @@ class Table {
 
   /* SQL-Constructor */
 
-  /****/
   public function fetch() {
     $this->_dbh->from($this->_name);
     return $this->_dbh->fetch();
   }
 
-  /****/
   public function fetchColumn() {
     $this->_dbh->from($this->_name);
     return $this->_dbh->fetchColumn();
   }
 
-  /****/
   public function fetchAll($fetch_style = \PDO::FETCH_OBJ): array {
     $this->_dbh->from($this->_name);
     return $this->_dbh->fetchAll($fetch_style);
   }
 
-  /****/
-  public function truncate() {
+  public function reset(): \DB\Schema {
+    return $this->_dbh->reset();
+  }
+
+  public function truncate(): bool {
     $this->_dbh->exec("truncate table ".$this->_name);
     return true;
   }
 
-  /****/
   public function update(array $columns = array(), $conditions='', array $params=array()): bool {
     return $this->_dbh->update($this->_name, $columns, $conditions, $params);
   }

@@ -181,7 +181,7 @@ namespace http;
 		 */
 		public function send() {
 			if ($this->isSent) return $this;
-		
+			
 			$this->trigger(self::EVENT_BEFORE_SEND);
 			$this->prepare();
 			$this->trigger(self::EVENT_AFTER_PREPARE);

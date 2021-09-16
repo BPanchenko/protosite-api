@@ -69,7 +69,7 @@ class Schema extends \PDO {
   }
 
   /****/
-  public function reset() {
+  public function reset(): self {
     $this->_query = is_array($this->_default_query) ? $this->_default_query : array();
     $this->_params = is_array($this->_default_params) ? $this->_default_params : array();
     return $this;
@@ -222,6 +222,7 @@ class Schema extends \PDO {
   /****/
   public function fetchAll($fetch_style = \PDO::FETCH_OBJ): array {
     $sql = $this->_buildQuery();
+    
     try {
       if(count($this->_params)) {
         $sth = $this->prepare($sql);

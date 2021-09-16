@@ -1,9 +1,8 @@
 <?php
+$start_ts = microtime(true);
 
-$Log = new Log;
 $Request = http\Request::init();
 $Response = http\Response::init();
-$start_ts = microtime(true);
 
 if($Request->method == 'OPTIONS' || $Request->uri() == '/favicon.ico') {
   $Response->setStatusCode(200, 'OK');
@@ -11,7 +10,7 @@ if($Request->method == 'OPTIONS' || $Request->uri() == '/favicon.ico') {
   exit();
 }
 
-$Log->write($Request->ip() . "\t" . $Request->uri() . "\n");
+$Log = new Log;
 $lastRequests = $Log->read();
 
 // calc the count of requests for the period
@@ -39,18 +38,6 @@ if ($cnt_from_ip > 20 || $cnt_all_requests > 400) {
   exit();
 }
 
-if(isset($_GET['debug'])) {
-  echo "\n\n//*********************************";
-  echo "\n// DATE\n";
-  echo date("c");
-}
-
-if(isset($_GET['debug'])) {
-  echo "\n\n//*********************************";
-  echo "\n// LIST OF THE LAST REQUESTS\n";
-  var_dump($lastRequests);
-}
-
 if(isset($_GET['fields'])) {
   $_GET['fields'] = explode(',', $_GET['fields']);
 }
@@ -60,12 +47,6 @@ if(isset($_GET['fields'])) {
  */
 
 $points = $Request->parts();
-
-if(isset($_GET['debug'])) {
-  echo "\n\n//*********************************";
-  echo "\n// POINTS OF THE REQUEST\n";
-  var_dump($points);
-}
 
 /**
  * Make a response based on the static json files.
@@ -209,12 +190,14 @@ try {
   $Response->get('meta')->code = $e->getCode();
   $Response->get('meta')->error_type = $e->getType();
   $Response->get('meta')->error_message = $e->getMessage();
+  $Response->get('meta')->request_points = $points;
 
 } catch (PDOException $e) {
   $Response->setStatusCode(500, 'PDOException');
   $Response->get('meta')->code = '500.' . $e->getCode();
   $Response->get('meta')->error_type = 'PDOException';
   $Response->get('meta')->error_message = $e->getMessage();
+  $Response->get('meta')->request_points = $points;
 
 } catch (Exception $e) {
   $Response->get('meta')->code = 400;
@@ -224,13 +207,29 @@ try {
 
 $Response->send();
 
+$execution_time = round((microtime(true) - $start_ts), 5);
+$Log->write($Request->ip() . "\t" . $Request->uri() . "\t" . $execution_time . "\n");
+
 if(isset($_GET['debug'])) {
+  echo "\n\n//*********************************";
+  echo "\n// POINTS OF THE REQUEST\n";
+  var_dump($points);
+
+  echo "\n\n//*********************************";
+  echo "\n// DATE\n";
+  echo date("c");
+
   echo "\n\n//*********************************";
   echo "\n// MEMORY USAGE\n";
   echo round(memory_get_usage() / (1024 * 1024), 2) . "Mb";
 
   echo "\n\n//*********************************";
   echo "\n// EXECUTION TIME\n";
-  echo round((microtime(true) - $start_ts), 2) . 's';
+  echo $execution_time . 's';
+  
+  echo "\n\n//*********************************";
+  echo "\n// LIST OF THE LAST REQUESTS\n";
+  var_dump($lastRequests);
 }
+
 ?>
