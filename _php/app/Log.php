@@ -4,6 +4,7 @@ class Log {
 
     private  $_dir;
     private  $_filename;
+    private  $_handle;
     private  $_path;
 
     function __construct(string $filename = '') {
@@ -11,6 +12,10 @@ class Log {
 
         if(!$this->filename($filename)) {
             $this->filename($_SERVER['HTTP_HOST'] . '--' . date('Ymd') . '.log');
+        }
+
+        if (!file_exists($this->_path)) {
+            $this->_handle = fopen($this->_path, 'a+');
         }
     }
 
