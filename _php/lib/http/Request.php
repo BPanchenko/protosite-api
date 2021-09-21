@@ -18,7 +18,7 @@ class Request {
         
         self::$_instance = new self;
         self::$_instance->method = strtoupper($_SERVER['REQUEST_METHOD']);
-        self::$_instance->content_type = strtolower($_SERVER['CONTENT_TYPE'] ?? '');
+        self::$_instance->content_type = self::$_instance->_getContentType();
         self::$_instance->_headers = new \base\Model(getallheaders());
         self::$_instance->_parameters = new RequestParametersModel($_GET);
 
@@ -26,10 +26,10 @@ class Request {
     }
 
 	public function getBody(): array {
-		$result = array();
+		$result = [];
 
-		if($this->method == 'POST' && array_search($this->content_type, ['multipart/form-data', 'application/x-www-form-urlencoded']) !== false) {
-			$result = count($_POST) ? $_POST : array();
+		if($this->_isPostFormData()) {
+			$result = count($_POST) ? $_POST : [];
 		} else {
 			$data = file_get_contents("php://input");
 			if($this->content_type == 'application/json') {
@@ -67,10 +67,7 @@ class Request {
     }
 
     public function parts() {
-        if(!is_null($this->_parts))
-            return $this->_parts;
-
-        $_res = array();
+        if(!is_null($this->_parts)) return $this->_parts;
 
         $_parts = explode('/', $this->uri());
 
@@ -114,9 +111,32 @@ class Request {
         return $this->_uri;
     }
 
-	private function _parseBodyData(array $data): array {
+    private function _getContentType(): string {
+        $content_type = strtolower($_SERVER['CONTENT_TYPE'] ?? 'application/json');
+        $types = [
+            'application/json',
+            'application/x-www-form-urlencoded',
+            'multipart/form-data'
+        ];
 
-		foreach ($data as $key=>$value) {
+        foreach ($types as $value) if (str_contains($content_type, $value)) {
+            $content_type = $value;
+            break;
+        }
+
+        return $content_type;
+    }
+
+    private function _isPostFormData(): bool {
+        return $this->method == 'POST'
+            && array_search(
+                $this->content_type,
+                ['multipart/form-data', 'application/x-www-form-urlencoded']
+            ) !== false;
+    }
+
+	private function _parseBodyData(array $data): array {
+		foreach ($data as $key => $value) {
 			$_val = is_string($value) ? trim(stripcslashes(urldecode($value))) : $value;
 
 			if(is_double($_val) && $_val < PHP_INT_MAX) {
@@ -129,7 +149,6 @@ class Request {
 			elseif($_val == 'false') $data[$key] = 0;
 			else $data[$key] = $_val;
 		}
-
 		return $data;
 	}
 
