@@ -46,20 +46,20 @@ class Schema extends \PDO {
   }
 
   /****/
-  public function dropTable($name) {
+  public function dropTable(string $name): self {
     $this->exec("DROP TABLE ".$this->quote($name));
     if(!is_null($this->_tableNames)) unset($this->_tableNames[array_search($name, $this->_tableNames)]);
     return $this;
   }
 
   /****/
-  public function truncateTable($name) {
+  public function truncateTable(string $name): self {
     $this->exec("TRUNCATE TABLE ".$this->quote($name));
     return $this;
   }
 
-  /****/
-  public function addColumn($table, $column, $type) {
+  /* TODO */
+  public function addColumn($table, $column, $type): self {
     /*
         return 'ALTER TABLE ' . $this->db->quoteTableName($table)
         . ' ADD ' . $this->db->quoteColumnName($column) . ' '

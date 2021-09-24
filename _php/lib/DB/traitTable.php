@@ -4,9 +4,21 @@ namespace DB;
 trait traitTable
 {
 
+  public function dns() {
+    return $this->_dns;
+  }
+
+  public function drop() {
+    return $this->_dbh->dropTable($this->_name);
+  }
+
   public function hasColumn(string $column_name = ''): bool {
     if(!$this->_columns) $this->columns();
     return array_key_exists($column_name, $this->_columns);
+  }
+
+  public function name() {
+    return $this->_name;
   }
 
   public function save(array $data) {
@@ -21,14 +33,10 @@ trait traitTable
     // creation date of the entity
     if($this->hasColumn('created')) $data['created'] = date("Y-m-d H:i:s");
 
-    return parent::save($this->name(), $data);
+    return $this->_dbh->save($this->name(), $data);
   }
 
-  public function dns() { return $this->_dns; }
-  public function drop() { return $this->dropTable($this->_name); }
-  public function name() { return $this->_name; }
-
-  private function _getShortFieldType(string $origin):string {
+  private function _getShortFieldType(string $origin): string {
     $origin = strtolower($origin);
     $type = '';
     $reg_numeric = '/^(?:int|tinyint|smallint|mediumint|bigint|float|decimal|double|real).*/';
