@@ -87,9 +87,9 @@ class Table {
     return $this->hasColumn($column_name) ? $this->_columns[$column_name]['type'] : NULL;
   }
 
-  /****/
-  public function primaryKey() {
-    return $this->_primary_key;
+  public function insert(array $columns): self {
+    $this->_dbh->insert($this->_name, $columns);
+    return $this;
   }
 
   public function setTimeZone(string $value): self {
@@ -110,8 +110,6 @@ class Table {
 
     return $this->primaryKey();
   }
-
-  /* SQL-Constructor */
 
   public function fetch() {
     $this->_dbh->from($this->_name);

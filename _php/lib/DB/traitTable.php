@@ -24,6 +24,16 @@ trait traitTable
   public function lastInsertId() {
     return $this->_dbh->lastInsertId();
   }
+  
+  public function primaryKey() {
+    return $this->_primary_key;
+  }
+
+  public function primaryKeyIsNumber() {
+    $type = $this->_columns[$this->_primary_key]['type'];
+    return $type == $this->_dbh->columnTypes['integer']
+            || $type == $this->_dbh->columnTypes['bigint'];
+  }
 
   public function save(array $data) {
     

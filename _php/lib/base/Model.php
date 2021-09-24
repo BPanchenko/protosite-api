@@ -55,7 +55,8 @@ class Model extends Component {
     $this->tb->save($this->toArray());
 
     if($is_new) {
-      $this->set(static::$idAttribute, $this->tb->lastInsertId());
+      if ($this->tb->primaryKeyIsNumber())
+        $this->set(static::$idAttribute, $this->tb->lastInsertId());
       $this->trigger(self::EVENT_CREATE);
     } else {
       $this->trigger(self::EVENT_UPDATE);
