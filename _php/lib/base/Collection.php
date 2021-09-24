@@ -192,6 +192,15 @@ class Collection extends Component implements \ArrayAccess {
 
     return $index;
   }
+
+
+  /* Saving collection's models
+   ========================================================================== */
+
+  public function save(): self {
+    foreach($this as $model) $model->save();
+    return $this;
+  }
 		
 		
   /****/

@@ -61,18 +61,16 @@ abstract class Component {
   /* Events bus
    ========================================================================== */
 
-  public function trigger($name, $event = null): self
+  public function trigger(string $name, array $event = []): self
   {
-    if(empty($this->_events[$name])) return $this;
+    if(!empty($this->_events[$name])) {
+      if(empty($event['target'])) $event['target'] = $this;
 
-    if(is_null($event)) $event = array();
-    if(is_null($event['target'])) $event['target'] = $this;
-
-    foreach ($this->_events[$name] as $handler) {
-      $event['data'] = $handler[1];
-      call_user_func($handler[0], $event);
+      foreach ($this->_events[$name] as $handler) {
+        $event['data'] = $handler[1];
+        call_user_func($handler[0], $event);
+      }
     }
-
     return $this;
   }
 
@@ -298,26 +296,6 @@ abstract class Component {
     }
 
     return $table;
-  }
-
-
-  /* Insert or update a component in the database
-   ========================================================================== */
-
-  public function save(array $data = []) {
-
-    // save models of collection
-    if($this instanceof \base\Collection) {
-      foreach($this as $model) $model->save();
-      return $this;
-    }
-
-    // save model
-    if(count($data)) $this->set($this->parse($data));
-    $this->tb->save($this->toArray());
-    if($this->isNew()) $this->set(static::$idAttribute, $this->tb->lastInsertId());
-
-    return $this;
   }
 
 

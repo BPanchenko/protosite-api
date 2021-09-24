@@ -2,6 +2,9 @@
 namespace base;
 
 class Model extends Component {
+		
+  const EVENT_CREATE = 'create';
+  const EVENT_UPDATE = 'update';
 
   protected $_attributes = [];
   protected $_changed = [];
@@ -13,7 +16,7 @@ class Model extends Component {
   public $collection;
 
 
-  function __construct($data = [], $parent = null) {
+  function __construct($data = [], $parent = NULL) {
     $data = $data ? $data + $this->_defaults : $this->_defaults;
     if($parent instanceof Model) {
       $data[$parent::$idAttribute] = $parent->id;
@@ -41,6 +44,27 @@ class Model extends Component {
   }
 
 
+  /* Insert or update a model in the database
+   ========================================================================== */
+
+  public function save(array $data = []): self {
+    if(count($data)) $this->set($this->parse($data));
+
+    $is_new = $this->isNew();
+
+    $this->tb->save($this->toArray());
+
+    if($is_new) {
+      $this->set(static::$idAttribute, $this->tb->lastInsertId());
+      $this->trigger(self::EVENT_CREATE);
+    } else {
+      $this->trigger(self::EVENT_UPDATE);
+    }
+
+    return $this;
+  }
+
+
   /**
    * @method parse()
    */
@@ -54,12 +78,12 @@ class Model extends Component {
    */
   public function set($attr, $value = null): self {
 
-    $attributes = array();
+    $attributes = [];
     is_array($attr) ? $attributes = $attr : $attributes[$attr] = $value;
 
     if(count($attributes)) {
-      $_changed = array();
-      $_previous = array();
+      $_changed = [];
+      $_previous = [];
     } else {
       return $this;
     }
@@ -108,10 +132,10 @@ class Model extends Component {
     $this->_previous = $_previous;
 
     if(count($_changed)) {
-      $this->trigger(self::EVENT_CHANGE, array(
+      $this->trigger(self::EVENT_CHANGE, [
         "changed" => $_changed,
         "previous" => $_previous
-      ));
+      ]);
     }
 
     return $this;
@@ -122,7 +146,7 @@ class Model extends Component {
    * @method delete()
    */
   public function delete(): bool {
-    $this->_table->update(array( "is_del" => 1 ), "`".static::$idAttribute."` = " . $this->id);
+    $this->tb->update(["is_del" => 1], "`".static::$idAttribute."` = " . $this->id);
     return true;
   }
 

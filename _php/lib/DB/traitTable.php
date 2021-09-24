@@ -21,6 +21,10 @@ trait traitTable
     return $this->_name;
   }
 
+  public function lastInsertId() {
+    return $this->_dbh->lastInsertId();
+  }
+
   public function save(array $data) {
     
     // check columns among the fields of database table
