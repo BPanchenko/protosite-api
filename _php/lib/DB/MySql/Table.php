@@ -34,7 +34,7 @@ class Table {
       'from' => $this->_name
     );
 
-    $this->columns();
+    $this->setTimeZone('+00:00')->columns();
   }
 
   /****/
@@ -90,6 +90,12 @@ class Table {
   /****/
   public function primaryKey() {
     return $this->_primary_key;
+  }
+
+  public function setTimeZone(string $value): self {
+    $_sql = "SET time_zone = '{$value}';";
+    $this->_dbh->query($_sql);
+    return $this;
   }
 
   /****/
