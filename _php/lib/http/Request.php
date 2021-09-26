@@ -112,12 +112,13 @@ class Request {
     }
 
     private function _getContentType(): string {
-        $content_type = strtolower($_SERVER['CONTENT_TYPE'] ?? 'application/json');
         $types = [
             'application/json',
             'application/x-www-form-urlencoded',
             'multipart/form-data'
         ];
+
+        $content_type = strtolower($_SERVER['CONTENT_TYPE'] ?? $types[0]);
 
         foreach ($types as $value) if (str_contains($content_type, $value)) {
             $content_type = $value;
