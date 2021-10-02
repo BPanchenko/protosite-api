@@ -31,21 +31,18 @@ trait traitTable
 
   public function primaryKeyIsNumber() {
     $type = $this->_columns[$this->_primary_key]['type'];
-    return $type == $this->_dbh->columnTypes['integer']
-            || $type == $this->_dbh->columnTypes['bigint'];
+    return str_contains($type, "int");
   }
 
   public function save(array $data) {
     
     // check columns among the fields of database table
-    foreach($data as $column=>$value) {
-      if(!$this->hasColumn($column)) {
-        unset($data[$column]);
-      }
-    }
-
+    foreach($data as $column=>$value)
+      if(!$this->hasColumn($column)) unset($data[$column]);
+    
     // creation date of the entity
-    if($this->hasColumn('created')) $data['created'] = date("Y-m-d H:i:s");
+    if($this->hasColumn('created'))
+      $data['created'] = date("Y-m-d H:i:s", $data['created'] ?? NULL);
 
     return $this->_dbh->save($this->name(), $data);
   }

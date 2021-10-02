@@ -18,7 +18,7 @@ class Model extends Component {
 
   function __construct($data = [], $parent = NULL) {
     $data = $data ? $data + $this->_defaults : $this->_defaults;
-    if($parent instanceof Model) {
+    if ($parent instanceof Model) {
       $data[$parent::$idAttribute] = $parent->id;
     }
     $this->set($this->parse($data));
@@ -38,8 +38,8 @@ class Model extends Component {
    * @method get()
    */
   public function get(string $attr) {
-    if($attr == 'id') return $this->id;
-    if($this->has($attr)) return $this->_attributes[$attr];
+    if ($attr == 'id') return $this->id;
+    if ($this->has($attr)) return $this->_attributes[$attr];
     return null;
   }
 
@@ -48,13 +48,13 @@ class Model extends Component {
    ========================================================================== */
 
   public function save(array $data = []): self {
-    if(count($data)) $this->set($this->parse($data));
+    if (count($data)) $this->set($this->parse($data));
 
     $is_new = $this->isNew();
 
     $this->tb->save($this->toArray());
 
-    if($is_new) {
+    if ($is_new) {
       if ($this->tb->primaryKeyIsNumber())
         $this->set(static::$idAttribute, $this->tb->lastInsertId());
       $this->trigger(self::EVENT_CREATE);
@@ -82,7 +82,7 @@ class Model extends Component {
     $attributes = [];
     is_array($attr) ? $attributes = $attr : $attributes[$attr] = $value;
 
-    if(count($attributes)) {
+    if (count($attributes)) {
       $_changed = [];
       $_previous = [];
     } else {
@@ -91,11 +91,11 @@ class Model extends Component {
 
     // предварительное приведение типов
     foreach($attributes as $key => $val) {
-      if(is_double($val) && $val < PHP_INT_MAX) {
+      if (is_double($val) && $val < PHP_INT_MAX) {
         $val = doubleval($val);
-      } elseif(is_numeric($val) && $val < PHP_INT_MAX) {
+      } elseif (is_numeric($val) && $val < PHP_INT_MAX) {
         $val = strpos($val, '.') != false ? floatval($val) : intval($val);
-      } elseif(is_string($val)) {
+      } elseif (is_string($val)) {
         $val = trim($val);
       }
       $attributes[$key] = $val;
@@ -105,21 +105,21 @@ class Model extends Component {
       // Если атрибут был задан ранее и не равен новому значению,
       // то он сохраняется в хеше измененных атрибутов, а также
       // прежнее значение сохраняется в $this->_previous.
-      if(isset($this->_attributes[$key]) && $this->_attributes[$key] !== $val) {
+      if (isset($this->_attributes[$key]) && $this->_attributes[$key] !== $val) {
         $_previous[$key] = $this->_attributes[$key];
         $_changed[$key] = $val;
       } elseif (isset($this->_attributes[$key]) && $this->_attributes[$key] === $val) {
         continue;
       }
 
-      if(isset($this->_attributes[$key]) && is_array($this->_attributes[$key]) && is_array($val)) {
+      if (isset($this->_attributes[$key]) && is_array($this->_attributes[$key]) && is_array($val)) {
         // для сохранения массива данных используется слияние старых и новых данных
         $this->_attributes[$key] = $val + $this->_attributes[$key];
       } else {
         $this->_attributes[$key] = $val;
       }
 
-      if($key == static::$idAttribute || $key == 'id') {
+      if ($key == static::$idAttribute || $key == 'id') {
         $this->id = $this->_attributes[static::$idAttribute] = $val;
       }
 
@@ -132,7 +132,7 @@ class Model extends Component {
     $this->_changed = $_changed;
     $this->_previous = $_previous;
 
-    if(count($_changed)) {
+    if (count($_changed)) {
       $this->trigger(self::EVENT_CHANGE, [
         "changed" => $_changed,
         "previous" => $_previous
@@ -189,19 +189,19 @@ class Model extends Component {
   /**
    * @method toArray()
    */
-  public function toArray(array $options=array()): array {
+  public function toArray(array $options = []): array {
     $result = [];
 
-    if(!empty($options['fields'])) $fields = str2array($options['fields']);
+    if (!empty($options['fields'])) $fields = str2array($options['fields']);
 
-    if(!empty($fields)) {
-      if(!in_array(static::$idAttribute, $fields)) {
+    if (!empty($fields)) {
+      if (!in_array(static::$idAttribute, $fields)) {
         array_unshift($fields, static::$idAttribute);
       }
       foreach($fields as $attr) {
         $attr = explode('.', $attr);
-        if(array_key_exists($attr[0], $this->_attributes)) {
-          if(!empty($attr[1]) && is_array($this->_attributes[$attr[0]]))
+        if (array_key_exists($attr[0], $this->_attributes)) {
+          if (!empty($attr[1]) && is_array($this->_attributes[$attr[0]]))
             $result[$attr[0]][$attr[1]] = $this->_attributes[$attr[0]][$attr[1]];
           else
             $result[$attr[0]] = $this->_attributes[$attr[0]];
@@ -209,7 +209,7 @@ class Model extends Component {
       }
     } else {
       foreach($this->_attributes as $attr=>$value)
-        if(is_object($value) && method_exists($value, 'toArray'))
+        if (is_object($value) && method_exists($value, 'toArray'))
           $result[$attr] = call_user_func(array($value, 'toArray'));
         else
           $result[$attr] = $value;
@@ -220,7 +220,7 @@ class Model extends Component {
     return $result;
   }
 
-  public function toJSON(array $options=array()): string {
+  public function toJSON(array $options = []): string {
     return json_encode($this->toArray($options));
   }
 

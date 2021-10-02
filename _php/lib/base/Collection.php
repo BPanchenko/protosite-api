@@ -2,6 +2,9 @@
 namespace base;
 
 class Collection extends Component implements \ArrayAccess {
+  
+  const EVENT_ADD = 'add';
+
   public $models = [];
   public $length = 0;
   public $pagination;
@@ -10,7 +13,7 @@ class Collection extends Component implements \ArrayAccess {
 		
 		
   function __construct($data = [], $parent = NULL) {
-    if(is_array($data) && count($data)) {
+    if (is_array($data) && count($data)) {
       foreach($data as $item) {
         $this->add($item);
       }
@@ -55,23 +58,21 @@ class Collection extends Component implements \ArrayAccess {
    * Добавление элемента в коллекцию
    */
   public function add($data): self {
-    if($this->isModel($data)) {
+    if ($this->isModel($data)) {
       $model = $data;
       $model->collection = $this;
-    } elseif(is_numeric($data) || is_array($data) || is_object($data)) {
+    } elseif (is_numeric($data) || is_array($data) || is_object($data)) {
       $model = $this->initModel($data);
     }
 
-    if(!$model->isValid()) return $this;
+    if (!$model->isValid()) return $this;
 
-    if($this->get($model->id))
+    if ($this->get($model->id))
       $this->get($model->id)->set($model->toArray());
     else {
       array_push($this->models, $model);
       $this->length++;
-      $this->trigger('add', array(
-          'model' => $model
-      ));
+      $this->trigger(self::EVENT_ADD, [ 'model' => $model ]);
     }
 
     return $this;
@@ -89,9 +90,10 @@ class Collection extends Component implements \ArrayAccess {
    */
   public function create($data){
     try {
-      $this->add($this->initModel($data));
+      $model = $this->initModel($data);
+      $this->add($model);
     } catch(ErrorException $e) {
-      if($e->getMessage() == 'WrongModelID') return NULL;
+      if ($e->getMessage() == 'WrongModelID') return NULL;
     }
     return $model;
   }
@@ -103,7 +105,7 @@ class Collection extends Component implements \ArrayAccess {
    * При каждом вызове функции ей будут переданы 3 аргумента: $model, $index, $collection.
    */
   public function each($fn): self {
-    if(!is_callable($fn)) return $this;
+    if (!is_callable($fn)) return $this;
     foreach($this->models as $index=>$model) call_user_func($fn, $model, $index, $this);
     return $this;
   }
@@ -114,7 +116,7 @@ class Collection extends Component implements \ArrayAccess {
    * подходящего под переданый массив атрибутов.
    */
   public function findWhere($attributes, $value){
-    if(!is_array($attributes) && $value) {
+    if (!is_array($attributes) && $value) {
       $attributes = [
           $attributes => $value
       ];
@@ -127,9 +129,9 @@ class Collection extends Component implements \ArrayAccess {
    * Возвращает модель из коллекции по ее идентификатору.
    */
   public function get(int $id) {
-    if($id && is_numeric($id)) {
+    if ($id && is_numeric($id)) {
       foreach($this->models as $model) {
-        if($model->id == $id) return $model;
+        if ($model->id == $id) return $model;
       }
     }
     return null;
@@ -143,11 +145,11 @@ class Collection extends Component implements \ArrayAccess {
     $result = NULL;
 
     for ($i = 0; $i <= $this->length; $i++) {
-      if(!$this[$i]->has($attr)) continue;
+      if (!$this[$i]->has($attr)) continue;
 
-      if(is_null($result))
+      if (is_null($result))
         $result = $this[$i];
-      elseif($result->get($attr) < $this[$i]->get($attr))
+      elseif ($result->get($attr) < $this[$i]->get($attr))
         $result = $this[$i];
     }
 
@@ -162,12 +164,12 @@ class Collection extends Component implements \ArrayAccess {
     $result = NULL;
 
     for ($i = 0; $i <= $this->length; $i++) {
-      if(!method_exists($this[$i], 'has') || !$this[$i]->has($attr))
+      if (!method_exists($this[$i], 'has') || !$this[$i]->has($attr))
         continue;
 
-      if(is_null($result))
+      if (is_null($result))
         $result = $this[$i];
-      elseif($result->get($attr) > $this[$i]->get($attr))
+      elseif ($result->get($attr) > $this[$i]->get($attr))
         $result = $this[$i];
     }
 
@@ -184,7 +186,7 @@ class Collection extends Component implements \ArrayAccess {
     $id = $searchValue instanceof Model ? $searchValue->id : (int)$searchValue;
 
     foreach($this->models as $key=>$model) {
-      if($model->id == $id) {
+      if ($model->id == $id) {
         $index = $key;
         continue;
       }
@@ -227,9 +229,9 @@ class Collection extends Component implements \ArrayAccess {
   public function toArray(array $options=[]): array {
     $result = [];
 
-    if(!$this->length) return $result;
+    if (!$this->length) return $result;
 
-    if(isset($options['bulk']) && $options['bulk'] == 'ids') {
+    if (isset($options['bulk']) && $options['bulk'] == 'ids') {
       foreach($this->models as $model) {
         array_push($result, $model->id);
       }
@@ -257,13 +259,13 @@ class Collection extends Component implements \ArrayAccess {
     foreach($this->models as $model) {
       $apt = true;
       foreach($attributes as $key => $val) {
-        if($model->get($key) != $val) {
+        if ($model->get($key) != $val) {
           $apt = false;
           break;
         }
       }
-      if($apt) {
-        if($first) return [$model];
+      if ($apt) {
+        if ($first) return [$model];
         else array_push($_result, $model);
       }
     }
