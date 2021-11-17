@@ -278,7 +278,7 @@ class Collection extends Component implements \ArrayAccess {
    * Вернет массив значений свойства каждого элемента коллекции.
    */
   public function pluck(string $attr): array {
-    return array_column($this->models, $attr);
+    return array_map($this->models, fn($model) => $model->get($attr));
   }
 
 
