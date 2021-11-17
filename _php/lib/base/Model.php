@@ -224,10 +224,9 @@ class Model extends Component {
     return json_encode($this->toArray($options));
   }
 
-  /**
-   * Magic methods
-   */
-  public function __get($attr) { return $this->get($attr); }
+  /* Magic methods
+   ========================================================================== */
+  
   public function __set($attr, $value) { return $this->set($attr, $value); }
   public function __isset($attr) { return $this->has($attr); }
 }

@@ -318,6 +318,15 @@ abstract class Component {
   /* Magic methods
    ========================================================================== */
 
+  public function __get(string $attr)
+  {
+    if ($attr === 'parent') {
+      return $this->_parent;
+    } elseif ($this instanceof \base\Model) {
+      return $this->get($attr);
+    }
+  }
+
   public function __toString() { return '{' . get_called_class() . ':' . json_encode($this->toArray()) .'}'; }
   public function __call($name, $arguments) { echo "Call undefined method '$name' " . implode(', ', $arguments). "\n"; }
   public static function __callStatic($name, $arguments) { echo "Call undefined static method '$name' " . implode(', ', $arguments). "\n"; }
