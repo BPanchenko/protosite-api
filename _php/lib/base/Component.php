@@ -324,6 +324,8 @@ abstract class Component {
       return $this->_parent;
     } elseif ($this instanceof \base\Model) {
       return $this->get($attr);
+    } elseif ($this instanceof \base\Collection) {
+      return $this->pluck($attr);
     }
   }
 
