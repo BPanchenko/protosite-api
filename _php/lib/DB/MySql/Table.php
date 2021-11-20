@@ -21,7 +21,7 @@ class Table {
     $temp = explode('.', str_replace('mysql:', '', $this->_dns));
 
     if(strpos($this->_dns, 'mysql:') !== 0 || !count($temp)) {
-      throw new SystemException('WrongMySqlTableName');
+      throw new \base\SystemException('WrongTableName');
     }
 
     $this->_schema = count($temp) == 2 ? $temp[0] : DB_NAME;

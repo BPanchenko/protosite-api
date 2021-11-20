@@ -1,11 +1,12 @@
 <?php
 
-class AppException extends Exception {
-  private $_type;
-  private $_data;
-  private $error;
+class AppException extends \base\SystemException {
+  protected $default_error = [
+    'code' => 400,
+    'message' => "Unknown Error"
+  ];
 
-  private $_hash = [
+  protected $_hash = [
     'AccessDenied' => [
       'code' => 401,
       'message' => "Access denied"
@@ -38,64 +39,10 @@ class AppException extends Exception {
       'code' => 401,
       'message' => "Access denied"
     ],
-    'UnknownError' => [
-      'code' => 400,
-      'message' => "Unknown Error"
-    ],
     'UnprocessableEntity' => [
       'code' => 422,
       'message' => "Unprocessable Entity"
     ]
   ];
-
-  public function __construct(string $type = 'UnknownError', $data = null)
-  {
-    parent::__construct($type);
-
-    $this->_type = $type;
-    $this->_data = $data;
-
-    if(array_key_exists($this->_type, $this->_hash))
-      $this->error = $this->_hash[$this->_type];
-    else
-      $this->error = $this->_hash['UnknownError'];
-  }
-
-  public function code(): int
-  {
-    return $this->_data['code'] ?? $this->error['code'];
-  }
-
-  public function data() {
-    return $this->_data;
-  }
-
-  public function message(): string
-  {
-    return $this->error['message'];
-  }
-
-  public function toArray(): array
-  {
-    $result = [];
-    $result['code'] = $this->code();
-    $result['error'] = [
-      'message' => $this->error['message'],
-      'type' => $this->_type
-    ];
-    return $result;
-  }
-
-  public function type(): string
-  {
-    return $this->_type;
-  }
-
-  public function __toString(): string
-  {
-    $string = $this->_type;
-    if(count($this->_data)) $string .= ': ' . json_encode($this->_data);
-    return $string;
-  }
 }
 ?>

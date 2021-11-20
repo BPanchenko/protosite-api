@@ -7,6 +7,7 @@ require_once PHP_DIR . "/config.php";
 require_once PHP_LIB_DIR . "/functions.php";
 require_once PHP_LIB_DIR . "/traits.php";
 
+require_once PHP_LIB_DIR . "/base/SystemException.php";
 require_once PHP_LIB_DIR . "/base/CaseInsensitiveArray.php";
 require_once PHP_LIB_DIR . "/base/Component.php";
 require_once PHP_LIB_DIR . "/base/Model.php";

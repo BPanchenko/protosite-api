@@ -283,7 +283,7 @@ abstract class Component {
     if($table instanceof \DB\Table) return $table;
 
     if(empty($table)) {
-      throw new \SystemException('EmptyTableName');
+      throw new \base\SystemException('EmptyTableName');
     }
     elseif (strpos($table, 'sqlite:') === 0) {
       $table = new \DB\SQLite\Table($table);
@@ -292,7 +292,7 @@ abstract class Component {
       $table = new \DB\MySql\Table($table);
     }
     else {
-      throw new \SystemException('FailInitTable');
+      throw new \base\SystemException('FailInitTable');
     }
 
     return $table;

@@ -20,7 +20,7 @@ class Schema extends \PDO {
    * @param boolean $dropIsExists.
    */
   public function createTable(string $name, array $columns, string $options='', bool $dropIsExists=false) {
-    $cols = array();
+    $cols = [];
     foreach($columns as $col=>$type)
       array_push($cols, "\t".$this->quote($col).' '.$this->getColumnType($type));
 
@@ -70,8 +70,8 @@ class Schema extends \PDO {
 
   /****/
   public function reset(): self {
-    $this->_query = is_array($this->_default_query) ? $this->_default_query : array();
-    $this->_params = is_array($this->_default_params) ? $this->_default_params : array();
+    $this->_query = is_array($this->_default_query) ? $this->_default_query : [];
+    $this->_params = is_array($this->_default_params) ? $this->_default_params : [];
     return $this;
   }
 
@@ -131,21 +131,21 @@ class Schema extends \PDO {
   }
 
   /****/
-  public function where(string $conditions, array $params = array()): self {
+  public function where(string $conditions, array $params = []): self {
     $this->_query['where'] = $conditions;
     foreach($params as $name=>$value) $this->_params[$name]=$value;
     return $this;
   }
 
   /****/
-  public function andWhere(string $conditions, array $params = array()): self {
+  public function andWhere(string $conditions, array $params = []): self {
     $this->_query['where'] .= ' AND ' . $conditions;
     foreach($params as $name=>$value) $this->_params[$name] = $value;
     return $this;
   }
 
   /****/
-  public function orWhere(string $conditions, array $params = array()): self {
+  public function orWhere(string $conditions, array $params = []): self {
     $this->_query['where'] .= ' OR ' . $conditions;
     foreach($params as $name=>$value) $this->_params[$name]=$value;
     return $this;
@@ -189,6 +189,7 @@ class Schema extends \PDO {
   /****/
   public function fetch($fetch_style = \PDO::FETCH_ASSOC) {
     $sql = $this->_buildQuery();
+    
     try {
       if(count($this->_params)) {
         $sth = $this->prepare($sql);
@@ -241,11 +242,11 @@ class Schema extends \PDO {
 
   /****/
   public function save(string $table, array $columns) {
-    $params=array();
-    $names=array();
-    $placeholders=array();
-    $equalities=array();
-
+    $params = [];
+    $names = [];
+    $placeholders = [];
+    $equalities = [];
+    
     foreach($columns as $name=>$value) {
       $names[] = $this->quote($name);
       $placeholders[] = ':' . $name;
@@ -270,9 +271,9 @@ class Schema extends \PDO {
 
   /****/
   public function insert(string $table, array $columns) {
-    $params=array();
-    $names=array();
-    $placeholders=array();
+    $params = [];
+    $names = [];
+    $placeholders = [];
 
     foreach($columns as $name=>$value) {
       $names[] = $this->quote($name);
@@ -291,9 +292,9 @@ class Schema extends \PDO {
   }
 
   /****/
-  public function update(string $table, array $columns, $conditions='', array $params=array()) {
+  public function update(string $table, array $columns, $conditions='', array $params=[]) {
     $keys = array_keys($columns);
-    $update_parts = array();
+    $update_parts = [];
 
     foreach($keys as $key) array_push($update_parts, $this->quote($key)."=:".$key);
 
@@ -344,7 +345,9 @@ class Schema extends \PDO {
     $sql.=' '.(!empty($this->_query['select']) ? $this->_query['select'] : '*');
 
     if(!empty($this->_query['from']))
-        $sql.="\nFROM ".$this->_query['from'];
+      $sql.="\nFROM ".$this->_query['from'];
+    else
+      throw new \base\SystemException('UnknownTable');
 
     if(!empty($this->_query['join']))
         $sql.="\n".(is_array($this->_query['join']) ? implode("\n",$this->_query['join']) : $this->_query['join']);
