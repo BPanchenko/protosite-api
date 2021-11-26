@@ -176,8 +176,8 @@ class Model extends Component {
   public function isEmpty(string $attr = ''): bool {
     return !count($this->_attributes)
         || !$this->has($attr)
-        || !(bool)trim($this->get($attr))
-        || !(bool)count($this->get($attr));
+        || is_string($this->get($attr)) && !(bool)trim($this->get($attr))
+        || is_array($this->get($attr)) && !(bool)count($this->get($attr));
   }
   /**
    * @method isNew()
