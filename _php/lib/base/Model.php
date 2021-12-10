@@ -230,4 +230,3 @@ class Model extends Component {
   public function __set($attr, $value) { return $this->set($attr, $value); }
   public function __isset($attr) { return $this->has($attr); }
 }
-?>

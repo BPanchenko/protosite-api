@@ -14,10 +14,10 @@ require_once PHP_LIB_DIR . "/base/Model.php";
 require_once PHP_LIB_DIR . "/base/Collection.php";
 
 require_once PHP_LIB_DIR . "/DB/Schema.php";
-require_once PHP_LIB_DIR . "/DB/MySql/Schema.php";
-require_once PHP_LIB_DIR . "/DB/SQLite/Schema.php";
 require_once PHP_LIB_DIR . "/DB/traitTable.php";
+require_once PHP_LIB_DIR . "/DB/MySql/Schema.php";
 require_once PHP_LIB_DIR . "/DB/MySql/Table.php";
+require_once PHP_LIB_DIR . "/DB/SQLite/Schema.php";
 require_once PHP_LIB_DIR . "/DB/SQLite/Table.php";
 
 require_once PHP_LIB_DIR . "/http/Request.php";

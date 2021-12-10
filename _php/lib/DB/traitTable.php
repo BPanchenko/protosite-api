@@ -41,8 +41,10 @@ trait traitTable
       if(!$this->hasColumn($column)) unset($data[$column]);
     
     // creation date of the entity
-    if($this->hasColumn('created'))
-      $data['created'] = date("Y-m-d H:i:s", $data['created'] ?? NULL);
+    if($this->hasColumn('created') && !strtotime($data['created'])) {
+      $timestamp = is_numeric($data['created']) ? $data['created'] : NULL;
+      $data['created'] = date("Y-m-d H:i:s", $timestamp);
+    }
 
     return $this->_dbh->save($this->name(), $data);
   }

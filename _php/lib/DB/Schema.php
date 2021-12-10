@@ -246,7 +246,13 @@ class Schema extends \PDO {
     $names = [];
     $placeholders = [];
     $equalities = [];
+
+    // parsing values
+    foreach($columns as &$value) {
+      if (is_array($value)) $value = implode(';', $value);
+    }
     
+    // build params
     foreach($columns as $name=>$value) {
       $names[] = $this->quote($name);
       $placeholders[] = ':' . $name;
@@ -262,7 +268,7 @@ class Schema extends \PDO {
             . ' (' . implode(', ',$names) . ')'
             . ' VALUES (' . implode(', ', $placeholders) . ')'
             . ' ON DUPLICATE KEY UPDATE ' . implode(", ",$equalities);
-
+    
     $this->prepare($sql)
          ->execute($params);
 
