@@ -1,6 +1,6 @@
 <?php
 define('PHP_DIR', __DIR__);
-define('PHP_LIB_DIR', __DIR__ . "/lib");
+define('PHP_LIB_DIR', __DIR__ . "/kernel");
 
 require_once PHP_DIR . "/config.php";
 

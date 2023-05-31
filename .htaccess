@@ -13,4 +13,4 @@ Options -Indexes
 
 php_value date.timezone UTC
 php_value default_charset utf-8
-php_value auto_prepend_file /home/bp/bpanchenko.ru/docs/api/php/init.php
+php_value auto_prepend_file /home/bp/api.protosite.rocks/docs/_php/init.php
