@@ -37,20 +37,17 @@ class Collection extends Component implements \ArrayAccess {
     return $this->offsetExists($offset) ? $this->models[$offset] : null;
   }
 
-  public function offsetSet($offset, $model): self {
+  public function offsetSet(mixed $offset, mixed $model): void {
     if (is_null($offset)) {
       $this->models[] = $model;
     } else {
       $this->models[$offset] = $model;
     }
-    return $this;
   }
 
-  public function offsetUnset($offset): bool {
+  public function offsetUnset(mixed $offset): void {
     $index = NULL;
     unset($this->models[$index]);
-
-    return is_null($index) ? false : true;
   }
 		
 		
@@ -92,7 +89,7 @@ class Collection extends Component implements \ArrayAccess {
     try {
       $model = $this->initModel($data);
       $this->add($model);
-    } catch(ErrorException $e) {
+    } catch(\ErrorException $e) {
       if ($e->getMessage() == 'WrongModelID') return NULL;
     }
     return $model;
@@ -278,7 +275,7 @@ class Collection extends Component implements \ArrayAccess {
    * Вернет массив значений свойства каждого элемента коллекции.
    */
   public function pluck(string $attr): array {
-    return array_map($this->models, fn($model) => $model->get($attr));
+    return array_map(fn($model) => $model->get($attr), $this->models);
   }
 
 
@@ -324,4 +321,3 @@ class Collection extends Component implements \ArrayAccess {
     return $this;
   }
 }
-?>
