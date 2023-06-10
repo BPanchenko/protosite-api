@@ -5,6 +5,7 @@ class Collection extends Component implements \ArrayAccess {
   
   const EVENT_ADD = 'add';
 
+  public static $classModel = '\base\Model';
   public $models = [];
   public $length = 0;
   public $pagination;
@@ -85,7 +86,7 @@ class Collection extends Component implements \ArrayAccess {
    * Создание модели внутри коллекции.
    * Новая модель автоматически добавляется в коллекцию.
    */
-  public function create($data){
+  public function create($data) {
     try {
       $model = $this->initModel($data);
       $this->add($model);
@@ -277,24 +278,19 @@ class Collection extends Component implements \ArrayAccess {
   public function pluck(string $attr): array {
     return array_map(fn($model) => $model->get($attr), $this->models);
   }
-
-
-  /* Методы для работы с моделями коллекции требуют переопределения в
-   * конкретных коллекциях для переопределения класса элементов коллекции.
-   ========================================================================== */
-
+  
   /**
    * Проверит является ли параметр моделью
    */
   protected function isModel($data): bool {
-    return ($data instanceof Model);
+    return $data instanceof $this::$classModel;
   }
 
   /**
    * Вернёт инициализированный элемент коллекции
    */
   protected function initModel($data): Model {
-    return $this->isModel($data) ? $data : new Model($data, $this);
+    return $this->isModel($data) ? $data : new $this::$classModel($data, $this);
   }
 
 
