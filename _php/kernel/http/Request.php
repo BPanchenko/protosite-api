@@ -2,14 +2,21 @@
 namespace http;
 require_once dirname(__FILE__) . '/RequestParametersModel.php';
 
+enum ContentType: string {
+    case Json = 'application/json';
+    case FormUrlencodedData = 'application/x-www-form-urlencoded';
+    case FormMultipartData = 'multipart/form-data';
+}
+
 class Request {
     protected static $_instance;
 
-    public $method;
+    public ContentType $content_type;
+    public string $method;
     public $params;
     private $_parts;
     private $_headers;
-    private $_parameters;
+    private RequestParametersModel $_parameters;
     private $_uri;
 
     static public function init() {
@@ -32,7 +39,7 @@ class Request {
 			$result = count($_POST) ? $_POST : [];
 		} else {
 			$data = file_get_contents("php://input");
-			if($this->content_type == 'application/json') {
+			if($this->content_type == ContentType::Json) {
 				$result = json_decode($data, true);
 			} elseif($data) {
 				parse_str($data, $result);
@@ -112,20 +119,14 @@ class Request {
     }
 
     private function _getContentType(): string {
-        $types = [
-            'application/json',
-            'application/x-www-form-urlencoded',
-            'multipart/form-data'
-        ];
-
-        $content_type = strtolower($_SERVER['CONTENT_TYPE'] ?? $types[0]);
-
-        foreach ($types as $value) if (str_contains($content_type, $value)) {
-            $content_type = $value;
-            break;
+        $result = strtolower($_SERVER['CONTENT_TYPE'] ?? ContentType::Json);
+        foreach (ContentType::cases() as $value) {
+            if (str_contains($result, (string) $value)) {
+                $result = $value;
+                break;
+            }
         }
-
-        return $content_type;
+        return $result;
     }
 
     private function _isPostFormData(): bool {
