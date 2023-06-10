@@ -4,6 +4,7 @@ namespace base;
 abstract class Component {
   const EVENT_CHANGE = 'change';
 
+  public array $paging = [];
   public $tb = null;
   public $tbs = null;
 
@@ -280,7 +281,7 @@ abstract class Component {
    * @param $table -
    */
   public static function initTable($table) {
-    if($table instanceof \DB\Table) return $table;
+    if(is_string($table) === false) return $table;
 
     if(empty($table)) {
       throw new \base\SystemException('EmptyTableName');
@@ -333,5 +334,3 @@ abstract class Component {
   public function __call($name, $arguments) { echo "Call undefined method '$name' " . implode(', ', $arguments). "\n"; }
   public static function __callStatic($name, $arguments) { echo "Call undefined static method '$name' " . implode(', ', $arguments). "\n"; }
 }
-
-?>
