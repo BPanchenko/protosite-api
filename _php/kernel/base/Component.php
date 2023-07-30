@@ -26,6 +26,7 @@ abstract class Component {
   function __construct($data = [], $parent = null) {
 
     if (!is_null($parent)) $this->attachTo($parent);
+    
     if (is_string($this->tb)) $this->tb = self::initTable($this->tb);
 
     if(is_array($this->tbs))
@@ -216,57 +217,58 @@ abstract class Component {
 
     // build where expression
 
-    $_conditions = array();
+    $_conditions = is_array($options['where']) ? $_conditions = $options['where'] : [];
 
-    if($this instanceof \base\Collection) {
-      if(is_array($options['where']))
-        $_conditions = $options['where'];
+    if($this instanceof \base\Collection && is_string($options['where'])) {
+      
+      $_conditions = explode(';', $options['where']);
 
-      else if(is_string($options['where'])) {
-        $_conditions = explode(';', $options['where']);
-        foreach($_conditions as $_i => $_condition) {
-          preg_match('/([^\s!:]+)([!:]?:)([^:\s]+)/', $_condition, $_temp);
+      foreach($_conditions as $_i => $_condition) {
+        preg_match('/([^\s!:]+)([!:]?:)([^:\s]+)/', $_condition, $_temp);
 
-          if(count($_temp) != 4) {
-            unset($_conditions[$_i]);
-            continue;
-          }
-
-          $column = $_temp[1];
-          $expr = $_temp[2];
-          $value = strpos($_temp[3], ',') === false ? $_temp[3] : explode(',', $_temp[3]);
-
-          if($this->tb->hasColumn($column)) {
-            $column = '`' . $this->tb->name() . '`.`' . $column . '`';
-          } else {
-            unset($_conditions[$_i]);
-            continue;
-          }
-
-          if(is_array($value)) {
-            $expr = str_replace(array('!:', '::', ':'), array(' NOT IN ', 'IN', 'IN'), $expr);
-            $value = array_map(function($val) {
-              return is_numeric($val) ? $val : '"' . strtolower($val) . '"';
-            }, $value);
-            $value = '(' . join(',', $value) . ')';
-          } else if(is_numeric($value)) {
-            $expr = str_replace(array('!:', '::', ':'), array('!=', '=', '='), $expr);
-          } else {
-            if ($expr == '::') $value = '"' . addslashes(strtolower($value)) . '"';
-            else $value = '"%' . addslashes(strtolower($value)) . '%"';
-            $expr = str_replace(array('!:', '::', ':'), array('NOT LIKE', 'LIKE', 'LIKE'), $expr);
-          }
-
-          $_conditions[$_i] = $column . ' ' . $expr . ' ' . $value;
+        if(count($_temp) != 4) {
+          unset($_conditions[$_i]);
+          continue;
         }
+
+        $column = $_temp[1];
+        $expr = $_temp[2];
+        $value = strpos($_temp[3], ',') === false ? $_temp[3] : explode(',', $_temp[3]);
+
+        if($this->tb->hasColumn($column)) {
+          $column = '`' . $this->tb->name() . '`.`' . $column . '`';
+        } else {
+          unset($_conditions[$_i]);
+          continue;
+        }
+
+        if(is_array($value)) {
+          $expr = str_replace(array('!:', '::', ':'), array(' NOT IN ', 'IN', 'IN'), $expr);
+          $value = array_map(function($val) {
+            return is_numeric($val) ? $val : '"' . strtolower($val) . '"';
+          }, $value);
+          $value = '(' . join(',', $value) . ')';
+        } else if(is_numeric($value)) {
+          $expr = str_replace(array('!:', '::', ':'), array('!=', '=', '='), $expr);
+        } else {
+          if ($expr == '::') $value = '"' . addslashes(strtolower($value)) . '"';
+          else $value = '"%' . addslashes(strtolower($value)) . '%"';
+          $expr = str_replace(array('!:', '::', ':'), array('NOT LIKE', 'LIKE', 'LIKE'), $expr);
+        }
+
+        $_conditions[$_i] = $column . ' ' . $expr . ' ' . $value;
       }
 
     } else if($this instanceof \base\Model) {
-      if($this->isNew()) throw new \AppException("Model can not be fetched");
-      if($this->tb->hasColumn(static::$idAttribute))
-        array_push($_conditions, "`" . static::$idAttribute . "` = '" . $this->id . "'");
-      else
-        array_push($_conditions, "`" . $this->tb->primaryKey() . "` = '" . $this->id . "'");
+      if($this->isNew()) {
+        throw new \AppException("Model can not be fetched");
+      }
+      if ($this->id) {
+        if($this->tb->hasColumn(static::$idAttribute))
+          array_push($_conditions, "`" . static::$idAttribute . "` = '" . $this->id . "'");
+        else
+          array_push($_conditions, "`" . $this->tb->primaryKey() . "` = '" . $this->id . "'");
+      }
     }
 
     $options['where'] = join(' AND ', $_conditions);
@@ -311,7 +313,7 @@ abstract class Component {
   /* Helpers
    ========================================================================== */
 
-  public function isAccessible(): bool { return true; }
+  public function isAccessible(\http\Request $request): bool { return true; }
   public function isValid(): bool { return true; }
 
 
