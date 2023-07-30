@@ -139,8 +139,14 @@ try {
   // close endpoint
   if($endpoint->type == 'object') {
 
+    if (!$endpoint->instance->isAccessible($Request)) {
+      $Response->setStatusCode(403);
+      $Response->sendHeaders();
+      exit();
+    }
+
     if (!$endpoint->instance->isValid()) {
-      $Response->setStatusCode(422, 'Unprocessable Entity');
+      $Response->setStatusCode(422);
       $Response->sendHeaders();
       exit();
     }

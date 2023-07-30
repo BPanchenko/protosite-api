@@ -26,7 +26,6 @@ abstract class Component {
   function __construct($data = [], $parent = null) {
 
     if (!is_null($parent)) $this->attachTo($parent);
-    if (!$this->isAccessible()) throw new \AppException('AccessDenied');
     if (is_string($this->tb)) $this->tb = self::initTable($this->tb);
 
     if(is_array($this->tbs))
