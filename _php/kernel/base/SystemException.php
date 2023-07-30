@@ -2,9 +2,9 @@
 namespace base;
 
 class SystemException extends \Exception {
-  protected $type;
-  protected $data;
-  protected $error;
+  protected string $type;
+  protected array|null $data;
+  protected array $error;
 
   protected $hash = [
     'UnknownError' => [
@@ -18,7 +18,7 @@ class SystemException extends \Exception {
     'message' => "Unknown Error"
   ];
 
-  public function __construct(string $type, $data = null)
+  public function __construct(string $type, array $data = null)
   {
     parent::__construct($type);
 
@@ -56,7 +56,7 @@ class SystemException extends \Exception {
     return $result;
   }
 
-  public function type(): string
+  public function getType(): string
   {
     return $this->type;
   }
@@ -64,7 +64,9 @@ class SystemException extends \Exception {
   public function __toString(): string
   {
     $string = $this->type;
-    if(count($this->data)) $string .= ': ' . json_encode($this->data);
+    if(!is_null($this->data) && count($this->data)) {
+      $string .= ': ' . json_encode($this->data);
+    }
     return $string;
   }
 }
